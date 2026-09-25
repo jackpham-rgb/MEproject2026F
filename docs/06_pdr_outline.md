@@ -22,7 +22,7 @@ generated. Items marked ✋ need your hand sketches or SolidWorks renders.
 | 15 | BOM, schedule, risks | ~$55 purchased. Risks: dent force, FSR drift, axis-height tolerance, motor lead time | BOM table | 1:00 |
 | | | | **Total** | **≈ 13:30** |
 
-## Motion clips for slides 4–8
+## Motion clips for slides 4–7
 
 `viewer/concepts.html` animates each concept. Screen-record each tab (macOS: Cmd+Shift+5;
 Windows: Win+Alt+R or the Snipping Tool's video mode) and drop the clips onto slides 4–7. For
