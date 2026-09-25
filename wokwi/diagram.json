@@ -3,24 +3,104 @@
   "author": "ME 2331 Project 2",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0, "left": 0, "attrs": {} },
-    { "type": "wokwi-servo", "id": "grip", "top": -170, "left": 260, "attrs": {} },
-    { "type": "wokwi-pushbutton", "id": "start", "top": 250, "left": 330, "attrs": { "color": "green", "label": "START" } },
-    { "type": "wokwi-hc-sr04", "id": "sonar", "top": -190, "left": -40, "attrs": { "distance": "6" } },
-    { "type": "wokwi-slide-switch", "id": "home", "top": 250, "left": 180, "attrs": { "value": "1" } }
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "grip",
+      "top": -170,
+      "left": 260,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "start",
+      "top": 250,
+      "left": 330,
+      "attrs": {
+        "color": "green",
+        "label": "START"
+      }
+    },
+    {
+      "type": "wokwi-slide-switch",
+      "id": "home",
+      "top": 250,
+      "left": 180,
+      "attrs": {
+        "value": "1"
+      }
+    },
+    {
+      "type": "wokwi-slide-switch",
+      "id": "canir",
+      "top": 250,
+      "left": 60,
+      "attrs": {
+        "value": "1"
+      }
+    }
   ],
   "connections": [
-    [ "uno:9", "grip:PWM", "orange", [] ],
-    [ "uno:5V", "grip:V+", "red", [] ],
-    [ "uno:GND.1", "grip:GND", "black", [] ],
-    [ "uno:4", "start:1.l", "green", [] ],
-    [ "uno:GND.2", "start:2.l", "black", [] ],
-    [ "uno:12", "sonar:TRIG", "blue", [] ],
-    [ "uno:11", "sonar:ECHO", "violet", [] ],
-    [ "uno:5V", "sonar:VCC", "red", [] ],
-    [ "uno:GND.1", "sonar:GND", "black", [] ],
-    [ "uno:10", "home:2", "gray", [] ],
-    [ "uno:GND.2", "home:1", "black", [] ]
+    [
+      "uno:9",
+      "grip:PWM",
+      "orange",
+      []
+    ],
+    [
+      "uno:5V",
+      "grip:V+",
+      "red",
+      []
+    ],
+    [
+      "uno:GND.1",
+      "grip:GND",
+      "black",
+      []
+    ],
+    [
+      "uno:4",
+      "start:1.l",
+      "green",
+      []
+    ],
+    [
+      "uno:GND.2",
+      "start:2.l",
+      "black",
+      []
+    ],
+    [
+      "uno:10",
+      "home:2",
+      "gray",
+      []
+    ],
+    [
+      "uno:GND.2",
+      "home:1",
+      "black",
+      []
+    ],
+    [
+      "uno:11",
+      "canir:2",
+      "purple",
+      []
+    ],
+    [
+      "uno:GND.3",
+      "canir:1",
+      "black",
+      []
+    ]
   ],
   "dependencies": {}
 }

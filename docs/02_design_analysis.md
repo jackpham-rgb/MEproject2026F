@@ -136,6 +136,7 @@ external-interrupt pins (D2/D3), and both are needed for 4× decoding on the fli
 | Check | Tool | Result |
 |---|---|---|
 | Collision and reachability through the full flip | `sim/flip_geometry.py` | Pass (+0.06 in min clearance) |
+| Part-vs-part collisions (base, tower, motor, home post, landed can) over 0–180° | `sim/mechanism.py` | Pass after moving the home stop and the can sensor out of the counterweight's path |
 | Controller robustness (J ±30 %, friction ×2, counterweight missing) | `sim/flip_control.py` | Peak ≤ 179.80° (limit 180.9°) |
 | Grip loop across 0.5–2× pad stiffness | `sim/grip_control.py` | ≤ 1.6 % overshoot |
 | Firmware logic, full sequence + 3 injected faults | `firmware/host_test` (g++) | 11/11 scenarios pass |

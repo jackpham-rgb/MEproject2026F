@@ -5,7 +5,7 @@
 ```
 12 V DC (≥2 A wall adapter or 3S LiPo)
  ├── Motor driver VM (TB6612FNG recommended; L298N/L293D work but drop ~1.5–2 V)
- ├── Uno VIN (on-board regulator → 5 V logic, encoder, FSR, HC-SR04)
+ ├── Uno VIN (on-board regulator → 5 V logic, encoder, FSR, IR sensor)
  └── 5 V buck (≥2 A, e.g. mini-360/LM2596) → servo V+ ONLY
          SG90 stall ≈ 0.65 A; on the Uno's 5 V pin it browns out the board mid-grip
 All grounds common (star at the driver).
@@ -22,11 +22,11 @@ All grounds common (star at the driver).
 | D7, D8 | Driver AIN1/AIN2 or IN1/IN2 | Direction |
 | D9 | Grip servo signal | Servo lib (Timer1) |
 | D10 | Home microswitch → GND | `INPUT_PULLUP`, closed = on stop |
-| D11 | HC-SR04 ECHO | |
-| D12 | HC-SR04 TRIG | |
+| D11 | IR proximity module OUT (in the palm) | `INPUT_PULLUP`, LOW = can present |
+| D12 | spare | |
 | D13 | Status LED (on-board) | Blinking = running, solid = DONE, fast = FAULT |
 | A0 | FSR divider: 5 V — FSR — A0 — 10 kΩ — GND | |
-| 5 V / GND | Encoder VCC, HC-SR04, FSR divider | |
+| 5 V / GND | Encoder VCC, IR module, FSR divider | |
 
 Do not use `tone()`: it needs Timer2, which the control tick uses.
 
@@ -43,14 +43,14 @@ diagram in `wokwi/diagram.json` covers the logic side.
 | 4 | SG90 or MG90S servo | 1 | Kit / purchase | $3–6 | MG90S (metal gears) preferred for holding force |
 | 5 | FSR 402 (Interlink) | 1 | Purchase | $7 | + 10 kΩ resistor |
 | 6 | Microswitch with lever | 1 | Purchase | $1 | Home stop |
-| 7 | HC-SR04 | 1 | Kit | — | |
+| 7 | IR proximity module (TCRT5000 or KY-032) | 1 | Kit / purchase | $1–2 | In the palm; replaces the HC-SR04 |
 | 8 | Push button | 1 | Kit | — | Start |
 | 9 | 5 V ≥2 A buck converter | 1 | Purchase | $3 | Servo supply |
 | 10 | 12 V ≥2 A supply | 1 | Purchase / lab | $8 | |
 | 11 | 626ZZ bearing + 6 mm shaft (optional) | 2 + 1 | Purchase | $5 | Takes the bending load off the gearbox shaft |
 | 12 | Steel bar ½ × ¾ × 2 in (counterweight) | 1 | Hardware store / shop | $2 | ≈ 97 g; or a washer stack |
 | 13 | Silicone/TPU pad material | — | Purchase / print in TPU | $2 | |
-| 14 | Printed parts: base, tower, hub, arm, 2 jaws, stop, sensor bracket | 8 | Designed (PLA) | filament | Part numbers come with the Part C drawings |
+| 14 | Printed parts: base, tower, hub (with stop tab), arm, palm, 2 jaws, home post | 8 | Designed (PLA) | filament | Part numbers come with the Part C drawings |
 | 15 | M3 fasteners, standoffs, wire, headers | — | Kit / purchase | $5 | |
 
 Estimated purchased cost beyond the kit: **~$50–60**.

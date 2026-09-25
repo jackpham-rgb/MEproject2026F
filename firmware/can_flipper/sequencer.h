@@ -25,7 +25,7 @@ struct Inputs {
   float force;        // N, grip force per finger
   bool home_switch;   // true = arm on the theta = 0 stop
   bool start;         // start button edge or serial 'g'
-  bool can_seen;      // ultrasonic reading inside the start-spot window this tick
+  bool can_seen;      // palm IR sensor sees the can between the jaws
 };
 
 struct Outputs {
@@ -33,7 +33,7 @@ struct Outputs {
   float servo_deg = SERVO_OPEN_DEG;
   float theta_ref = 0.0f;
   float force_set = 0.0f;
-  bool want_ultrasonic = false;   // lets the Uno skip the blocking ping outside DETECT
+  bool want_can_sensor = false;   // DETECT is the only state that reads it
 };
 
 class Sequencer {
@@ -46,7 +46,7 @@ class Sequencer {
 
   void step(const Inputs& in, Outputs& out, float dt) {
     t_state_ += dt;
-    out.want_ultrasonic = false;
+    out.want_can_sensor = false;
     out.force_set = 0.0f;
     if (in.theta > peak_theta) peak_theta = in.theta;
 
@@ -65,7 +65,7 @@ class Sequencer {
         break;
 
       case DETECT:
-        out.want_ultrasonic = true;
+        out.want_can_sensor = true;
         hits_ = in.can_seen ? hits_ + 1 : 0;
         if (hits_ >= DETECT_HITS) { servo_cmd_ = SERVO_OPEN_DEG; contact_ = false; grip_.reset(); enter(GRIP); }
         else if (t_state_ > T_DETECT_MAX) failWith(F_NO_CAN);

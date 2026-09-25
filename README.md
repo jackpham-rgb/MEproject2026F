@@ -26,6 +26,9 @@ adding a lift axis.
 | `docs/04_wiring_and_bom.md` | Power architecture, pin map, draft BOM |
 | `docs/05_rvtm.md` | Requirements traceability matrix (draft; Part C 4a) |
 | `docs/06_pdr_outline.md` | Slide-by-slide PDR plan with figures and timing |
+| `viewer/index.html` | **Interactive 3D replay** of the firmware's simulated run, with telemetry charts, wiring and plots (built by `tools/build_viewer.py`) |
+| `cad/` | Concept CAD: STEP assembly + per-part STEP/STL, and Fusion 360 motion-study steps (`cad/README.md`) |
+| `sim/mechanism.py` | Part geometry (single source for the CAD and the viewer) + full-sweep part-collision check |
 | `sim/` | Python: `flip_geometry.py` (clearance sweep), `flip_control.py` (plant + pole placement + robustness), `grip_control.py` (force loop), `plot_telemetry.py` (plots Uno CSV logs, sim or bench) |
 | `firmware/can_flipper/` | Uno sketch. `control.h` / `sequencer.h` are hardware-free; `plant_model.h` is the simulated mechanism |
 | `firmware/host_test/` | Laptop regression test of the real firmware logic (nominal, ±30 % spreads, fault injection) |
@@ -39,6 +42,8 @@ pip install -r sim/requirements.txt
 python3 sim/flip_geometry.py && python3 sim/flip_control.py && python3 sim/grip_control.py   # -> sim/out/
 make -C firmware/host_test                  # full-sequence + fault tests, prints "all checks passed"
 tools/emulate_uno.sh                        # needs: apt install gcc-avr avr-libc simavr
+python3 sim/mechanism.py && python3 cad/build_cad.py   # STEP/STL (pip install cadquery)
+python3 tools/build_viewer.py               # then open viewer/index.html in a browser
 ```
 
 Arduino IDE: open `firmware/can_flipper/can_flipper.ino`, board = Uno, Serial Monitor at 250000 baud.

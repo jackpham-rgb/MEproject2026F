@@ -1,5 +1,5 @@
 // Software model of the mechanism: flip gearmotor + arm + can, grip servo + pads,
-// FSR divider, ultrasonic presence, home switch. A C++ port of sim/*.py used by
+// FSR divider, palm IR can sensor, home switch. A C++ port of sim/*.py used by
 //   * firmware/host_test (laptop regression test of the full sequence), and
 //   * SIM_PLANT=1 builds (Wokwi or a bare Uno with no mechanism attached).
 // Plain C++, no Arduino.h. "True" parameters can be scaled to test robustness.

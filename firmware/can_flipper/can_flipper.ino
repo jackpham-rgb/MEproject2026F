@@ -80,14 +80,7 @@ static bool pingCan() {
 #if SIM_PLANT
   return plant.canSeen();
 #else
-  digitalWrite(PIN_US_TRIG, LOW);
-  delayMicroseconds(2);
-  digitalWrite(PIN_US_TRIG, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(PIN_US_TRIG, LOW);
-  const unsigned long echo = pulseIn(PIN_US_ECHO, HIGH, US_TIMEOUT_US);  // <= 3 ms, only in DETECT
-  const float cm = echo * 0.01715f;
-  return echo > 0 && cm > US_MIN_CM && cm < US_MAX_CM;
+  return digitalRead(PIN_CAN_IR) == LOW;
 #endif
 }
 
@@ -129,8 +122,7 @@ void setup() {
   pinMode(PIN_MOT_IN1, OUTPUT);
   pinMode(PIN_MOT_IN2, OUTPUT);
   pinMode(PIN_MOT_PWM, OUTPUT);
-  pinMode(PIN_US_TRIG, OUTPUT);
-  pinMode(PIN_US_ECHO, INPUT);
+  pinMode(PIN_CAN_IR, INPUT_PULLUP);
   pinMode(PIN_LED, OUTPUT);
   setMotorVolts(0);
   grip_servo.attach(PIN_GRIP_SERVO, SERVO_US_MIN, SERVO_US_MAX);
@@ -170,7 +162,7 @@ void loop() {
 #if SIM_PLANT && defined(SIM_AUTOSTART)
   in.start = in.start || (seq.state == IDLE && n == 100);   // headless emulator runs (simavr)
 #endif
-  in.can_seen = out.want_ultrasonic ? pingCan() : false;
+  in.can_seen = out.want_can_sensor ? pingCan() : false;
 
   const State before = seq.state;
   seq.step(in, out, DT);

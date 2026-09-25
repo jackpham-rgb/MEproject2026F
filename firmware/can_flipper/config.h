@@ -4,7 +4,7 @@
 #pragma once
 
 // ---- Build options ---------------------------------------------------------
-// 1 = replace the encoder/FSR/ultrasonic with the software plant in plant_model.h
+// 1 = replace the encoder/FSR/can sensor with the software plant in plant_model.h
 //     (for Wokwi / bench runs with no mechanism attached). 0 = real hardware.
 #ifndef SIM_PLANT
 #define SIM_PLANT 0
@@ -20,8 +20,7 @@
 #define PIN_MOT_IN2 8
 #define PIN_GRIP_SERVO 9
 #define PIN_HOME 10       // home microswitch in the theta = 0 hard stop, to GND (INPUT_PULLUP)
-#define PIN_US_ECHO 11
-#define PIN_US_TRIG 12
+#define PIN_CAN_IR 11     // IR proximity module (TCRT5000 / KY-032) in the palm, digital out, LOW = can present
 #define PIN_LED 13
 #define PIN_FSR A0        // FSR to 5 V, 10k to GND, junction to A0
 
@@ -68,12 +67,10 @@ static const float GRIP_KP = 1.5f;             // deg / N  (on error change, vel
 static const int SERVO_US_MIN = 544;           // Servo library defaults, 0..180 deg
 static const int SERVO_US_MAX = 2400;
 
-// ---- Can detection (HC-SR04 at the axis foot, under the arm, aimed at the start spot) ----
-// Can face is 2.34 in (5.9 cm) from the axis foot; re-centre this window once CAD fixes
-// the sensor position (measure: can present vs absent).
-static const float US_MIN_CM = 3.0f;
-static const float US_MAX_CM = 9.0f;
-#define US_TIMEOUT_US 3000UL
+// ---- Can detection --------------------------------------------------------------------
+// IR proximity sensor in the gripper palm, looking at the can between the open jaws.
+// (An HC-SR04 under the arm was rejected: the counterweight sweeps that space; see
+// sim/mechanism.py.) Set the module's trim pot so it trips at ~0.5 in.
 #define DETECT_HITS 5
 
 // ---- Timeouts (s) ------------------------------------------------------------------
