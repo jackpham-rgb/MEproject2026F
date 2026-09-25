@@ -32,10 +32,13 @@ adding a lift axis.
 | `sim/` | Python: `flip_geometry.py` (clearance sweep), `flip_control.py` (plant + pole placement + robustness), `grip_control.py` (force loop), `plot_telemetry.py` (plots Uno CSV logs, sim or bench) |
 | `firmware/can_flipper/` | Uno sketch. `control.h` / `sequencer.h` are hardware-free; `plant_model.h` is the simulated mechanism |
 | `firmware/host_test/` | Laptop regression test of the real firmware logic (nominal, ±30 % spreads, fault injection) |
+| `tools/capture_serial.py` | Logs the Uno's serial telemetry to CSV for `sim/plot_telemetry.py` |
 | `tools/emulate_uno.sh` | Builds the sketch with avr-gcc and runs the real AVR binary in simavr |
 | `wokwi/` | Wokwi diagram for a browser simulation |
 
 ## Run it
+
+**Laptop setup, step by step (Windows/macOS): [docs/00_local_setup.md](docs/00_local_setup.md).**
 
 ```bash
 pip install -r sim/requirements.txt
