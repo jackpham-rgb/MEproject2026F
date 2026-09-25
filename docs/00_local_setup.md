@@ -17,6 +17,7 @@ No git? On GitHub, switch to the branch, then **Code → Download ZIP**.
 | What | How |
 |---|---|
 | 3D replay + charts + wiring | Double-click `viewer/index.html`. It needs internet, because three.js loads from a CDN |
+| All four concepts, animated | Double-click `viewer/concepts.html` |
 | Plots | `sim/out/*.png` |
 | Design docs | `docs/*.md` (GitHub renders them) |
 | Wiring simulation | wokwi.com in the browser: steps in `wokwi/README.md` |

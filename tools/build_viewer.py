@@ -23,8 +23,16 @@ with open(os.path.join(ROOT, "firmware/host_test/sequence_nominal.csv")) as f:
 html = open(os.path.join(ROOT, "viewer/template.html")).read()
 html = html.replace("__MECH__", json.dumps(mech, separators=(",", ":")))
 html = html.replace("__TRAJ__", json.dumps(rows, separators=(",", ":")))
+html = html.replace("__CONCEPTS_URL__", "https://claude.ai/artifact/Y5mf8ChwZyVuCEkr7pjYP1")
 open(os.path.join(ROOT, "viewer/index.html"), "w").write(html)
 os.makedirs(os.path.join(ROOT, "viewer/plots"), exist_ok=True)
 for n in ("flip_path_3d", "flip_clearance", "flip_tracking", "flip_step", "grip_step", "simavr_sim_plant_run"):
     shutil.copy(os.path.join(ROOT, "sim/out", n + ".png"), os.path.join(ROOT, "viewer/plots", n + ".png"))
 print(f"viewer/index.html: {len(rows)} samples, {len(html) // 1024} KB")
+
+# Concepts page (all four concepts animated). Links back to the published replay page.
+VIEWER_URL = "https://claude.ai/artifact/Sq3iuS55Be8UzQHFSEEF2F"
+c = open(os.path.join(ROOT, "viewer/concepts_template.html")).read()
+c = c.replace("__MECH__", json.dumps(mech, separators=(",", ":"))).replace("__VIEWER_URL__", VIEWER_URL)
+open(os.path.join(ROOT, "viewer/concepts.html"), "w").write(c)
+print(f"viewer/concepts.html: {len(c) // 1024} KB")

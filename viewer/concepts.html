@@ -1,0 +1,384 @@
+<title>Can Flipper Concepts</title>
+<meta name="description" content="Animated side-by-side of the four ME 2331 Project 2 concepts, with actuator counts, matrix scores and a live table-clearance check.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#eef1f4; --panel:#ffffff; --ink:#1a1e24; --muted:#5b6572; --line:#d5dbe2;
+  --accent:#2f6fdb; --jaw:#d9962c; --bad:#c8413a; --ok:#1f8a5b; --grid:#e3e8ee;
+  --scene-bg:#e7ecf1; --scene-grid:#c3ccd6; --table:#f6f8fa;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#111418; --panel:#191d23; --ink:#e6eaef; --muted:#9aa4b1; --line:#2b313a;
+  --accent:#6b9cf0; --jaw:#e6ad4f; --bad:#e8645c; --ok:#43b883; --grid:#232932;
+  --scene-bg:#161a20; --scene-grid:#2e3641; --table:#1c2128; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --ground:#111418; --panel:#191d23; --ink:#e6eaef; --muted:#9aa4b1; --line:#2b313a;
+  --accent:#6b9cf0; --jaw:#e6ad4f; --bad:#e8645c; --ok:#43b883; --grid:#232932;
+  --scene-bg:#161a20; --scene-grid:#2e3641; --table:#1c2128; color-scheme:dark;}
+body{background:var(--ground);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:22px}
+h1{font-size:26px;line-height:1.2;margin:0;font-weight:600;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;max-width:72ch}
+.sub a{color:var(--accent)}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:700px){.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tab{font:inherit;text-align:left;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;display:grid;gap:2px}
+.tab:hover{border-color:var(--accent)}
+.tab[aria-selected="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tab .k{font:500 12px "IBM Plex Mono",monospace;color:var(--muted);letter-spacing:.06em}
+.tab .n{font-weight:600;font-size:14px}
+.tab .sc{font:500 13px "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;color:var(--muted)}
+.tab[aria-selected="true"] .sc{color:var(--accent)}
+.bench{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.bench{grid-template-columns:1fr}}
+.viewport{position:relative;background:var(--scene-bg);border:1px solid var(--line);border-radius:8px;overflow:hidden;aspect-ratio:16/11;max-width:100%}
+.viewport canvas{display:block;width:100%;height:100%}
+.views{position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap}
+.banner{position:absolute;left:10px;bottom:10px;right:10px;display:flex;justify-content:space-between;gap:8px;align-items:end;pointer-events:none}
+.phase{font:500 14px "IBM Plex Sans",sans-serif;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
+.hit{font:600 13px "IBM Plex Mono",monospace;background:var(--bad);color:#fff;border-radius:6px;padding:4px 10px}
+button,select{font:inherit;font-size:13px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.transport{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.transport input[type=range]{flex:1 1 200px;accent-color:var(--accent)}
+.transport label{font-size:13px;display:flex;gap:6px;align-items:center}
+.side{display:grid;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px}
+.card h2{font-size:17px;margin:0;font-weight:600}
+.card p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.lbl{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.val{font:500 18px "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-top:12px}
+.kv div{display:grid;gap:1px}
+.good{color:var(--ok)} .badc{color:var(--bad)}
+ol.steps{margin:8px 0 0;padding-left:20px;display:grid;gap:3px;font-size:14px;color:var(--muted)}
+ol.steps li.now{color:var(--ink);font-weight:600}
+.bars{display:grid;gap:8px;margin-top:10px}
+.bar{display:grid;grid-template-columns:22px 1fr 40px;gap:8px;align-items:center;font:500 13px "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.track{height:10px;background:var(--grid);border-radius:5px;overflow:hidden}
+.fill{height:100%;background:var(--muted);border-radius:5px}
+.bar.cur .fill{background:var(--accent)}
+.note{font-size:13px;color:var(--muted)}
+.fail{padding:20px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Can Flipper Concepts</h1>
+    <p class="sub">Four ways to invert the can and move it 90° at 5 in. The animations are scripted kinematics (no physics), built to the same dimensions as the design analysis. The live readout tracks the can's lowest point, so a concept that drives the can into the table shows it. The selected concept's firmware-driven replay is in the <a href="https://claude.ai/artifact/Sq3iuS55Be8UzQHFSEEF2F" target="_blank" rel="noopener">Can Flipper Viewer</a>.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Concept">
+    <button class="tab" role="tab" data-c="A"><span class="k">CONCEPT A</span><span class="n">Claw + wrist + turntable</span><span class="sc">3.00 · 4 actuators</span></button>
+    <button class="tab" role="tab" data-c="B"><span class="k">CONCEPT B</span><span class="n">Cradle flip + drag</span><span class="sc">2.30 · 4 actuators</span></button>
+    <button class="tab" role="tab" data-c="C"><span class="k">CONCEPT C</span><span class="n">Multi-DOF pincer arm</span><span class="sc">2.55 · 5 actuators</span></button>
+    <button class="tab" role="tab" data-c="D"><span class="k">CONCEPT D · SELECTED</span><span class="n">Mirror flip</span><span class="sc">4.35 · 2 actuators</span></button>
+  </div>
+
+  <section class="bench">
+    <div>
+      <div class="viewport" id="vp">
+        <div class="views" role="group" aria-label="Camera">
+          <button data-view="iso" aria-pressed="true">3/4</button>
+          <button data-view="top">Top</button>
+          <button data-view="low">Low side</button>
+        </div>
+        <div class="banner"><span class="phase" id="phase">–</span><span class="hit" id="hit" hidden>Can hits the table</span></div>
+      </div>
+      <div class="transport">
+        <button id="play">Pause</button>
+        <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Time">
+        <select id="speed" aria-label="Playback speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+        <label id="liftwrap"><input type="checkbox" id="nolift"> remove the lift axis</label>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h2 id="c-name">–</h2>
+        <p id="c-idea"></p>
+        <div class="kv">
+          <div><span class="lbl">Actuators</span><span class="val" id="c-act">–</span></div>
+          <div><span class="lbl">Lowest can point</span><span class="val" id="c-low">–</span></div>
+        </div>
+        <ol class="steps" id="c-steps"></ol>
+      </div>
+      <div class="card">
+        <span class="lbl">Main risk</span>
+        <p id="c-risk" style="color:var(--ink)"></p>
+      </div>
+      <div class="card">
+        <span class="lbl">Decision matrix total (of 5)</span>
+        <div class="bars" id="bars"></div>
+      </div>
+    </div>
+  </section>
+  <p class="note">Try Concept A with "remove the lift axis" ticked. The can's bottom rim goes about 0.29 in below the table mid-flip. That's why A and B need a fourth actuator and D doesn't.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.128.0/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>const MECH = {"units":"in","axis_height":2.39,"arm_radius":3.5355339059327373,"axis_point_xy":[2.5,2.5],"axis_dir_xy":[0.7071067811865476,0.7071067811865476],"u_dir_xy":[-0.7071067811865476,0.7071067811865476],"start_xy":[0.0,5.0],"target_xy":[5.0,0.0],"can":{"r":1.2,"h":4.7,"t":3.5355339059327373},"open_gap":2.9,"closed_gap":2.4,"moving":[{"name":"hub","kind":"cyl_s","s":[-2.2,0.35],"t":[-0.45,0.45],"w":[-0.45,0.45],"color":"#8a8f98","note":"printed hub on the gearmotor shaft"},{"name":"arm","kind":"box","s":[-0.3,0.3],"t":[0.0,2.1],"w":[-0.125,0.125],"color":"#3d7be0","note":"printed arm, 3.54 in axis to can centre"},{"name":"palm","kind":"box","s":[-1.65,1.65],"t":[1.9,2.1],"w":[-0.4,0.4],"color":"#3d7be0","note":"palm face 0.24 in clear of the can"},{"name":"servo","kind":"box","s":[-0.45,0.45],"t":[1.1,1.9],"w":[0.125,0.6],"color":"#2b2f36","note":"SG90 / MG90S grip servo"},{"name":"ir_sensor","kind":"box","s":[-0.3,0.3],"t":[1.75,1.9],"w":[-0.35,-0.1],"color":"#1b8a5a","note":"IR proximity sensor in the palm (can present)"},{"name":"jaw_L","kind":"jaw","s":[-1.65,-1.45],"t":[1.9,4.3],"w":[-0.3,0.3],"color":"#e0a33d","note":"V-jaw + silicone pad"},{"name":"jaw_R","kind":"jaw","s":[1.45,1.65],"t":[1.9,4.3],"w":[-0.3,0.3],"color":"#e0a33d","note":"V-jaw + pad, FSR 402 behind it"},{"name":"cw_arm","kind":"box","s":[-0.3,0.3],"t":[-1.8,0.0],"w":[-0.125,0.125],"color":"#3d7be0","note":"counterweight arm"},{"name":"counterweight","kind":"box","s":[-1.0,1.0],"t":[-2.05,-1.55],"w":[-0.375,0.375],"color":"#6b4f3a","note":"steel bar 1/2 x 3/4 x 2 in, about 97 g, centre 1.8 in from axis"},{"name":"stop_tab","kind":"box","s":[-2.1,-1.8],"t":[0.0,1.2],"w":[-0.15,0.15],"color":"#3d7be0","note":"rests on the home post at theta = 0"}],"static":[{"name":"base_plate","kind":"box","s":[-3.8,1.6],"t":[-2.1,2.1],"w":[-2.39,-2.14],"color":"#c9ccd2","note":"printed base, 0.25 in"},{"name":"tower","kind":"box","s":[-2.5,-2.25],"t":[-0.9,0.9],"w":[-2.14,0.7],"color":"#9aa0aa","note":"motor tower, slotted for axis-height trim"},{"name":"gearmotor","kind":"cyl_s","s":[-4.3,-2.5],"t":[-0.5,0.5],"w":[-0.5,0.5],"color":"#50555e","note":"12 V JGA25-370 + hall encoder"},{"name":"home_post","kind":"box","s":[-2.1,-1.8],"t":[0.8,1.2],"w":[-2.14,-0.15],"color":"#d0453b","note":"hard stop + microswitch, defines theta = 0"}]};</script>
+<script>
+(function(){
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+const vp = $("vp");
+if (!window.THREE) { vp.insertAdjacentHTML("beforeend", '<p class="fail">The 3D library did not load. Check the network and reload.</p>'); return; }
+
+const CAN_R = 1.2, CAN_H = 4.7, ZC = CAN_H / 2;
+const D2R = Math.PI / 180;
+const ease = s => s <= 0 ? 0 : s >= 1 ? 1 : s * s * s * (10 - 15 * s + 6 * s * s);   // minimum-jerk
+
+/* ---------- renderer / scene ---------- */
+const renderer = new THREE.WebGLRenderer({antialias: true});
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+renderer.shadowMap.enabled = true;
+vp.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, 1.45, 0.1, 200);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; scene.add(root);   // world z-up inside root
+const W = (x, y, z) => new THREE.Vector3(x, z, -y);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8090a0, 0.75));
+const sun = new THREE.DirectionalLight(0xffffff, 0.7);
+sun.position.copy(W(6, 10, 16)); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, {left: -9, right: 9, top: 9, bottom: -9}); scene.add(sun);
+
+const tableMat = new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 1});
+const table = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), tableMat);
+table.position.set(2.5, 2.5, 0); table.receiveShadow = true; root.add(table);
+let grid = null;
+function paint(){
+  scene.background = new THREE.Color(css("--scene-bg"));
+  tableMat.color.set(css("--table"));
+  if (grid) root.remove(grid);
+  grid = new THREE.GridHelper(16, 16, css("--scene-grid"), css("--scene-grid"));
+  grid.rotation.x = Math.PI / 2; grid.position.set(2.5, 2.5, 0.003); root.add(grid);
+}
+paint();
+function ring(x, y, color, label){
+  const m = new THREE.Mesh(new THREE.RingGeometry(1.25, 1.4, 48), new THREE.MeshBasicMaterial({color, side: THREE.DoubleSide}));
+  m.position.set(x, y, 0.01); root.add(m);
+  const c = document.createElement("canvas"); c.width = 256; c.height = 64;
+  const g = c.getContext("2d"); g.font = "600 34px IBM Plex Mono, monospace"; g.fillStyle = color; g.textAlign = "center"; g.fillText(label, 128, 44);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: new THREE.CanvasTexture(c), depthTest: false}));
+  sp.scale.set(2.4, 0.6, 1); sp.position.set(x + (x ? 1.6 : -1.6), y + (y ? 1.6 : -1.6), 0.3); root.add(sp);
+}
+ring(0, 5, "#1f8a5b", "START"); ring(5, 0, "#c8413a", "TARGET");
+
+const M = c => new THREE.MeshStandardMaterial({color: c, roughness: 0.55, metalness: 0.05});
+function box(parent, c, s, color){ const m = new THREE.Mesh(new THREE.BoxGeometry(...s), M(color)); m.position.set(...c); m.castShadow = true; parent.add(m); return m; }
+function cylZ(parent, c, r, h, color){ const g = new THREE.CylinderGeometry(r, r, h, 32); g.rotateX(Math.PI / 2);
+  const m = new THREE.Mesh(g, M(color)); m.position.set(...c); m.castShadow = true; parent.add(m); return m; }
+function rod(parent, r, color){ const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 1, 16), M(color)); m.castShadow = true; parent.add(m); return m; }
+const UP = new THREE.Vector3(0, 1, 0);
+function setRod(m, a, b){ const d = b.clone().sub(a); m.position.copy(a).add(b).multiplyScalar(0.5);
+  m.scale.set(1, Math.max(1e-3, d.length()), 1); m.quaternion.setFromUnitVectors(UP, d.normalize()); }
+
+/* ---------- the can (child of scene, pose copied from an anchor) ---------- */
+const can = new THREE.Group(); scene.add(can);
+{ const b = new THREE.CylinderGeometry(CAN_R, CAN_R, CAN_H - 0.35, 40); b.rotateX(Math.PI / 2); b.translate(0, 0, -0.175);
+  const t = new THREE.CylinderGeometry(CAN_R * 0.88, CAN_R, 0.35, 40); t.rotateX(-Math.PI / 2); t.translate(0, 0, CAN_H / 2 - 0.175);
+  [[b, 0xc0202a, 0.2], [t, 0xe3e6ea, 0.1]].forEach(([g, col, met]) => { const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({color: col, roughness: 0.3, metalness: met})); m.castShadow = true; can.add(m); }); }
+const canPts = [];
+for (let k = 0; k < 24; k++) { const q = k / 24 * 2 * Math.PI; for (const z of [-CAN_H / 2, CAN_H / 2]) canPts.push(new THREE.Vector3(CAN_R * Math.cos(q), CAN_R * Math.sin(q), z)); }
+const tmp = new THREE.Vector3();
+function canLowest(){ can.updateMatrixWorld(true); let m = 1e9; for (const p of canPts) { tmp.copy(p).applyMatrix4(can.matrixWorld); m = Math.min(m, tmp.y); } return m; }
+
+/* ---------- keyframe helper ---------- */
+function track(keys){   // keys: [t, {var: value}] ; each var eases between the keys that set it
+  const names = [...new Set(keys.flatMap(k => Object.keys(k[1])))];
+  const series = Object.fromEntries(names.map(n => [n, keys.filter(k => n in k[1]).map(k => [k[0], k[1][n]])]));
+  return t => { const o = {}; for (const n of names) { const s = series[n]; let v = s[0][1];
+    for (let i = 1; i < s.length; i++) { const [t0, v0] = s[i - 1], [t1, v1] = s[i];
+      if (t >= t1) v = v1; else if (t > t0) { v = v0 + (v1 - v0) * ease((t - t0) / (t1 - t0)); break; } else break; }
+    o[n] = v; } return o; };
+}
+
+/* ---------- Concept A / B: turntable + lift + wrist roll ---------- */
+function turntableConcept(kind){
+  const g = new THREE.Group();
+  cylZ(g, [0, 0, 0.2], 1.6, 0.4, "#9aa0aa");
+  const yawG = new THREE.Group(); g.add(yawG);
+  cylZ(yawG, [0, 0, 0.475], 1.3, 0.15, "#8a8f98");
+  box(yawG, [0, 0, 2.5], [0.9, 0.9, 3.9], "#9aa0aa");
+  const liftG = new THREE.Group(); yawG.add(liftG);
+  box(liftG, [0.6, 0, ZC], [0.5, 1.1, 0.8], "#3d7be0");
+  box(liftG, [1.9, 0, ZC], [2.2, 0.5, 0.35], "#3d7be0");
+  box(liftG, [3.15, 0, ZC], [0.5, 0.9, 0.9], "#2b2f36");
+  const rollG = new THREE.Group(); rollG.position.set(5, 0, ZC); liftG.add(rollG);
+  box(rollG, [-1.52, 0, 0], [0.34, 0.5, 0.5], "#50555e");
+  const tall = kind === "B";
+  box(rollG, [-1.35, 0, 0], [0.3, 3.2, tall ? 4.2 : 0.8], tall ? "#6b8fd6" : "#3d7be0");
+  const fL = box(rollG, [-0.2, 1.4, 0], [2.3, 0.2, tall ? 4.2 : 0.6], "#e0a33d");
+  const fR = box(rollG, [-0.2, -1.4, 0], [2.3, 0.2, tall ? 4.2 : 0.6], "#e0a33d");
+  const anchor = new THREE.Object3D(); rollG.add(anchor);
+  const keys = kind === "A" ? track([
+      [0, {grip: 0, lift: 0, roll: 0, yaw: 90}], [1.2, {grip: 1}], [2.0, {lift: 0.6}],
+      [2.1, {roll: 0}], [3.7, {roll: 180, yaw: 90}], [5.5, {yaw: 0, lift: 0.6}], [6.3, {lift: 0, grip: 1}],
+      [6.9, {grip: 0, lift: 0}], [7.7, {lift: 1.0}], [8.6, {lift: 1.0}]])
+    : track([
+      [0, {grip: 0, lift: 0, roll: 0, yaw: 90}], [1.2, {grip: 1}], [2.0, {lift: 0.6}],
+      [2.1, {roll: 0}], [3.7, {roll: 180, lift: 0.6}], [4.5, {lift: 0, yaw: 90}], [6.9, {yaw: 0, grip: 1}],
+      [7.5, {grip: 0, lift: 0}], [8.3, {lift: 1.0}], [9.0, {lift: 1.0}]]);
+  const attachEnd = kind === "A" ? 6.9 : 7.5;
+  return {
+    group: g, dur: kind === "A" ? 8.6 : 9.0, anchor, attach: [1.2, attachEnd], liftAxis: true,
+    pose(t, noLift){ const v = keys(t); const lift = noLift && t < attachEnd ? 0 : v.lift;
+      yawG.rotation.z = v.yaw * D2R; liftG.position.z = lift; rollG.rotation.x = v.roll * D2R;
+      const off = 1.3 + (1 - v.grip) * 0.35; fL.position.y = off; fR.position.y = -off; },
+    tweak(t){ if (kind !== "B" || t < 4.5 || t > 6.9) return;   // dragging on the rim: wobble
+      const s = (t - 4.5) / 2.4, w = 4 * D2R * Math.sin(6 * Math.PI * s) * Math.sin(Math.PI * s);
+      can.rotateY(w); can.position.y += CAN_R * Math.abs(Math.sin(w)); },
+    steps: kind === "A"
+      ? [[0, "Close the claw"], [1.2, "Lift 0.6 in (4th actuator)"], [2.1, "Flip 180° at the wrist"], [3.7, "Turntable 90°"], [5.5, "Lower onto the table"], [6.3, "Open"], [6.9, "Clear"]]
+      : [[0, "Clamp the full-height cradle"], [1.2, "Lift 0.6 in"], [2.1, "Flip 180° in place"], [3.7, "Set down inverted"], [4.5, "Drag 90° on its rim"], [6.9, "Open"], [7.5, "Clear"]],
+  };
+}
+
+/* ---------- Concept C: articulated arm with 2-link IK ---------- */
+function armConcept(){
+  const g = new THREE.Group();
+  cylZ(g, [0, 0, 0.2], 1.4, 0.4, "#9aa0aa");
+  const yawG = new THREE.Group(); g.add(yawG);
+  box(yawG, [0, 0, 2.3], [0.8, 0.8, 3.8], "#9aa0aa");
+  const S = new THREE.Vector3(0.3, 0, 4.3), L1 = 2.5, L2 = 2.5;
+  box(yawG, [0.3, 0, 4.3], [0.7, 1.0, 0.7], "#2b2f36");
+  const r1 = rod(yawG, 0.2, "#3d7be0"), r2 = rod(yawG, 0.17, "#3d7be0"), r3 = rod(yawG, 0.14, "#50555e");
+  const elbow = box(yawG, [0, 0, 0], [0.5, 0.8, 0.5], "#2b2f36"), wrist = box(yawG, [0, 0, 0], [0.45, 0.7, 0.45], "#2b2f36");
+  const rollG = new THREE.Group(); yawG.add(rollG);
+  box(rollG, [-1.35, 0, 0], [0.3, 3.2, 0.8], "#3d7be0");
+  const fL = box(rollG, [-0.2, 1.4, 0], [2.3, 0.2, 0.6], "#e0a33d");
+  const fR = box(rollG, [-0.2, -1.4, 0], [2.3, 0.2, 0.6], "#e0a33d");
+  const anchor = new THREE.Object3D(); rollG.add(anchor);
+  const keys = track([
+    [0, {grip: 0, zc: ZC, yaw: 90, roll: 0, reach: 2.9}], [1.2, {grip: 1}], [2.2, {zc: ZC + 1.2, yaw: 90, roll: 0}],
+    [4.8, {yaw: 0, roll: 180, zc: ZC + 1.2}], [5.8, {zc: ZC, grip: 1}], [6.4, {grip: 0, reach: 2.9}], [7.2, {reach: 2.1}], [8.0, {reach: 2.1}]]);
+  return {
+    group: g, dur: 8.0, anchor, attach: [1.2, 6.4], liftAxis: false,
+    pose(t){ const v = keys(t); yawG.rotation.z = v.yaw * D2R;
+      const Wp = new THREE.Vector3(v.reach, 0, v.zc), d = Wp.clone().sub(S), dist = Math.min(L1 + L2 - 1e-3, d.length());
+      const a = Math.atan2(d.z, d.x), b = Math.acos((L1 * L1 + dist * dist - L2 * L2) / (2 * L1 * dist));
+      const E = new THREE.Vector3(S.x + L1 * Math.cos(a + b), 0, S.z + L1 * Math.sin(a + b));
+      setRod(r1, S, E); setRod(r2, E, Wp); const P = new THREE.Vector3(v.reach + 0.55, 0, v.zc); setRod(r3, Wp, P);
+      elbow.position.copy(E); wrist.position.copy(Wp);
+      rollG.position.set(v.reach + 2.1, 0, v.zc); rollG.rotation.x = v.roll * D2R;
+      const off = 1.3 + (1 - v.grip) * 0.35; fL.position.y = off; fR.position.y = -off; },
+    tweak(){},
+    steps: [[0, "Close the pincer"], [1.2, "Lift 1.2 in (shoulder + elbow)"], [2.2, "Swing 90° while the wrist rolls 180°"], [4.8, "Lower onto the table"], [5.8, "Open"], [6.4, "Retract"]],
+  };
+}
+
+/* ---------- Concept D: mirror flip (geometry from sim/mechanism.py) ---------- */
+function mirrorConcept(){
+  const g = new THREE.Group();
+  const H = MECH.axis_height, R = MECH.arm_radius, F = MECH.axis_point_xy, a = MECH.axis_dir_xy, u = MECH.u_dir_xy;
+  const frame = new THREE.Group();
+  frame.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3(a[0], a[1], 0), new THREE.Vector3(u[0], u[1], 0), new THREE.Vector3(0, 0, 1)));
+  frame.position.set(F[0], F[1], H); g.add(frame);
+  const axis = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-6, 0, 0), new THREE.Vector3(4.5, 0, 0)]), new THREE.LineDashedMaterial({color: 0xc8413a, dashSize: 0.25, gapSize: 0.15}));
+  axis.computeLineDistances(); frame.add(axis);
+  function part(p, parent){ const ds = p.s[1] - p.s[0], dt = p.t[1] - p.t[0], dw = p.w[1] - p.w[0]; let geo;
+    if (p.kind === "cyl_s") { geo = new THREE.CylinderGeometry(dt / 2, dt / 2, ds, 32); geo.rotateZ(Math.PI / 2); } else geo = new THREE.BoxGeometry(ds, dt, dw);
+    const m = new THREE.Mesh(geo, M(p.color)); m.position.set((p.s[0] + p.s[1]) / 2, (p.t[0] + p.t[1]) / 2, (p.w[0] + p.w[1]) / 2); m.castShadow = true; parent.add(m); return m; }
+  MECH.static.forEach(p => part(p, frame));
+  const arm = new THREE.Group(); frame.add(arm);
+  const jaws = {}; MECH.moving.forEach(p => { const m = part(p, arm); if (p.kind === "jaw") jaws[p.name] = m; });
+  const anchor = new THREE.Object3D(); anchor.position.set(0, R, -H + CAN_H / 2); arm.add(anchor);
+  const keys = track([[0, {grip: 0, th: 0}], [1.2, {grip: 1, th: 0}], [3.0, {th: 179.5}], [3.2, {grip: 1}], [3.7, {grip: 0, th: 179.5}], [5.5, {th: 0}], [6.2, {th: 0}]]);
+  return {
+    group: g, dur: 6.2, anchor, attach: [1.2, 3.7], liftAxis: false,
+    pose(t){ const v = keys(t); arm.rotation.x = v.th * D2R;
+      const gap = MECH.open_gap - v.grip * (MECH.open_gap - MECH.closed_gap - 0.02);
+      jaws.jaw_L.position.x = -gap / 2 - 0.1; jaws.jaw_R.position.x = gap / 2 + 0.1; },
+    tweak(){},
+    steps: [[0, "Close the jaws (force loop)"], [1.2, "One 180° turn about the 45° axis"], [3.2, "Open 2 mm above the table"], [3.7, "Swing back to the home stop"]],
+  };
+}
+
+const INFO = {
+  A: {name: "A · Claw + wrist + turntable", act: "4 (grip, lift, flip, yaw)", score: 3.00,
+      idea: "Grip the can at mid-height, flip it at the wrist, carry it 90° on a turntable, set it down.",
+      risk: "A can gripped at mid-height can't flip in place: its corners are 2.64 in from the grip point but only 2.35 in from the table. That needs a lift axis, so 3 of the 4 actuators end up in series."},
+  B: {name: "B · Cradle flip + drag", act: "4 (clamp, lift, flip, yaw)", score: 2.30,
+      idea: "Clamp the can in a full-height cradle, flip it in place, set it down inverted, then drag it 90° along the table.",
+      risk: "Dragging an empty 15 g can on its thin top rim: friction varies and the can wobbles (shown). It also needs the same lift axis as A."},
+  C: {name: "C · Multi-DOF pincer arm", act: "5 (yaw, shoulder, elbow, roll, grip)", score: 2.55,
+      idea: "An articulated arm lifts the can, swings it 90° while rolling it 180°, and sets it down.",
+      risk: "The most general and the most complex: inverse kinematics, five servos' backlash stacking at a 5 in reach, and the most code for the least certainty."},
+  D: {name: "D · Mirror flip (selected)", act: "2 (flip, grip)", score: 4.35,
+      idea: "One horizontal axis on the 45° bisector at can mid-height. A single 180° turn flips the can and moves it 90°.",
+      risk: "Overshoot past +0.9° pushes the rim into the table, so the flip runs closed loop and aims for 179.5°. The axis height is build-critical: 2.39 in +0.05/−0.02 in."},
+};
+const CONCEPTS = {A: turntableConcept("A"), B: turntableConcept("B"), C: armConcept(), D: mirrorConcept()};
+Object.values(CONCEPTS).forEach(c => { c.group.visible = false; root.add(c.group); });
+
+/* ---------- scoring bars ---------- */
+const bars = $("bars");
+Object.entries(INFO).forEach(([k, v]) => bars.insertAdjacentHTML("beforeend",
+  `<div class="bar" data-k="${k}"><span>${k}</span><div class="track"><div class="fill" style="width:${v.score / 5 * 100}%"></div></div><span>${v.score.toFixed(2)}</span></div>`));
+
+/* ---------- views ---------- */
+const VIEWS = {iso: [W(13.5, 12, 10), W(2.3, 2.6, 2.2)], top: [W(2.5, 2.49, 21), W(2.5, 2.5, 0)], low: [W(12, -6, 2.8), W(2.5, 2.5, 2.0)]};
+function setView(k){ camera.position.copy(VIEWS[k][0]); controls.target.copy(VIEWS[k][1]); controls.update();
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === k)); }
+document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+setView("iso");
+
+/* ---------- playback ---------- */
+let cur = "D", t = 0, playing = !matchMedia("(prefers-reduced-motion: reduce)").matches, last = null, hold = 0;
+const scrub = $("scrub"), playBtn = $("play");
+playBtn.textContent = playing ? "Pause" : "Play";
+function placeCan(c, time){
+  const [a0, a1] = c.attach, tc = Math.min(a1, Math.max(a0, time));
+  c.pose(tc, $("nolift").checked); root.updateMatrixWorld(true);
+  c.anchor.getWorldPosition(can.position); c.anchor.getWorldQuaternion(can.quaternion);
+  if (time >= a0 && time <= a1) c.tweak(time);
+  c.pose(time, $("nolift").checked);
+}
+function apply(time){
+  const c = CONCEPTS[cur]; t = time; placeCan(c, time);
+  const low = canLowest(), hit = low < -0.01;
+  $("c-low").textContent = (low >= 0 ? "+" : "") + low.toFixed(2) + " in";
+  $("c-low").className = "val " + (hit ? "badc" : "good");
+  $("hit").hidden = !hit;
+  tableMat.color.set(hit ? "#e8b4b0" : css("--table"));
+  let si = 0; c.steps.forEach((s, i) => { if (time >= s[0]) si = i; });
+  $("phase").textContent = c.steps[si][1];
+  document.querySelectorAll("#c-steps li").forEach((li, i) => li.classList.toggle("now", i === si));
+  scrub.value = Math.round(time / c.dur * 1000);
+}
+function select(k){
+  cur = k; Object.entries(CONCEPTS).forEach(([n, c]) => c.group.visible = n === k);
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", b.dataset.c === k));
+  document.querySelectorAll(".bar").forEach(b => b.classList.toggle("cur", b.dataset.k === k));
+  const I = INFO[k]; $("c-name").textContent = I.name; $("c-idea").textContent = I.idea; $("c-act").textContent = I.act; $("c-risk").textContent = I.risk;
+  $("c-steps").innerHTML = CONCEPTS[k].steps.map(s => `<li>${s[1]}</li>`).join("");
+  $("liftwrap").hidden = !CONCEPTS[k].liftAxis; if (!CONCEPTS[k].liftAxis) $("nolift").checked = false;
+  hold = 0; apply(0);
+}
+document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => select(b.dataset.c)));
+$("nolift").addEventListener("change", () => apply(t));
+playBtn.addEventListener("click", () => { playing = !playing; playBtn.textContent = playing ? "Pause" : "Play"; });
+scrub.addEventListener("input", () => { playing = false; playBtn.textContent = "Play"; apply(scrub.value / 1000 * CONCEPTS[cur].dur); });
+const repaint = () => { paint(); apply(t); };
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", repaint);
+new MutationObserver(repaint).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
+function resize(){ const w = vp.clientWidth, h = vp.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(vp);
+function loop(now){
+  if (last !== null && playing) { const dt = (now - last) / 1000 * parseFloat($("speed").value), c = CONCEPTS[cur];
+    if (t >= c.dur) { hold += dt; if (hold > 1.0) { hold = 0; apply(0); } } else apply(Math.min(c.dur, t + dt)); }
+  last = now; controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop);
+}
+resize(); select(location.hash.replace("#", "") in CONCEPTS ? location.hash.slice(1) : "D");
+if (!playing) apply(CONCEPTS[cur].dur * 0.35);
+requestAnimationFrame(loop);
+})();
+</script>

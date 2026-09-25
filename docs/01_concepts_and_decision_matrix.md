@@ -17,14 +17,19 @@ help. The far corner still passes below the table, and the can ends up hovering 
 then drops. So Concept A needs a **fourth actuator: lift ~0.5 in before the flip and lower after**.
 It also has to set the can down under control. That makes 4 actuators, and 3 of them are in series.
 
-## Concept B: Tipping cradle + slide
+## Concept B: Cradle flip + drag
 
-A cradle closes around the can and tips 90° about a table-level hinge, laying the can on its side.
-A second 90° tip stands it inverted. Then a pusher slides it 90° around an arc.
+A tall U-cradle on a turntable arm clamps the can along its full height. It lifts slightly, flips
+the can 180° in place, and sets it down inverted at START. Then the turntable **drags** it 90°
+along the table to TARGET, sliding on its rim, and releases.
 
-It needs 3 actuators. The lying can rolls unless the cradle captures it fully. Sliding an
-inverted 15 g can on its rim is the least repeatable step of all four concepts. The cradle
-also has to open without dragging the can.
+Why not "tip twice": tipping the can 90° about its bottom edge, then 90° about the new bottom
+edge, moves it about 4.7 + 2.4 in sideways, past the robot rather than to TARGET. So the flip has
+to happen in place, which needs the same lift axis as Concept A.
+
+It needs 4 actuators (clamp, lift, flip, turntable). Dragging an inverted 15 g can on its thin rim
+is the least repeatable step of all four concepts: friction varies and the can wobbles. The
+cradle also has to open without pulling the can over.
 
 ## Concept C: Multi-DOF pincer arm
 
@@ -72,17 +77,17 @@ backed by the analyses referenced. **Revise them as a team before the PDR** — 
 | Criterion | Weight | A: Claw+wrist+turntable | B: Cradle+slide | C: Pincer arm | D: Mirror flip |
 |---|---:|:-:|:-:|:-:|:-:|
 | Reliability of an inverted, free-standing landing | 0.30 | 3 | 2 | 3 | **5** |
-| Actuator / part count (fewer = better) | 0.15 | 2 (4 act.) | 3 (3 act.) | 1 (5 act.) | **5** (2 act.) |
+| Actuator / part count (fewer = better) | 0.15 | 2 (4 act.) | 2 (4 act.) | 1 (5 act.) | **5** (2 act.) |
 | Tolerance to can placement error | 0.15 | 4 | 2 | 4 | 4 |
 | Control + code complexity (lower = better) | 0.10 | 2 | 3 | 1 | **4** |
 | Torque / actuator demand (lower = better) | 0.10 | **4** | 3 | 2 | 3 |
 | Build time + cost | 0.10 | 2 | 3 | 2 | **4** |
 | Shows the closed-loop control objective | 0.10 | 4 | 2 | 4 | 4 |
-| **Weighted total** | **1.00** | **3.00** | **2.45** | **2.55** | **4.35** |
+| **Weighted total** | **1.00** | **3.00** | **2.30** | **2.55** | **4.35** |
 
-**Sensitivity check.** With all seven criteria weighted equally, the totals are A 3.00, B 2.57,
+**Sensitivity check.** With all seven criteria weighted equally, the totals are A 3.00, B 2.43,
 C 2.43, D 4.14. With landing reliability cut from 0.30 to 0.15 and the difference spread evenly
-over the others, the totals are A 3.00, B 2.55, C 2.45, D 4.20, and D still leads by 1.2. So the ranking holds across reasonable weightings.
+over the others, the totals are A 3.00, B 2.38, C 2.45, D 4.20, and D still leads by 1.2. So the ranking holds across reasonable weightings.
 
 **Selected: Concept D.** It keeps both closed-loop axes from the original plan (grip force, flip
 angle), where they matter most. It drops the turntable. The ~90° move needed no closed loop anyway,

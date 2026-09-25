@@ -65,7 +65,7 @@ figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 <div class="wrap">
   <header>
     <h1>Can Flipper Viewer</h1>
-    <p class="sub">Mirror-flip concept for ME 2331 Project 2. The motion replays the firmware's own simulated run: the Uno state machine and PID loops driving the plant model (<span class="mono">firmware/host_test</span>). The solids are block-level concept geometry, the same data the collision check uses.</p>
+    <p class="sub">Mirror-flip concept for ME 2331 Project 2. The motion replays the firmware's own simulated run: the Uno state machine and PID loops driving the plant model (<span class="mono">firmware/host_test</span>). The solids are block-level concept geometry, the same data the collision check uses. All four concepts, animated for comparison: <a href="https://claude.ai/artifact/Y5mf8ChwZyVuCEkr7pjYP1" target="_blank" rel="noopener" style="color:var(--accent)">Can Flipper Concepts</a>.</p>
   </header>
 
   <section class="bench" aria-label="3D replay">
@@ -268,7 +268,7 @@ const canPivot = new THREE.Group(); frame.add(canPivot);
 const can = new THREE.Group();
 const cr = MECH.can.r, ch = MECH.can.h;
 const body = new THREE.Mesh(new THREE.CylinderGeometry(cr, cr, ch - 0.35, 40), new THREE.MeshStandardMaterial({color: 0xc0202a, roughness: 0.35, metalness: 0.2}));
-const top = new THREE.Mesh(new THREE.CylinderGeometry(cr * 0.88, cr, 0.35, 40), new THREE.MeshStandardMaterial({color: 0xd4d8dd, roughness: 0.25, metalness: 0.8}));
+const top = new THREE.Mesh(new THREE.CylinderGeometry(cr * 0.88, cr, 0.35, 40), new THREE.MeshStandardMaterial({color: 0xe3e6ea, roughness: 0.35, metalness: 0.1}));
 top.position.y = ch / 2 - 0.175 + 0.001; body.position.y = -0.175;
 [body, top].forEach(m => { m.castShadow = true; can.add(m); });
 can.rotation.x = Math.PI / 2;                   // cylinder y -> local w

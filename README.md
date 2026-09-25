@@ -26,6 +26,7 @@ adding a lift axis.
 | `docs/04_wiring_and_bom.md` | Power architecture, pin map, draft BOM |
 | `docs/05_rvtm.md` | Requirements traceability matrix (draft; Part C 4a) |
 | `docs/06_pdr_outline.md` | Slide-by-slide PDR plan with figures and timing |
+| `viewer/concepts.html` | **All four concepts animated** side by side, with scores and a live table-collision check (try A with the lift axis removed) |
 | `viewer/index.html` | **Interactive 3D replay** of the firmware's simulated run, with telemetry charts, wiring and plots (built by `tools/build_viewer.py`) |
 | `cad/` | Concept CAD: STEP assembly + per-part STEP/STL, and Fusion 360 motion-study steps (`cad/README.md`) |
 | `sim/mechanism.py` | Part geometry (single source for the CAD and the viewer) + full-sweep part-collision check |
