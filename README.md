@@ -31,6 +31,7 @@ adding a lift axis.
 | `cad/` | Concept CAD: STEP assembly + per-part STEP/STL, and Fusion 360 motion-study steps (`cad/README.md`) |
 | `sim/mechanism.py` | Part geometry (single source for the CAD and the viewer) + full-sweep part-collision check |
 | `sim/` | Python: `flip_geometry.py` (clearance sweep), `flip_control.py` (plant + pole placement + robustness), `grip_control.py` (force loop), `plot_telemetry.py` (plots Uno CSV logs, sim or bench) |
+| `firmware/concept_a/` | **Concept A (4 servos) Arduino code**, single file, runs in Tinkercad / Wokwi / real Uno. Wiring: `docs/tinkercad_concept_a.md`, `wokwi/concept_a/` |
 | `firmware/can_flipper/` | Uno sketch. `control.h` / `sequencer.h` are hardware-free; `plant_model.h` is the simulated mechanism |
 | `firmware/host_test/` | Laptop regression test of the real firmware logic (nominal, ±30 % spreads, fault injection) |
 | `tools/capture_serial.py` | Logs the Uno's serial telemetry to CSV for `sim/plot_telemetry.py` |
