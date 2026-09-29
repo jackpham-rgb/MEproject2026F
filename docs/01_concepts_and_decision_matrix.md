@@ -5,7 +5,7 @@ upright at 5 in along +Y and must end inverted at 5 in along +X, 90° away.
 
 ---
 
-## Concept A: Claw + wrist flip + turntable *(original "selected direction")*
+## Concept A: Claw + wrist flip + turntable *(selected)*
 
 A claw on a wrist joint sits on an arm, and the arm sits on a turntable. The sequence is grip,
 flip 180° at the wrist, rotate the turntable 90°, then release.
@@ -16,6 +16,10 @@ cannot flip in place. Its bottom rim hits the table partway through. Gripping of
 help. The far corner still passes below the table, and the can ends up hovering after the flip,
 then drops. So Concept A needs a **fourth actuator: lift ~0.5 in before the flip and lower after**.
 It also has to set the can down under control. That makes 4 actuators, and 3 of them are in series.
+
+**Resolved in the selected design:** a 0.6 in lift on LM6UU bushings gives +0.31 in of clearance.
+Flipping about the can's own centre means lowering the same 0.6 in sets it down exactly on the
+table. Full analysis: `02_design_analysis.md`.
 
 ## Concept B: Cradle flip + drag
 
@@ -40,7 +44,7 @@ It is the most general option: 4–5 servos, inverse kinematics, and stacked ser
 end effector. Servo torques add up quickly at a 5 in reach. It is also the most code for the
 least certainty.
 
-## Concept D: Mirror flip, one diagonal axis *(recommended)*
+## Concept D: Mirror flip, one diagonal axis *(alternative, full design kept in `docs/concept_d/`)*
 
 One horizontal revolute axis runs along the **45° bisector** through the robot origin. It sits at
 **can mid-height (2.35 in + 0.04 in)**. A gripper on a 3.54 in arm grips the can. Then **one 180°
@@ -69,29 +73,49 @@ has to stay low near the axis. Axis height is a build-critical dimension, ±0.04
 
 ---
 
-## Decision matrix
+## Decision matrix (team, final)
 
-Scores are 1 (poor) to 5 (best) and weights sum to 1.0. The scores are engineering judgement
-backed by the analyses referenced. **Revise them as a team before the PDR** — the matrix should be yours.
+Ranking: **A → B → D → C.** Scores are 1 (bad) to 5 (good). Each weight is how much that
+criterion matters to the team, and the weights sum to 1.00.
 
-| Criterion | Weight | A: Claw+wrist+turntable | B: Cradle+slide | C: Pincer arm | D: Mirror flip |
+| Criterion | Weight | A | B | D | C |
 |---|---:|:-:|:-:|:-:|:-:|
-| Reliability of an inverted, free-standing landing | 0.30 | 3 | 2 | 3 | **5** |
-| Actuator / part count (fewer = better) | 0.15 | 2 (4 act.) | 2 (4 act.) | 1 (5 act.) | **5** (2 act.) |
+| Clearly meets "90° around the robot" | 0.25 | 5 | 5 | 2 | 4 |
+| Lands upright and upside down reliably | 0.20 | 4 | 2 | 4 | 4 |
+| Few failure points (fewer motors) | 0.15 | 2 (4 servos) | 2 (4) | 5 (2) | 1 (5) |
+| Simple parts and electronics | 0.15 | 4 (servos only) | 4 | 2 (motor + encoder + driver) | 3 |
+| Simple movement and code | 0.15 | 4 (one move at a time) | 3 | 3 (closed-loop PID) | 1 |
+| Easy to build (tolerances) | 0.10 | 3 | 3 | 2 (±0.04 in axis) | 2 |
+| **Total** | **1.00** | **3.85** | **3.30** | **3.00** | **2.75** |
+
+**Calculation:** total = Σ (score × weight). For A: 5×0.25 + 4×0.20 + 2×0.15 + 4×0.15 + 4×0.15
++ 3×0.10 = 1.25 + 0.80 + 0.30 + 0.60 + 0.60 + 0.30 = **3.85**. With all criteria weighted equally
+(the plain average), the order stays A 3.67, B 3.17, D 3.00, C 2.50.
+
+**Selected: Concept A.**
+- It's the one people expect: the robot visibly turns 90° at 5 in.
+- It uses only hobby servos, with no encoder, motor driver or closed-loop tuning.
+- Every move is simple and can be tested on its own.
+- The price is more failure points (4 servos in series) and a lift that must slide freely. Both
+  are handled in `02_design_analysis.md`.
+
+### First-pass engineering matrix (superseded)
+
+The first scoring weighted landing reliability and actuator count most, and it favoured D.
+It's kept for the record. The team matrix above replaces it, because it adds the criteria that
+matter for the demo and presentation: an obviously-met 90° turn and simple servo-only
+electronics.
+
+| Criterion | Weight | A | B | C | D |
+|---|---:|:-:|:-:|:-:|:-:|
+| Reliability of an inverted, free-standing landing | 0.30 | 3 | 2 | 3 | 5 |
+| Actuator / part count | 0.15 | 2 | 2 | 1 | 5 |
 | Tolerance to can placement error | 0.15 | 4 | 2 | 4 | 4 |
-| Control + code complexity (lower = better) | 0.10 | 2 | 3 | 1 | **4** |
-| Torque / actuator demand (lower = better) | 0.10 | **4** | 3 | 2 | 3 |
-| Build time + cost | 0.10 | 2 | 3 | 2 | **4** |
+| Control + code complexity | 0.10 | 2 | 3 | 1 | 4 |
+| Torque / actuator demand | 0.10 | 4 | 3 | 2 | 3 |
+| Build time + cost | 0.10 | 2 | 3 | 2 | 4 |
 | Shows the closed-loop control objective | 0.10 | 4 | 2 | 4 | 4 |
-| **Weighted total** | **1.00** | **3.00** | **2.30** | **2.55** | **4.35** |
-
-**Sensitivity check.** With all seven criteria weighted equally, the totals are A 3.00, B 2.43,
-C 2.43, D 4.14. With landing reliability cut from 0.30 to 0.15 and the difference spread evenly
-over the others, the totals are A 3.00, B 2.38, C 2.45, D 4.20, and D still leads by 1.2. So the ranking holds across reasonable weightings.
-
-**Selected: Concept D.** It keeps both closed-loop axes from the original plan (grip force, flip
-angle), where they matter most. It drops the turntable. The ~90° move needed no closed loop anyway,
-and here it comes free from the geometry.
+| **Weighted total** | | 3.00 | 2.30 | 2.55 | 4.35 |
 
 ## What still needs doing by hand
 

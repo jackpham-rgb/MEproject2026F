@@ -1,43 +1,45 @@
-# Preliminary CAD Brief (SolidWorks)
+# Preliminary CAD Brief: Concept A (SolidWorks / Fusion 360)
 
-Modelling brief for the PDR-level CAD of Concept D. The dimensions come from `sim/params.py` and
-`sim/flip_geometry.py`. If you change one, change it there and rerun the scripts.
+The concept solids are already generated: `cad/out/concept_a/concept_a_assembly.step` (mm), with
+one STEP/STL per part (`python3 cad/build_cad_concept_a.py`). Use it as the layout skeleton,
+then detail each part.
 
-## Global frame (make this the assembly origin)
+## Frame
 
-- **Origin:** robot corner on the table surface. **+Y** points to START (can at (0, 5) in),
-  **+X** points to TARGET (can at (5, 0) in), and **+Z** is up.
-- **Flip axis:** a construction line through (0, 0, 2.39) in with direction (1, 1, 0)/√2.
-- **Arm plane:** perpendicular to the axis, passing through the axis point (2.5, 2.5, 2.39) in,
-  which is 3.536 in along the axis from the origin.
-- Add two 2.4 in × 4.7 in reference cylinders, one at START upright and one at TARGET inverted.
-  Add a mate or a configuration that rotates the arm sub-assembly 0 → 180° about the axis. Then use
-  *Interference Detection* at 0°, 45°, 90°, 135° and 180°, or a *Motion Study* sweep.
+- **Origin:** the turntable axis on the table, which is the robot's location (the vertex of
+  Figure 2). **+Y** → START, can at (0, 5) in. **+X** → TARGET, can at (5, 0) in. **+Z** up.
+- **Home pose:** arm pointing at START, lift down, wrist upright, arms open.
+- **Joints:**
+  - Turntable: revolute about Z, 0 → −90°.
+  - Lift: slider along Z, 0 → 0.6 in.
+  - Wrist: revolute about the radial Y line at z = 2.35 in (+0.6 when lifted), 0 → 180°.
 
 ## Parts
 
-| Part | Critical dimensions | Notes |
-|---|---|---|
-| **Base plate** | Keep-outs: Ø 2.9 in circles at START and TARGET (can + 0.25 in). Under the arm plane, a half-disk of radius 2.3 in below the axis (counterweight sweep) must be clear | Low profile. Nothing within 0.3 in of the table plane along the can path near START or TARGET |
-| **Motor tower** | Shaft centreline at **z = 2.39 +0.05/−0.02 in** on the 45° line. Tower faces at axial position **≤ 1.9 in** from the origin | Can's axial extent is 2.34–4.74 in, so leave 0.4 in margin. Slot the mount holes vertically so the axis height can be trimmed |
-| **Shaft / hub** | Hub reaches from the tower to the arm plane, ~1.6 in. Hub radius < 1.0 in near the arm plane | Can passes no closer than 2.34 in radially. Use a D-shaft set-screw hub or a 6 mm shaft + 2 × 626 bearings, so the gearbox takes no bending load |
-| **Arm** | Axis → gripper palm face **2.1 in** (0.24 in clear of the can, so the palm doesn't rub it on the return stroke). Axis → can centre 3.536 in. Opposite side: counterweight pocket with its centre at **1.8 in** | Counterweight: steel bar **½ × ¾ × 2 in** (≈ 97 g), long edge parallel to the axis, ½ in dimension radial |
-| **Gripper** | Two jaws closing **parallel to the flip axis**, contact at can mid-height. Open width ≥ 2.9 in, closed on the can at 2.4 in | **V-jaws** (90–120° included angle) to self-centre the can. Silicone or TPU pads (~2 mm). FSR 402 under one pad, with a small puck so the load goes through the sensing area |
-| **Grip servo mount** | SG90/MG90S on the arm, horn → finger lever **~30 mm** | Use a rack or a linkage so both jaws move symmetrically |
-| **Home stop** | A tab on the hub **between the tower and the arm plane** (axial 1.8–2.1 in from the arm plane toward the motor). It rests on a post at ~1.0 in radius when the arm is exactly horizontal (θ = 0) | Not under the arm itself: the counterweight sweeps that half-disk (caught by `sim/mechanism.py`). Gravity holds the tab on the post. The microswitch goes in the post face |
-| **Can sensor** | IR proximity module (TCRT5000/KY-032) in the palm, looking at the can between the open jaws | Moves with the arm, so nothing fixed sits in the counterweight's path. An HC-SR04 under the arm was rejected for that reason |
+| Group | Part | Critical dimensions (in) | Notes |
+|---|---|---|---|
+| fixed | Base box | ±3.0 × ±3.0, 1.0 tall | Must stay **within 3.55 in** of the axis toward both cans. May extend behind the corner. Holds the turntable servo. Add washer pockets and rubber feet |
+| fixed | Lazy-susan bearing | Ø 3.5 ring, top at z = 1.15 | Carries the turret's weight and tipping load, so the servo only turns it |
+| fixed | Turntable servo (MG996R) | Inside the base, output shaft on the Z axis | Couple it to the turret with a spline horn. It must not carry side load |
+| turret | Turntable plate | Ø 3.6, z 1.15–1.35 | |
+| turret | Column | 0.9 × 0.9, to z = 4.3 | |
+| turret | Guide rods | 2 × Ø 6 mm steel, 0.7 apart, 0.6 in front of the axis | **LM6UU bushings**, a printed slide jams (see `02_design_analysis.md` § 5) |
+| turret | Lift servo (MG90S) | On the back of the column | Horn radius **0.35 in**, swings ±60° to give a 0.61 in stroke through a link to the carriage |
+| lift | Carriage | 1.2 × 0.65 × **1.6 tall** | The 2 LM6UU bushings are ≥ 1.6 in apart vertically. Travel z 1.55–3.15 (down) to 2.15–3.75 (up) |
+| lift | Arm | From the carriage to r = 2.65, at the grip height 2.35 | |
+| lift | Wrist servo | r = 2.65–3.35, output shaft pointing radially (+Y) | **Must reach a full 180°.** Use a 270° micro servo if not |
+| wrist | Wrist hub + palm | Palm face at **r = 3.7** (0.1 in clear of the can at 3.8), ±1.6 wide | The wrist axis passes through the can's centre: r = 5, z = 2.35 |
+| wrist | Gripper servo | On top of the palm | Link to both arms so they move symmetrically |
+| wrist | 2 gripper arms | V-shaped, **open gap 2.9**, closed on the can at 2.4, reach r = 3.5–5.9 | Contact at can mid-height. TPU or silicone pads. The FSR goes under one pad (optional) |
 
-## Concept solids already generated
+## Checks to do in CAD
 
-`cad/build_cad.py` writes `cad/out/can_flipper_assembly.step` (mm) plus one STEP/STL per part,
-from the same geometry the collision check (`sim/mechanism.py`) uses. It has two groups:
-`fixed` and `flip_arm`. Import it into SolidWorks or Fusion 360 as the layout skeleton, then do
-the detail design over it.
-
-## Mass properties
-
-Once modelled, assign materials (PLA 1.24 g/cc at your infill, steel for the counterweight). Then
-read the arm sub-assembly's **mass, centre of mass and moment of inertia about the flip axis**.
-Put them into `sim/params.py` (`M_GRIPPER`, `M_ARM`, `R_CW`/`M_CW`, or override `load_inertia()`)
-and rerun `flip_control.py`. The counterweight mass is chosen to cancel 90 % of the *empty* arm's
-first moment. Adjust it with washers after the build.
+1. **Interference at wrist roll 0°, 27°, 90°, 153° and 180°** with the lift up. The can must clear
+   the table by ≥ 0.3 in (the calc says +0.31 in).
+2. **Turntable sweep 0 → −90°** with the lift up: nothing on the turret hits the base or the can
+   footprints.
+3. **Carriage travel:** 0.6 in without binding. Check the bushing spacing (≥ 1.6 in).
+4. **Mass properties:** put the moving masses back into `sim/concept_a.py` (the `M = {…}` table)
+   and rerun it for the servo loads and the jam ratio.
+5. **Optional wide-opening claw:** if the arms pivot open ≥ 80°, check they clear the can so the
+   turntable can turn back without the can being removed first.

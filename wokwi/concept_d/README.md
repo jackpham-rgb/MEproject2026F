@@ -1,4 +1,4 @@
-# Wokwi simulation
+# Wokwi simulation — Concept D (alternative, not selected)
 
 Wokwi has no DC gearmotor/encoder part, so the flip axis and FSR are simulated
 inside the firmware (`SIM_PLANT=1`, see `firmware/can_flipper/plant_model.h`).

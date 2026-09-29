@@ -1,56 +1,57 @@
-# Wiring (draft) and Bill of Materials (draft)
+# Wiring and Bill of Materials: Concept A
 
-## Power architecture
+## Power
 
 ```
-12 V DC (≥2 A wall adapter or 3S LiPo)
- ├── Motor driver VM (TB6612FNG recommended; L298N/L293D work but drop ~1.5–2 V)
- ├── Uno VIN (on-board regulator → 5 V logic, encoder, FSR, IR sensor)
- └── 5 V buck (≥2 A, e.g. mini-360/LM2596) → servo V+ ONLY
-         SG90 stall ≈ 0.65 A; on the Uno's 5 V pin it browns out the board mid-grip
-All grounds common (star at the driver).
+Wall adapter 7–12 V, ≥3 A
+ ├── Uno VIN (on-board regulator → Uno logic, IR sensor, FSR divider)
+ └── 5–6 V buck converter, ≥5 A ──┬── all 4 servo V+   (NOT from the Uno's 5 V pin)
+                                   └── 1000 µF capacitor across V+ / GND
+All grounds joined (servo supply GND ↔ Uno GND).
 ```
 
-## Pin map (matches `firmware/can_flipper/config.h`)
+Why: the 4 servos can pull up to 4.6 A if they all stall (MG996R alone ~2.5 A). On the Uno's
+5 V pin they would reset the board in the middle of a move.
+
+## Pin map (matches `firmware/concept_a/concept_a.ino`)
 
 | Uno pin | Connects to | Notes |
 |---|---|---|
-| D2 (INT0) | Encoder A | Both edges, 4× decode |
-| D3 (INT1) | Encoder B | Both edges |
-| D4 | Start button → GND | `INPUT_PULLUP`, 50 ms debounce |
-| D5 | Driver PWMA / ENA | Timer0 PWM (Timer1 = Servo, Timer2 = control tick) |
-| D7, D8 | Driver AIN1/AIN2 or IN1/IN2 | Direction |
-| D9 | Grip servo signal | Servo lib (Timer1) |
-| D10 | Home microswitch → GND | `INPUT_PULLUP`, closed = on stop |
-| D11 | IR proximity module OUT (in the palm) | `INPUT_PULLUP`, LOW = can present |
-| D12 | spare | |
-| D13 | Status LED (on-board) | Blinking = running, solid = DONE, fast = FAULT |
-| A0 | FSR divider: 5 V — FSR — A0 — 10 kΩ — GND | |
-| 5 V / GND | Encoder VCC, IR module, FSR divider | |
+| D9 | Turntable servo signal (MG996R) | |
+| D10 | Lift servo signal (MG90S) | |
+| D6 | Wrist servo signal (180° or 270° micro) | Set `WRIST_RANGE 270` for a 270° servo |
+| D5 | Gripper servo signal (SG90 / MG90S) | |
+| D4 | Start button → GND | `INPUT_PULLUP`, debounced |
+| D13 | Status LED (+220 Ω) | off = idle, slow blink = moving, on = done, fast blink = fault |
+| D11 | IR proximity module OUT (optional) | LOW = can present, `USE_IR_SENSOR 1` |
+| A0 | FSR divider (optional): 5 V – FSR – A0 – 10 kΩ – GND | `USE_FSR 1` |
 
-Do not use `tone()`: it needs Timer2, which the control tick uses.
+The Servo library works on any pin. It disables `analogWrite` on D9/D10, which this design doesn't
+need.
 
-The Part C wiring diagram: draw this in Fritzing or KiCad once the parts are in hand. The Wokwi
-diagram in `wokwi/diagram.json` covers the logic side.
+Simulations with the same pins: `wokwi/concept_a/diagram.json` and `docs/tinkercad_concept_a.md`.
+For the Part C report, draw the final wiring diagram in Fritzing.
 
-## Draft BOM
+## Bill of Materials
 
 | # | Item | Qty | Source | Est. cost | Notes |
 |---|---|---:|---|---:|---|
 | 1 | Arduino Uno R3 | 1 | ELEGOO kit | — | |
-| 2 | 12 V gearmotor with hall encoder, ~1:34, ~200 rpm (JGA25-370 class) | 1 | Purchase | $12–15 | The main purchase. Check stall torque ≥ 0.3 N·m |
-| 3 | TB6612FNG driver breakout | 1 | Purchase | $5 | Or the kit's L293D |
-| 4 | SG90 or MG90S servo | 1 | Kit / purchase | $3–6 | MG90S (metal gears) preferred for holding force |
-| 5 | FSR 402 (Interlink) | 1 | Purchase | $7 | + 10 kΩ resistor |
-| 6 | Microswitch with lever | 1 | Purchase | $1 | Home stop |
-| 7 | IR proximity module (TCRT5000 or KY-032) | 1 | Kit / purchase | $1–2 | In the palm; replaces the HC-SR04 |
-| 8 | Push button | 1 | Kit | — | Start |
-| 9 | 5 V ≥2 A buck converter | 1 | Purchase | $3 | Servo supply |
-| 10 | 12 V ≥2 A supply | 1 | Purchase / lab | $8 | |
-| 11 | 626ZZ bearing + 6 mm shaft (optional) | 2 + 1 | Purchase | $5 | Takes the bending load off the gearbox shaft |
-| 12 | Steel bar ½ × ¾ × 2 in (counterweight) | 1 | Hardware store / shop | $2 | ≈ 97 g; or a washer stack |
-| 13 | Silicone/TPU pad material | — | Purchase / print in TPU | $2 | |
-| 14 | Printed parts: base, tower, hub (with stop tab), arm, palm, 2 jaws, home post | 8 | Designed (PLA) | filament | Part numbers come with the Part C drawings |
-| 15 | M3 fasteners, standoffs, wire, headers | — | Kit / purchase | $5 | |
-
-Estimated purchased cost beyond the kit: **~$50–60**.
+| 2 | MG996R servo (180°) | 1 | Buy | $8–10 | Turntable |
+| 3 | MG90S servo | 1 | Buy | $4 | Lift |
+| 4 | Micro servo with a full 180° (or a 270° micro servo) | 1 | Buy | $5–8 | Wrist: check the range |
+| 5 | SG90 or MG90S servo | 1 | Kit / buy | $0–4 | Gripper |
+| 6 | Lazy-susan bearing, 3–4 in | 1 | Buy / hardware store | $4 | Turntable |
+| 7 | 6 mm steel rod, ~3 in | 2 | Buy | $3 | Lift guide |
+| 8 | LM6UU linear bearing | 2 | Buy | $3 | Carriage (a printed slide jams) |
+| 9 | 5–6 V buck converter, ≥5 A | 1 | Buy | $6 | Servo power |
+| 10 | Wall adapter 7–12 V, ≥3 A | 1 | Buy / lab | $10 | |
+| 11 | 1000 µF capacitor (≥10 V) | 1 | Kit / buy | $1 | Across servo power |
+| 12 | Push button + LED + 220 Ω | 1 each | Kit | — | Start / status |
+| 13 | IR proximity module (TCRT5000 / KY-032) | 1 | Kit / buy | $1–2 | Optional |
+| 14 | FSR 402 + 10 kΩ | 1 | Buy | $7 | Optional |
+| 15 | TPU filament or silicone sheet | small | Buy | $2 | Gripper arm pads |
+| 16 | Steel washers / bolts + rubber feet | some | Hardware store | $3 | Base weight and grip on the table |
+| 17 | Printed parts (PLA): base box, turntable plate, column, carriage, arm, wrist hub, palm, 2 arms | 9 | Designed | filament | Part numbers come with the Part C drawings |
+| 18 | M3 screws, nuts, wires, headers | — | Kit / buy | $5 | |
+| | **Total to buy beyond the kit** | | | **≈ $50–65** | ≈ $40–55 without the optional parts |

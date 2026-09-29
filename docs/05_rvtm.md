@@ -1,35 +1,36 @@
-# Requirements Verification Traceability Matrix (draft)
+# Requirements Verification Traceability Matrix: Concept A (draft)
 
 Method: **A** = analysis, **I** = inspection, **D** = demonstration, **T** = test (measured).
-The Status column is updated as evidence comes in. It feeds Part C item 4a.
+Update the Status column as evidence comes in. It feeds Part C item 4a.
 
 ## Assignment requirements
 
 | ID | Requirement | Design feature | Method | Evidence | Status |
 |---|---|---|---|---|---|
-| R1 | Complete the test objective (TO1–TO3) | Mirror-flip mechanism + closed-loop flip and grip | D, T | Part B demo; `firmware/host_test`; `tools/emulate_uno.sh` | Simulated ✔, hardware pending |
-| R2 | Arduino Uno or similar | Arduino Uno R3 (ATmega328P) | I | BOM #1; 36.6 % flash / 21.4 % RAM | ✔ (build) |
-| R3 | Operated by the microcontroller | Uno runs the state machine and both control loops standalone. The laptop only logs | I, D | `firmware/can_flipper/sequencer.h` | Design ✔ |
-| R4 | Sized for a classroom tabletop | Robot + swept envelope ~7 × 7 in in plan; max swept height 7.7 in (farthest can point is 5.29 in from the axis) | I | CAD envelope | Pending CAD |
-| R5 | No direct human intervention | One start press. DETECT → DONE runs with no further input; FAULT stops safely | D | State machine; fault tests | Simulated ✔ |
+| R1 | Complete the test objective (TO1–TO3) | Turntable + lift + wrist flip + gripper, one move at a time | D, T | Part B demo; `tools/emulate_concept_a.sh` | Emulated ✔, hardware pending |
+| R2 | Arduino Uno or similar | Arduino Uno R3 | I | BOM #1; 6.3 KB (19 %) flash | ✔ (build) |
+| R3 | Operated by the microcontroller | The Uno runs the whole sequence from `concept_a.ino`. No laptop needed | I, D | Firmware | Design ✔ |
+| R4 | Sized for a classroom tabletop | Base 6 × 6 in; reach 6.2 in; column 4.3 in; up to ~5.3 in with the can lifted | I | `cad/out/concept_a/` | Concept CAD ✔ |
+| R5 | No direct human intervention | One start press; the rest is automatic. Faults freeze safely | D | Firmware | Emulated ✔ |
 
 ## Test objective
 
 | ID | Requirement | Design feature | Method | Evidence | Status |
 |---|---|---|---|---|---|
-| TO1 | Start: can upright, free-standing, at the initial location | Palm IR sensor DETECT (5 consecutive hits) before any motion | T | Fault test "no can" → F_NO_CAN | Simulated ✔ |
-| TO2a | Turn the can upside down | 180° rotation about a horizontal axis | A | `sim/flip_geometry.py`: inverted = True | ✔ (analysis) |
-| TO2b | Move ~90° about the robot at ~5 in radius | Axis on the 45° bisector, so the mirror image of START is TARGET | A | Landing centre (5.000, 0.000) in | ✔ (analysis) |
-| TO3 | Ends free-standing, inverted, at the target | θ_end = 179.5° with no overshoot, 2 mm hover, jaws open symmetrically | A, T | Error budget § 1; sim peak ≤ 179.8° | Simulated ✔ |
+| TO1 | Start: can upright, free-standing, at the initial location | Gripper closes at START; optional IR check | D | Firmware (`USE_IR_SENSOR`) | Design ✔ |
+| TO2a | Turn the can upside down | Wrist rolls 180° about the radial line through the can's centre | A, T | `sim/concept_a.py` § 1 | Analysis ✔ |
+| TO2b | Move ~90° about the robot at ~5 in | Turntable 90°, can held at r = 5.0 in | A, T | Error budget: 2° → 0.17 in | Analysis ✔ |
+| TO3 | Ends free-standing, inverted, at the target | Lowered back the same 0.6 in, so it's set down, not dropped | A, T | `02_design_analysis.md` § 1, § 6 | Analysis ✔, bench pending |
 
 ## Derived design requirements
 
 | ID | Requirement | Rationale | Method | Evidence | Status |
 |---|---|---|---|---|---|
-| DR1 | Final flip angle 179.5° (−2.5 / +1.4°), overshoot never past 180.9° | Rim hits the table at +1°. Tip-over at 24° | A, T | `flip_control.py`; host test checks it | Sim ✔, bench pending |
-| DR2 | Grip force 1.5 ± 0.25 N per finger, never > 4 N | Slip at 0.44 N, dent ~8 N **EST** | A, T | `grip_control.py`; can crush test | Sim ✔, dent test pending |
-| DR3 | Flip axis height 2.39 +0.05/−0.02 in | Hover gap ≥ 0 and drop ≤ 0.2 in | A, I | Geometry sensitivity table; caliper check | Pending build |
-| DR4 | No part of the robot below the can path mid-flip | Collision | A | `sim/mechanism.py` sweep: no part collisions; min table clearance can +0.08 in, counterweight +0.31 in | ✔ (analysis) |
-| DR5 | Control loop 200 Hz with no missed ticks | Discrete design assumes a fixed dt | T | simavr: 1.49 ms worst case, 0 overruns | ✔ (emulated) |
-| DR6 | Any fault leaves the motor off and the jaws open | Safety; the can isn't crushed | T | Host fault-injection tests | Sim ✔ |
-| DR7 | Encoder zero re-established every cycle | Incremental encoder drift | D | Home stop + switch, HOME/SEAT states | Design ✔ |
+| DR1 | Lift ≥ 0.6 in before the flip | The can corner dips 0.29 in below the table mid-flip | A | Clearance +0.31 in at 0.6 in lift | ✔ |
+| DR2 | Wrist reaches 180° ± 3° | Tilt at release; tip-over at 24° | T | Servo range test | Pending |
+| DR3 | Turntable 90° ± 2° | Landing within 0.17 in | T | Calibrate `TURN_TARGET` | Pending |
+| DR4 | Grip ≥ 0.39 N per arm, below the dent force | Slip vs dent | A, T | `sim/concept_a.py` § 3; crush test | Analysis ✔, test pending |
+| DR5 | Lift carriage slides without jamming (2μe/L < 1) | Drawer effect | A, T | LM6UU: 0.04; printed: 1.10 (rejected) | Analysis ✔ |
+| DR6 | Servo supply ≥ 5 A, separate from the Uno 5 V | Stall current up to 4.6 A | A, I | `04_wiring_and_bom.md` | Design ✔ |
+| DR7 | Moves eased (zero speed and accel at both ends) | Don't shake the 15 g can loose | A, T | `concept_a_sequence.png`; emulator log | ✔ |
+| DR8 | Home only after the can is removed | The open arms straddle the can | D | Firmware DONE → button → HOMING | Design ✔ |

@@ -69,14 +69,14 @@ ol.steps li.now{color:var(--ink);font-weight:600}
 <div class="wrap">
   <header>
     <h1>Can Flipper Concepts</h1>
-    <p class="sub">Four ways to invert the can and move it 90° at 5 in. The animations are scripted kinematics (no physics), built to the same dimensions as the design analysis. The live readout tracks the can's lowest point, so a concept that drives the can into the table shows it. The selected concept's firmware-driven replay is in the <a href="https://claude.ai/artifact/Sq3iuS55Be8UzQHFSEEF2F" target="_blank" rel="noopener">Can Flipper Viewer</a>.</p>
+    <p class="sub">Four ways to invert the can and move it 90° at 5 in. The animations are scripted kinematics (no physics), built to the same dimensions as the design analysis. The live readout tracks the can's lowest point, so a concept that drives the can into the table shows it. Selected: Concept A. The closed-loop firmware replay of the Concept D alternative is in the <a href="https://claude.ai/artifact/Sq3iuS55Be8UzQHFSEEF2F" target="_blank" rel="noopener">Can Flipper Viewer</a>.</p>
   </header>
 
   <div class="tabs" role="tablist" aria-label="Concept">
-    <button class="tab" role="tab" data-c="A"><span class="k">CONCEPT A</span><span class="n">Claw + wrist + turntable</span><span class="sc">3.00 · 4 actuators</span></button>
-    <button class="tab" role="tab" data-c="B"><span class="k">CONCEPT B</span><span class="n">Cradle flip + drag</span><span class="sc">2.30 · 4 actuators</span></button>
-    <button class="tab" role="tab" data-c="C"><span class="k">CONCEPT C</span><span class="n">Multi-DOF pincer arm</span><span class="sc">2.55 · 5 actuators</span></button>
-    <button class="tab" role="tab" data-c="D"><span class="k">CONCEPT D · SELECTED</span><span class="n">Mirror flip</span><span class="sc">4.35 · 2 actuators</span></button>
+    <button class="tab" role="tab" data-c="A"><span class="k">CONCEPT A · SELECTED</span><span class="n">Claw + wrist + turntable</span><span class="sc">3.85 · 4 servos</span></button>
+    <button class="tab" role="tab" data-c="B"><span class="k">CONCEPT B</span><span class="n">Cradle flip + drag</span><span class="sc">3.30 · 4 actuators</span></button>
+    <button class="tab" role="tab" data-c="D"><span class="k">CONCEPT D</span><span class="n">Mirror flip</span><span class="sc">3.00 · 2 actuators</span></button>
+    <button class="tab" role="tab" data-c="C"><span class="k">CONCEPT C</span><span class="n">Multi-DOF pincer arm</span><span class="sc">2.75 · 5 actuators</span></button>
   </div>
 
   <section class="bench">
@@ -303,18 +303,18 @@ function mirrorConcept(){
 }
 
 const INFO = {
-  A: {name: "A · Claw + wrist + turntable", act: "4 (grip, lift, flip, yaw)", score: 3.00,
+  A: {name: "A · Claw + wrist + turntable (selected)", act: "4 servos (grip, lift, flip, turn)", score: 3.85,
       idea: "Grip the can at mid-height, flip it at the wrist, carry it 90° on a turntable, set it down.",
-      risk: "A can gripped at mid-height can't flip in place: its corners are 2.64 in from the grip point but only 2.35 in from the table. That needs a lift axis, so 3 of the 4 actuators end up in series."},
-  B: {name: "B · Cradle flip + drag", act: "4 (clamp, lift, flip, yaw)", score: 2.30,
+      risk: "Most voted, but the most failure points: 4 servos in series. A can gripped at mid-height can't flip in place (its corners are 2.64 in from the grip point, only 2.35 in above the table), so it needs the 0.6 in lift, on LM6UU bushings so the carriage doesn't jam."},
+  B: {name: "B · Cradle flip + drag", act: "4 (clamp, lift, flip, yaw)", score: 3.30,
       idea: "Clamp the can in a full-height cradle, flip it in place, set it down inverted, then drag it 90° along the table.",
       risk: "Dragging an empty 15 g can on its thin top rim: friction varies and the can wobbles (shown). It also needs the same lift axis as A."},
-  C: {name: "C · Multi-DOF pincer arm", act: "5 (yaw, shoulder, elbow, roll, grip)", score: 2.55,
-      idea: "An articulated arm lifts the can, swings it 90° while rolling it 180°, and sets it down.",
-      risk: "The most general and the most complex: inverse kinematics, five servos' backlash stacking at a 5 in reach, and the most code for the least certainty."},
-  D: {name: "D · Mirror flip (selected)", act: "2 (flip, grip)", score: 4.35,
+  D: {name: "D · Mirror flip (alternative)", act: "2 (flip, grip)", score: 3.00,
       idea: "One horizontal axis on the 45° bisector at can mid-height. A single 180° turn flips the can and moves it 90°.",
-      risk: "Overshoot past +0.9° pushes the rim into the table, so the flip runs closed loop and aims for 179.5°. The axis height is build-critical: 2.39 in +0.05/−0.02 in."},
+      risk: "The \"lazy\" option: technically meets the spec (90° and 5 in, measured from the robot's corner), but the arm swings 180° and the robot never turns 90° itself. It also needs a closed-loop gear motor, and the flip overshoot past +0.9° hits the table."},
+  C: {name: "C · Multi-DOF pincer arm", act: "5 (yaw, shoulder, elbow, roll, grip)", score: 2.75,
+      idea: "An articulated arm lifts the can, swings it 90° while rolling it 180°, and sets it down.",
+      risk: "The most general and the most complex: inverse kinematics, five servos' backlash stacking at a 5 in reach, and the most code for the least certainty."}
 };
 const CONCEPTS = {A: turntableConcept("A"), B: turntableConcept("B"), C: armConcept(), D: mirrorConcept()};
 Object.values(CONCEPTS).forEach(c => { c.group.visible = false; root.add(c.group); });
@@ -377,7 +377,7 @@ function loop(now){
     if (t >= c.dur) { hold += dt; if (hold > 1.0) { hold = 0; apply(0); } } else apply(Math.min(c.dur, t + dt)); }
   last = now; controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop);
 }
-resize(); select(location.hash.replace("#", "") in CONCEPTS ? location.hash.slice(1) : "D");
+resize(); select(location.hash.replace("#", "") in CONCEPTS ? location.hash.slice(1) : "A");
 if (!playing) apply(CONCEPTS[cur].dur * 0.35);
 requestAnimationFrame(loop);
 })();

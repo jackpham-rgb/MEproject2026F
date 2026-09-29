@@ -1,0 +1,39 @@
+CONCEPT A - design calculations (angles/times read from firmware/concept_a/concept_a.ino)
+
+1. Flip clearance
+   corner distance from grip point = sqrt(1.2^2 + 2.35^2) = 2.639 in
+   no lift: can digs 0.289 in into the table, worst at roll 27 deg (and 153)
+   lift 0.3 in: lowest point during flip = +0.011 in
+   lift 0.6 in: lowest point during flip = +0.311 in
+   after the flip the can spans the same heights, so lowering 0.6 in puts it exactly on the table
+
+2. Motion (eased slow-fast-slow moves)
+   turntable 90 deg in 1.5 s: peak 112 deg/s, can speed 249 mm/s, tangential accel 0.51 m/s^2, centripetal 0.49 m/s^2
+   wrist 180 deg in 1.5 s: peak 225 deg/s (can centre is on the roll axis, so almost no extra load)
+   full run: 6.4 s
+
+3. Grip
+   worst load on the pads: g + turn accel = 10.52 m/s^2 (the can hangs upside down in the arms)
+   minimum squeeze per arm = SF*m*a/(2*mu) = 3.0*0.015*10.52/(2*0.6) = 0.39 N
+   dent onset ~8 N per arm (EST): set GRIP_CLOSED so the pads squeeze ~1-2 N
+
+4. Servo loads (torques in kg*cm, stall ratings at 5 V)
+   turntable: inertia 8.2 kg*cm^2, accel torque 0.034 kg*cm vs MG996R 9.4 (the lazy-susan carries the weight)
+   lift (printed slide, mu 0.3): moving mass 112 g, CG 2.9 in out, jam ratio 2*mu*e/L = 1.10 (JAMS - must be < 1), torque 0.21 kg*cm vs MG90S 1.8
+   lift (LM6UU bushings, mu 0.01): moving mass 112 g, CG 2.9 in out, jam ratio 2*mu*e/L = 0.04 (ok, < 1), torque 0.10 kg*cm vs MG90S 1.8
+   wrist: gripper + can ~47 g, CG ~0.25 in off the roll axis (EST) -> 0.03 kg*cm vs 1.8
+
+5. Error budget
+   turntable off by 1 deg -> can lands 0.09 in from the target
+   turntable off by 2 deg -> can lands 0.17 in from the target
+   turntable off by 3 deg -> can lands 0.26 in from the target
+   wrist short of 180 by d deg -> can tilted d deg at release; it only tips past 24 deg
+   LIFT_DOWN set too high by h -> can drops h; too low -> pads slide on the can. Calibrate on a real can.
+
+6. Base
+   base must stay within 3.55 in of the turntable axis toward START and TARGET (can footprint + 0.25 in); it can extend behind the corner freely
+   tip-over about a 3 in base edge: outboard moment 0.019 N*m -> base needs > 25 g at the axis (easy; add washers anyway so it doesn't slide)
+
+7. Servo power
+   stall currents ~ MG996R 2.5 A, MG90S 0.7 A, micro 0.7 A, SG90 0.65 A -> up to 4.6 A if all stall
+   moves are one at a time, so normal draw < 1.5 A; use a 5-6 V supply rated 5 A + 1000 uF capacitor
