@@ -4,8 +4,8 @@
 
 cad/claw/claw.step               gripper frame + SG90 + wrist servo/horn (grp_frame), the two geared
                                  arms (grp_finger_L, grp_finger_R) and the can (grp_can), wrist upright
-cad/claw/claw_sequence.json      arm positions for close -> hold -> release 25° -> open, already
-                                 computed (4x4 matrices in mm), read by backend/cad/fusion_claw/
+cad/claw/claw_sequence.json      arm angle per frame for close -> hold -> release 25° -> open, plus the
+                                 arm pivots (and 4x4 matrices for reference), read by backend/cad/fusion_claw/
 
 Angles are the firmware's (GRIP_OPEN 20°, GRIP_CLOSED 95°, GRIP_RELEASE 70°) and the arm motion is
 the same kinematics as model.py, eased slow-fast-slow, slowed down so it is easy to watch.
@@ -47,7 +47,7 @@ def ease(s):
 
 def mat(t):
     """gp_Trsf -> 4x4 list (mm)."""
-    return [[round(t.Value(i, j), 9) for j in range(1, 5)] for i in range(1, 4)] + [[0, 0, 0, 1]]
+    return [[t.Value(i, j) for j in range(1, 5)] for i in range(1, 4)] + [[0, 0, 0, 1]]
 
 
 def main():
@@ -70,10 +70,10 @@ def main():
             g = g0 + (to - g0) * ease(k / n)
             j = M.joints_from_commands(FW["TURN_START"], FW["LIFT_DOWN"], FW["WRIST_UP"], g)
             T = M.group_transforms(j)
-            samples.append(dict(label=label, grip=round(g, 2), alpha=round(j["alpha"], 3),
+            samples.append(dict(label=label, grip=round(g, 2), alpha=j["alpha"],
                                 finger_L=mat(T["finger_L"]), finger_R=mat(T["finger_R"])))
         grip = to
-    json.dump(dict(frame_dt=dt, captions=CAPTION, samples=samples), open(os.path.join(OUT, "claw_sequence.json"), "w"))
+    json.dump(dict(frame_dt=dt, pivot_x=M.P["pivot_x"], pivot_y=M.P["pivot_y"], captions=CAPTION, samples=samples), open(os.path.join(OUT, "claw_sequence.json"), "w"))
     print(f"wrote cad/claw/claw.step and cad/claw/claw_sequence.json ({len(samples)} frames, {len(samples) * dt:.1f} s)")
 
 

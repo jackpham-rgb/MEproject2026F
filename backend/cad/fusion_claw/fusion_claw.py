@@ -14,6 +14,7 @@ NOT YET RUN IN FUSION: written without access to Fusion 360; if an API call fail
 says which one.
 """
 import json
+import math
 import os
 import time
 import traceback
@@ -35,6 +36,23 @@ INTRO = ("THE CLAW: one SG90 servo (pin D5), two geared arms\n\n"
          "Tip: orbit to look down on the gears before pressing OK.")
 
 
+def rot_z(px, py, deg):
+    """4x4 (mm) rotation by deg about the vertical line through (px, py), at full precision."""
+    c, s = math.cos(math.radians(deg)), math.sin(math.radians(deg))
+    return [[c, -s, 0.0, px - c * px + s * py],
+            [s, c, 0.0, py - s * px - c * py],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0]]
+
+
+def set_transform(occ, mx):
+    """Move an occurrence; fall back to transform2 (root-relative) if Fusion rejects transform."""
+    try:
+        occ.transform = mx
+    except Exception:
+        occ.transform2 = mx
+
+
 def to_fusion(m):
     """mm 4x4 (list of rows) -> adsk Matrix3D (Fusion's internal unit is cm)."""
     arr = []
@@ -45,7 +63,8 @@ def to_fusion(m):
                 v = v / 10.0
             arr.append(v)
     mx = adsk.core.Matrix3D.create()
-    mx.setWithArray(arr)
+    if not mx.setWithArray(arr):
+        raise RuntimeError("Matrix3D.setWithArray rejected the matrix")
     return mx
 
 
@@ -87,6 +106,7 @@ def run(context):
         YN = adsk.core.MessageBoxButtonTypes.YesNoButtonType
         samples = cfg["samples"]
         dt = cfg.get("frame_dt", 0.04)
+        px, py = cfg["pivot_x"], cfg["pivot_y"]
         while True:
             bar = None
             try:
@@ -95,8 +115,9 @@ def run(context):
             except Exception:
                 bar = None
             for k, s in enumerate(samples):
-                occ["finger_L"].transform = to_fusion(s["finger_L"])
-                occ["finger_R"].transform = to_fusion(s["finger_R"])
+                a = s["alpha"]                       # arm opening angle (0 = closed on the can)
+                set_transform(occ["finger_L"], to_fusion(rot_z(-px, py, a)))
+                set_transform(occ["finger_R"], to_fusion(rot_z(px, py, -a)))
                 if bar is not None:
                     try:
                         bar.message = f"{s['label']}: servo {s['grip']:.0f}°   ({cfg['captions'].get(s['label'], '')})"
