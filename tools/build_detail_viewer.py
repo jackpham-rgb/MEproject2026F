@@ -1,6 +1,6 @@
 """Build viewer/concept_a_detail.html: animated detail CAD + check results.
 
-    python3.13 cad/export.py && python3.13 cad/check.py
+    python3.13 backend/cad/export.py && python3.13 backend/cad/check.py
     python3 tools/build_detail_viewer.py
 """
 import csv
@@ -9,8 +9,8 @@ import json
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "cad", "out")
-mesh = json.load(open(os.path.join(OUT, "viewer_mesh.json")))
+OUT = os.path.join(ROOT, "cad", "check")
+mesh = json.load(open(os.path.join(ROOT, "backend", "cad", "build", "viewer_mesh.json")))
 report = open(os.path.join(OUT, "check_report.txt")).read()
 mass = list(csv.DictReader(open(os.path.join(OUT, "mass_table.csv"))))
 

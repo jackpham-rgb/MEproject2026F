@@ -40,7 +40,7 @@ Already have (check before you start):
 
 ## 2. Printing
 
-Files: `print/stl/` (already turned to the best side and placed on the bed). Orientation preview: `print/print_orientations.png`. Bed size assumed 220 × 220 mm.
+Files: `cad/print/stl/` (already turned to the best side and placed on the bed). Orientation preview: `cad/print/print_orientations.png`. Bed size assumed 220 × 220 mm.
 
 **PETG settings (start here, tune for your printer):** nozzle 0.4 mm at 235 °C, bed 80 °C, layer 0.2 mm, 3 walls (1.2 mm), 4 top / 4 bottom layers, 30 % gyroid infill, cooling fan 30–50 %, elephant-foot compensation 0.15 mm (holes on the bed side), print speed ~60 mm/s. Use glue stick on smooth PEI so PETG doesn't weld to the bed.
 
@@ -71,7 +71,7 @@ Total ≈ 309 g of PETG (+ ~15 % for supports and purge) and ≈ 30 h of printin
 | 6.0 mm (rod) | 6 mm rod | presses in by hand, doesn't fall out | `rod_press` |
 | 12.15 mm (LM6UU) | LM6UU | presses in with thumb pressure | `lm_press` |
 
-Then edit `TOL` in `cad/model.py` and re-run `python3.13 cad/export.py && python3.13 cad/print_prep.py` before printing the rest. The carriage (CA-301) prints lying on its back, so its 4 LM6UU seats are horizontal: if one is tight, turn a 12 mm drill bit through it by hand.
+Then edit `TOL` in `backend/cad/model.py` and re-run `python3.13 backend/cad/export.py && python3.13 backend/cad/print_prep.py` before printing the rest. The carriage (CA-301) prints lying on its back, so its 4 LM6UU seats are horizontal: if one is tight, turn a 12 mm drill bit through it by hand.
 
 Cut from the silicone sheet: 2 pad liners 32 × 40 mm (superglue to the curved pads, CA-402/403) and the can bumper CA-404, 9 × 13.5 mm (superglue to the gripper frame).
 

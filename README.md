@@ -31,9 +31,9 @@ A 3.85 → B 3.30 → D 3.00 → C 2.75.
 | `docs/05_bom.md`, `docs/bom.csv` | **Bill of materials**: every part with why we need it and the alternative we rejected |
 | `docs/decision_matrix_and_bom.xlsx` | **Excel**: binary decision matrices (concepts, power source) + BOM, totals as formulas. CSVs: `docs/decision_matrix_*.csv` |
 | `docs/Engineering_Report_ConceptA.docx` | **Part C engineering report** (summary, design, analysis, electrical, code, BOM, RVTM, test plan, drawings); build with `node tools/make_report.js` |
-| `docs/drawings/` | **Part C 2D drawings**: assembly + one dimensioned sheet per designed part (`all_drawings.pdf`); build with `python3 cad/drawings.py` |
+| `docs/drawings/` | **Part C 2D drawings**: assembly + one dimensioned sheet per designed part (`all_drawings.pdf`); build with `python3 backend/cad/drawings.py` |
 | `docs/08_build_guide.md` | **Build guide**: shopping list, print order and settings, assembly steps, wiring, calibration |
-| `print/` | **Print-ready STLs** (each turned to its best side), orientation preview |
+| `cad/print/` | **Print-ready STLs** (each turned to its best side), orientation preview |
 | `firmware/servo_setup/` | Servo setup sketch: fit horns at HOME, jog servos from the Serial Monitor to find the calibration angles |
 | `docs/06_rvtm.md` | Requirements traceability matrix (Part C 4a) |
 | `docs/07_pdr_outline.md` | Slide-by-slide PDR plan with GIFs and timing |
@@ -57,8 +57,8 @@ branch; they are still in the git history.
 ```bash
 pip install -r sim/requirements.txt cadquery
 python3 sim/concept_a.py                 # design calcs -> sim/out/
-python3 cad/check.py                     # motion + collision check (~5 min) -> cad/out/check_report.txt
-python3 cad/export.py                    # STEP / STL -> cad/out/
+python3 backend/cad/check.py                     # motion + collision check (~5 min) -> cad/check/check_report.txt
+python3 backend/cad/export.py                    # STEP / STL -> cad/step/
 python3 tools/make_tables.py             # BOM + decision matrices (md, csv, xlsx; needs openpyxl)
 python3 tools/make_wiring_diagram.py     # docs/wiring/wiring_diagram.svg
 python3 EE/ee_calcs.py                   # servo signals, current, rail voltage, LTspice files (ngspice optional)
@@ -81,6 +81,6 @@ Done (laptop only):
 Still to do:
 - [ ] Hand sketches of the 4 concepts; PDR deck from `docs/07_pdr_outline.md`
 - [ ] Print the tolerance coupon, then the parts; order the purchased parts (`docs/05_bom.md`)
-- [ ] Measure the real servos / bearing and update `P` in `cad/model.py`
+- [ ] Measure the real servos / bearing and update `P` in `backend/cad/model.py`
 - [ ] Calibrate the servo angles on the real robot (constants at the top of the code)
 - [ ] Part C: add test results and photos to the report after the build

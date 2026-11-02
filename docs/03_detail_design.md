@@ -5,8 +5,8 @@ the robot's kinematics. The collision check, the STEP/STL exports, the Fusion 36
 3D page (`viewer/concept_a_detail.html`) all use that same model.
 
 ```bash
-python3.13 cad/check.py    # motion + collision + mass + loads -> out/check_report.txt
-python3.13 cad/export.py   # STEP assembly, per-part STEP/STL, viewer + Fusion data
+python3.13 backend/cad/check.py    # motion + collision + mass + loads -> out/check_report.txt
+python3.13 backend/cad/export.py   # STEP assembly, per-part STEP/STL, viewer + Fusion data
 python3 tools/build_detail_viewer.py        # rebuild the 3D page
 ```
 (`pip install cadquery`; CadQuery needs Python ≥ 3.10.)
@@ -84,10 +84,10 @@ one print) · `lift_link` · `gripper_frame` (flange + 2 plates + posts) · `fin
 
 ## Simulating it in Fusion 360 and SolidWorks
 
-- **STEP:** `cad/out/concept_a_detail_assembly.step` opens in both. It has one
+- **STEP:** `cad/step/concept_a_assembly.step` opens in both. It has one
   component per moving group: `grp_fixed`, `grp_turret`, `grp_crank`, `grp_lift`, `grp_wrist`,
   `grp_finger_L`, `grp_finger_R`, `grp_can`.
-- **Fusion 360:** run the script `cad/fusion_animate/`. It imports the STEP,
+- **Fusion 360:** run the script `backend/cad/fusion_animate/`. It imports the STEP,
   plays the firmware sequence, and runs Fusion's own interference check at the end of every
   move. Its transforms match the model to 1e-14. It **has not been run inside Fusion yet**; if
   an API call fails, it reports which one.

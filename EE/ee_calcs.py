@@ -141,9 +141,9 @@ SP = {   # idle A, running A at full no-load speed, no-load speed deg/s, stall A
 }
 I_UNO, I_LED = 0.045, (5.0 - 2.0) / 220            # Uno R3 board (EST); yellow LED Vf ~2.0 V
 F_SQUEEZE, LEVER_M = 0.8, 0.044                    # N per arm (recommended 0.5-1 N); pad force lever about the finger pivot:
-                                                   # can centre y 127 mm - pivot y 83 mm (cad/model.py)
+                                                   # can centre y 127 mm - pivot y 83 mm (backend/cad/model.py)
 TAU_GRIP = 2 * F_SQUEEZE * LEVER_M / 9.81 * 100    # kg*cm at the gripper servo (both arms through the gears)
-TAU_LIFT = (0.33, 0.30)                            # kg*cm with / without the can (cad/out/check_report.txt)
+TAU_LIFT = (0.33, 0.30)                            # kg*cm with / without the can (cad/check/check_report.txt)
 TAU_WRIST = 0.06
 can_held = np.zeros(len(log), bool)
 ev = dict((n, tm) for tm, n in events if n not in ("press",))

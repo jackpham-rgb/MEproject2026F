@@ -59,15 +59,15 @@ Optional:
 
 ```bash
 pip install cadquery               # ~300 MB; regenerates the STEP/STL files
-python3 cad/export.py              # -> cad/out/ (STEP assembly, per-part STEP/STL)
-python3 cad/check.py               # motion + collision check, ~5 min -> cad/out/check_report.txt
+python3 backend/cad/export.py              # -> cad/step/ (STEP assembly, per-part STEP/STL)
+python3 backend/cad/check.py               # motion + collision check, ~5 min -> cad/check/check_report.txt
 ```
 
 ## 4. Fusion 360 (animate the CAD)
 
 Fusion 360 is free with an education licence (autodesk.com/education). Run the script in
-`cad/fusion_animate/` (Utilities → Add-Ins → Scripts → +): it imports
-`cad/out/concept_a_detail_assembly.step` and plays the firmware sequence with an interference
+`backend/cad/fusion_animate/` (Utilities → Add-Ins → Scripts → +): it imports
+`cad/step/concept_a_assembly.step` and plays the firmware sequence with an interference
 check at every move. SolidWorks opens the same STEP; the mates are in `cad/README.md`.
 
 ## 5. AVR emulator (optional; Linux or WSL only)

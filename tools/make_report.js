@@ -159,7 +159,7 @@ C.push(para("Running the real part shapes through the firmware sequence found pr
 C.push(h2("4.2 Print tolerances and fasteners"));
 C.push(table([["Fit", "Printed size (mm)", "Used for"], ["#6-32 clearance / pilot", "3.9 / 2.9", "Most joints; screws thread into the plastic (no nuts in the kit)"], ["#8-32 pilot", "3.5", "MG996R flange"], ["Servo-bag screw pilot", "1.7", "Servo tabs and horns"], ["6 mm rod press", "6.00", "Guide rods"], ["LM6UU press", "12.15", "Linear bearings"], ["6807 housing / hub", "47.10 / 34.95", "Turntable bearing"], ["Moving clearance", "≥ 0.5", "Fingers between the gripper plates"]], [3000, 2000, 4360]));
 C.push(spacer());
-C.push(para("A tolerance coupon (CA-900) with all six hole sizes is printed first; if a fit is off, the TOL table in cad/model.py is changed and every part regenerates. Screws: 8 × #6-32 × ½″ and 4 × #8-32 × ½″ from the HF #67675 kit."));
+C.push(para("A tolerance coupon (CA-900) with all six hole sizes is printed first; if a fit is off, the TOL table in backend/cad/model.py is changed and every part regenerates. Screws: 8 × #6-32 × ½″ and 4 × #8-32 × ½″ from the HF #67675 kit."));
 
 // 5 mechanical analysis
 C.push(h1("5. Mechanical analysis"));
@@ -256,10 +256,10 @@ C.push(para("Concept A meets every requirement that can be checked before hardwa
 
 // appendix
 C.push(h1("Appendix A. Drawings"));
-C.push(para("13 sheets, one per designed part plus the assembly, generated from the CAD (cad/drawings.py): third-angle views, overall dimensions, a hole table with fits and positions, and a title block. Full set: docs/drawings/all_drawings.pdf."));
+C.push(para("13 sheets, one per designed part plus the assembly, generated from the CAD (backend/cad/drawings.py): third-angle views, overall dimensions, a hole table with fits and positions, and a title block. Full set: docs/drawings/all_drawings.pdf."));
 image("docs/drawings/CA-000_assembly.png", 6.5, "Sheet 1: assembly CA-000.").forEach(x => C.push(x));
 C.push(h1("Appendix B. Files"));
-C.push(table([["What", "Where"], ["Detail CAD, STEP and STL", "cad/ (model.py, out/)"], ["Collision / mass / load check", "cad/check.py → cad/out/check_report.txt"], ["Drawings", "docs/drawings/"], ["Firmware", "firmware/concept_a/concept_a.ino"], ["Electronics calculations and LTspice", "EE/"], ["BOM and decision matrices", "docs/05_bom.md, docs/decision_matrix_and_bom.xlsx"], ["Wiring", "docs/04_wiring.md, docs/wiring/"]], [4000, 5360]));
+C.push(table([["What", "Where"], ["Detail CAD, STEP and STL", "cad/ (model.py, out/)"], ["Collision / mass / load check", "backend/cad/check.py → cad/check/check_report.txt"], ["Drawings", "docs/drawings/"], ["Firmware", "firmware/concept_a/concept_a.ino"], ["Electronics calculations and LTspice", "EE/"], ["BOM and decision matrices", "docs/05_bom.md, docs/decision_matrix_and_bom.xlsx"], ["Wiring", "docs/04_wiring.md, docs/wiring/"]], [4000, 5360]));
 
 // ------------------------------------------------------------------ document
 const doc = new Document({

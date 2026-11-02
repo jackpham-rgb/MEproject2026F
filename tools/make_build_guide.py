@@ -1,15 +1,15 @@
 """Build guide: shopping list, print list, assembly, wiring and calibration -> docs/08_build_guide.md
 
-    python3 tools/make_build_guide.py      (after tools/make_tables.py and cad/print_prep.py)
+    python3 tools/make_build_guide.py      (after tools/make_tables.py and backend/cad/print_prep.py)
 
-Reads docs/bom.csv (purchased parts) and print/print_table.csv (orientations from cad/print_prep.py).
+Reads docs/bom.csv (purchased parts) and cad/print/print_table.csv (orientations from backend/cad/print_prep.py).
 """
 import csv
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 bom = list(csv.DictReader(open(os.path.join(ROOT, "docs", "bom.csv"))))
-prints = list(csv.DictReader(open(os.path.join(ROOT, "print", "print_table.csv"))))
+prints = list(csv.DictReader(open(os.path.join(ROOT, "cad", "print", "print_table.csv"))))
 
 SEARCH = {  # what to type into Amazon / the store
     "Servo MG996R": "MG996R metal gear servo 180 degree",
@@ -48,8 +48,8 @@ L += ["", "**Tools:** Phillips #1 and #2 screwdrivers, multimeter, hot-glue gun,
       "clamp (pressing the bearing), superglue (silicone liners), a 12 mm drill bit turned by hand (to "
       "ream the LM6UU seats if tight).", "",
       "## 2. Printing", "",
-      "Files: `print/stl/` (already turned to the best side and placed on the bed). Orientation preview: "
-      "`print/print_orientations.png`. Bed size assumed 220 × 220 mm.", "",
+      "Files: `cad/print/stl/` (already turned to the best side and placed on the bed). Orientation preview: "
+      "`cad/print/print_orientations.png`. Bed size assumed 220 × 220 mm.", "",
       "**PETG settings (start here, tune for your printer):** nozzle 0.4 mm at 235 °C, bed 80 °C, layer "
       "0.2 mm, 3 walls (1.2 mm), 4 top / 4 bottom layers, 30 % gyroid infill, cooling fan 30–50 %, "
       "elephant-foot compensation 0.15 mm (holes on the bed side), print speed ~60 mm/s. Use glue stick "
@@ -73,7 +73,7 @@ L += ["", f"Total ≈ {tot_g:.0f} g of PETG (+ ~15 % for supports and purge) and
       "| 3.5 mm (#8 pilot) | #8-32 screw | threads in firmly | `n8_pilot` |",
       "| 6.0 mm (rod) | 6 mm rod | presses in by hand, doesn't fall out | `rod_press` |",
       "| 12.15 mm (LM6UU) | LM6UU | presses in with thumb pressure | `lm_press` |",
-      "", "Then edit `TOL` in `cad/model.py` and re-run `python3.13 cad/export.py && python3.13 cad/print_prep.py` "
+      "", "Then edit `TOL` in `backend/cad/model.py` and re-run `python3.13 backend/cad/export.py && python3.13 backend/cad/print_prep.py` "
       "before printing the rest. The carriage (CA-301) prints lying on its back, so its 4 LM6UU seats are "
       "horizontal: if one is tight, turn a 12 mm drill bit through it by hand.", "",
       "Cut from the silicone sheet: 2 pad liners 32 × 40 mm (superglue to the curved pads, CA-402/403) "
@@ -171,6 +171,6 @@ P = ["# Print files", "",
      "Ready to slice: every STL in `stl/` is already turned to its best side and placed on the bed.",
      "Settings, print order and the tolerance-coupon check: `docs/08_build_guide.md` section 2.", "",
      "![Print orientations](print_orientations.png)", "",
-     "Regenerate after changing `cad/model.py`: `python3.13 cad/export.py && python3.13 cad/print_prep.py`.", ""]
-open(os.path.join(ROOT, "print", "README.md"), "w").write("\n".join(P))
-print(f"wrote docs/08_build_guide.md ({len(buy)} items to buy, ≈ ${total:.0f}; {tot_g:.0f} g PETG, ≈ {tot_h:.0f} h) and print/README.md")
+     "Regenerate after changing `backend/cad/model.py`: `python3.13 backend/cad/export.py && python3.13 backend/cad/print_prep.py`.", ""]
+open(os.path.join(ROOT, "cad", "print", "README.md"), "w").write("\n".join(P))
+print(f"wrote docs/08_build_guide.md ({len(buy)} items to buy, ≈ ${total:.0f}; {tot_g:.0f} g PETG, ≈ {tot_h:.0f} h) and cad/print/README.md")
