@@ -69,7 +69,7 @@ ol.steps li.now{color:var(--ink);font-weight:600}
 <div class="wrap">
   <header>
     <h1>Can Flipper Concepts</h1>
-    <p class="sub">Four ways to invert the can and move it 90° at 5 in. The animations are scripted kinematics (no physics), built to the same dimensions as the design analysis. The live readout tracks the can's lowest point, so a concept that drives the can into the table shows it. Selected: Concept A. The closed-loop firmware replay of the Concept D alternative is in the <a href="https://claude.ai/artifact/Sq3iuS55Be8UzQHFSEEF2F" target="_blank" rel="noopener">Can Flipper Viewer</a>.</p>
+    <p class="sub">Four ways to invert the can and move it 90° at 5 in. The animations are scripted kinematics (no physics), built to the same dimensions as the design analysis. The live readout tracks the can's lowest point, so a concept that drives the can into the table shows it. Selected: Concept A.</p>
   </header>
 
   <div class="tabs" role="tablist" aria-label="Concept">
@@ -275,7 +275,7 @@ function armConcept(){
   };
 }
 
-/* ---------- Concept D: mirror flip (geometry from sim/mechanism.py) ---------- */
+/* ---------- Concept D: mirror flip (geometry in viewer/data/mechanism.json) ---------- */
 function mirrorConcept(){
   const g = new THREE.Group();
   const H = MECH.axis_height, R = MECH.arm_radius, F = MECH.axis_point_xy, a = MECH.axis_dir_xy, u = MECH.u_dir_xy;

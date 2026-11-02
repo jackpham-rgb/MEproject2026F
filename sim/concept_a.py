@@ -22,11 +22,11 @@ os.makedirs(OUT, exist_ok=True)
 IN, G = 0.0254, 9.81
 
 # ---------- test article and layout ----------
-CAN_R, CAN_H, CAN_M = 1.2, 4.7, 0.015          # in, in, kg
+CAN_R, CAN_H, CAN_M = 66.2 / 2 / 25.4, 122.2 / 25.4, 0.015   # standard 12 oz Coke can: 66.2 x 122.2 mm, 15 g empty
 R_CAN = 5.0                                    # turntable axis -> can centre, in
 GRIP_Z = CAN_H / 2                             # grip at mid-height
 LIFT = 0.6                                     # lift stroke, in
-TIP_ANGLE = math.degrees(math.atan(1.05 / (CAN_H / 2)))   # inverted can on its top rim (rim r EST 1.05 in)
+TIP_ANGLE = math.degrees(math.atan(1.09 / (CAN_H / 2)))   # inverted can on its top rim (rim r 27.6 mm = 1.09 in)
 
 # ---------- moving masses (EST) ----------
 M = {  # name: (kg, radius from turntable axis in inches, moves with lift?)
@@ -77,7 +77,7 @@ def main():
     need = max(-lowest_point(r, 0) for r in rolls)
     worst = rolls[int(np.argmax([-lowest_point(r, 0) for r in rolls]))]
     L.append("1. Flip clearance")
-    L.append(f"   corner distance from grip point = sqrt(1.2^2 + 2.35^2) = {math.hypot(CAN_R, CAN_H / 2):.3f} in")
+    L.append(f"   corner distance from grip point = sqrt(R^2 + (H/2)^2) = {math.hypot(CAN_R, CAN_H / 2):.3f} in")
     L.append(f"   no lift: can digs {need:.3f} in into the table, worst at roll {worst:.0f} deg (and {180 - worst:.0f})")
     for lift in (0.3, LIFT):
         L.append(f"   lift {lift:.1f} in: lowest point during flip = {min(lowest_point(r, lift) for r in rolls):+.3f} in")
@@ -115,7 +115,7 @@ def main():
     L.append("4. Servo loads (torques in kg*cm, stall ratings at 5 V)")
     tau_turn = (J * a) / G * 100                                             # N*m -> kg*cm
     L.append(f"   turntable: inertia {J * 1e4:.1f} kg*cm^2, accel torque {tau_turn:.3f} kg*cm "
-             f"vs MG996R {SERVOS['MG996R (turntable)']} (the lazy-susan carries the weight)")
+             f"vs MG996R {SERVOS['MG996R (turntable)']} (the 6807 bearing carries the weight)")
     for mu, name in ((MU_SLIDE_PRINTED, "printed slide"), (MU_SLIDE_LM6UU, "LM6UU bushings")):
         jam = 2 * mu * e / BUSHING_SPACING
         drag = lifted * G * jam                                              # N, friction from the tilting moment

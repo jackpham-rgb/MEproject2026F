@@ -1,5 +1,3 @@
 tools/.cache/
-firmware/host_test/test_sequence
-firmware/host_test/sequence_nominal.csv
 __pycache__/
 *.pyc

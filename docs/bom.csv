@@ -1,0 +1,39 @@
+type,part_no,item,spec / material,qty,unit,source,unit_price_usd_est,mass_g,used_for
+designed,CA-101,Base,PETG,1,ea,3D print,,109.2,"Bearing tower, MG996R pocket, ballast pockets, sweep sector cut away"
+designed,CA-102,Electronics tray,PETG,1,ea,3D print,,57.0,"Uno, buck, breadboard, button/LED/DC-jack panel"
+designed,CA-201,Turret plate,PETG,1,ea,3D print,,24.4,"D plate + hub pressed into the 6807 bore, rod bosses"
+designed,CA-202,Spine,PETG,1,ea,3D print,,22.4,Column back + lift-servo bracket
+designed,CA-203,Top cap,PETG,1,ea,3D print,,10.5,Captures the rod tops
+designed,CA-301,Carriage + arm,PETG,1,ea,3D print,,46.0,"4 LM6UU pockets, arm, wrist-servo bracket"
+designed,CA-302,Lift link,PETG,1,ea,3D print,,0.2,Crank pin to carriage
+designed,CA-401,Gripper frame,PETG,1,ea,3D print,,11.8,Flange + 2 plates + posts
+designed,CA-402,"Finger, right",PETG,1,ea,3D print,,9.7,Gear m1 16T + arm + curved pad
+designed,CA-403,"Finger, left",PETG,1,ea,3D print,,9.7,Mirror; gear has the servo-spline socket
+designed,CA-404,Can bumper,TPU,1,ea,3D print,,0.2,Glued to the gripper frame
+designed,CA-900,Tolerance coupon,PETG,1,ea,3D print,,8.2,Print first; checks all hole fits
+purchased,CA-P01,Arduino Uno R3,ATmega328P board + USB cable,1,ea,Kit (have),0,,Controller
+purchased,CA-P02,Servo MG996R,"Metal gear, 180°, 9.4 kg·cm",1,ea,Amazon,9,,Turntable (D9)
+purchased,CA-P03,Servo MG90S,"Metal gear micro, 1.8 kg·cm",1,ea,Amazon,4,,Lift (D10)
+purchased,CA-P04,"Servo, micro full-180° (or 270°)","MG90S-size, check it reaches 180°",1,ea,Amazon,6,,Wrist (D6)
+purchased,CA-P05,Servo SG90,"Micro, 1.6 kg·cm",1,ea,Kit (have),0,,Gripper (D5)
+purchased,CA-P06,Ball bearing 6807-2RS,35 × 47 × 7 mm,1,ea,Amazon / VXB,5,,Turntable
+purchased,CA-P07,Linear bearing LM6UU,6 mm ID × 12 mm OD × 19 mm,4,ea,Amazon,1,,Lift carriage
+purchased,CA-P08,"Steel rod 6 mm (h6), 300 mm long",Cut to 2 × 112 mm,1,ea,Amazon,5,,Lift guide rods
+purchased,CA-P09,Buck converter XL4015,"5 A, set to 6.0 V",1,ea,Amazon,5,,Servo power
+purchased,CA-P10,Wall adapter,"7.5–12 V DC, ≥ 3 A, 5.5 × 2.1 mm plug",1,ea,Amazon / lab,9,,Main power
+purchased,CA-P11,DC panel jack,"5.5 × 2.1 mm, panel mount",1,ea,Amazon,1,,Power input
+purchased,CA-P12,Electrolytic capacitor,"1000 µF, ≥ 10 V",1,ea,Kit (have),0,,Servo rail
+purchased,CA-P13,Push button,12 mm momentary,1,ea,Kit (have),0,,START (D4)
+purchased,CA-P14,LED + 220 Ω resistor,5 mm,1,set,Kit (have),0,,Status (D13)
+purchased,CA-P15,Mini breadboard,170 tie points,1,ea,Kit (have),0,,Servo power rails
+purchased,CA-P16,Jumper wires,M-M / M-F,20,ea,Kit (have),0,,"Signals, ground"
+purchased,CA-P17,Servo extension lead,300 mm,3,ea,Amazon,1,,"Lift, wrist, gripper"
+purchased,CA-P18,Machine screw #6-32 × ½″,"Pan Phillips, HF kit #67675",8,ea,Have,0,,"Tray 2, spine 2, top cap 2, link 1, gear axle 1"
+purchased,CA-P19,Machine screw #8-32 × ½″,"Pan Phillips, HF kit #67675",4,ea,Have,0,,MG996R flange
+purchased,CA-P20,Servo-bag screws,Come with the servos,14,ea,With servos,0,,"Servo tabs, horns, crank"
+purchased,CA-P21,M2 self-tapping screws,M2 × 6/8 mm pack,1,pack,Amazon,5,,Spare for servo tabs
+purchased,CA-P22,Pad liner,TPU filament or 1–2 mm silicone sheet,1,small,Amazon,2,,Finger pads
+purchased,CA-P23,Steel washers (ballast) + rubber feet,~100 g,1,set,Hardware store,3,,"Base weight, grip on table"
+purchased,CA-P24,PETG filament,1.75 mm,0.35,kg,Have,0,,Printed parts (~330 g incl. supports)
+purchased,CA-P25,IR sensor TCRT5000 / KY-032 (optional),Digital out,1,ea,Kit / Amazon,2,,Can present (D11)
+purchased,CA-P26,FSR 402 + 10 kΩ (optional),Force sensor,1,ea,Amazon,7,,Grip force (A0)

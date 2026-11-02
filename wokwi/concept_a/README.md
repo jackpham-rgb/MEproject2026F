@@ -13,7 +13,7 @@ Stand-ins for parts Wokwi doesn't have:
 - **Potentiometer on A0** = FSR force sensor (used when `USE_FSR 1`; turn it up to "squeeze").
 
 In Wokwi the servos run from the Uno's 5 V pin. That's fine in a simulation, but on the real
-robot the servos need their own 5–6 V supply (≥5 A) with the grounds joined. See the notes doc.
+robot the servos need their own 5–6 V supply (the XL4015 buck at 6.0 V, ≥5 A) with the grounds joined. See `docs/04_wiring.md`.
 
 I checked the code on an emulated Uno (it runs the full sequence), but I haven't loaded this
 diagram in Wokwi itself. If a wire shows up unconnected, check the pin names on first load.

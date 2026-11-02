@@ -10,14 +10,14 @@ upright at 5 in along +Y and must end inverted at 5 in along +X, 90° away.
 A claw on a wrist joint sits on an arm, and the arm sits on a turntable. The sequence is grip,
 flip 180° at the wrist, rotate the turntable 90°, then release.
 
-**The hidden "somehow": a lift axis.** A can gripped at mid-height has its corners 2.64 in from
-the grip point (√(1.2² + 2.35²)). That is 0.29 in more than the 2.35 in to the table. So the can
+**The hidden "somehow": a lift axis.** A can gripped at mid-height has its corners 2.74 in from
+the grip point (√(1.30² + 2.41²), Coke can 2.61 × 4.81 in). That is 0.33 in more than the 2.41 in to the table. So the can
 cannot flip in place. Its bottom rim hits the table partway through. Gripping off-centre doesn't
 help. The far corner still passes below the table, and the can ends up hovering after the flip,
 then drops. So Concept A needs a **fourth actuator: lift ~0.5 in before the flip and lower after**.
 It also has to set the can down under control. That makes 4 actuators, and 3 of them are in series.
 
-**Resolved in the selected design:** a 0.6 in lift on LM6UU bushings gives +0.31 in of clearance.
+**Resolved in the selected design:** a 0.6 in lift on LM6UU bushings gives +0.27 in of clearance.
 Flipping about the can's own centre means lowering the same 0.6 in sets it down exactly on the
 table. Full analysis: `02_design_analysis.md`.
 
@@ -28,7 +28,7 @@ the can 180° in place, and sets it down inverted at START. Then the turntable *
 along the table to TARGET, sliding on its rim, and releases.
 
 Why not "tip twice": tipping the can 90° about its bottom edge, then 90° about the new bottom
-edge, moves it about 4.7 + 2.4 in sideways, past the robot rather than to TARGET. So the flip has
+edge, moves it about 4.8 + 2.6 in sideways, past the robot rather than to TARGET. So the flip has
 to happen in place, which needs the same lift axis as Concept A.
 
 It needs 4 actuators (clamp, lift, flip, turntable). Dragging an inverted 15 g can on its thin rim
@@ -44,10 +44,10 @@ It is the most general option: 4–5 servos, inverse kinematics, and stacked ser
 end effector. Servo torques add up quickly at a 5 in reach. It is also the most code for the
 least certainty.
 
-## Concept D: Mirror flip, one diagonal axis *(alternative, full design kept in `docs/concept_d/`)*
+## Concept D: Mirror flip, one diagonal axis *(alternative, not selected; its full design is in the git history)*
 
 One horizontal revolute axis runs along the **45° bisector** through the robot origin. It sits at
-**can mid-height (2.35 in + 0.04 in)**. A gripper on a 3.54 in arm grips the can. Then **one 180°
+**can mid-height (2.41 in + 0.04 in)**. A gripper on a 3.54 in arm grips the can. Then **one 180°
 rotation about that axis moves the can from START to TARGET and inverts it at the same time**.
 A 180° turn about a horizontal line is a mirror across that line in plan view, plus z → 2h − z.
 So the 90° relocation and the flip are the same motion. See `sim/out/flip_path_3d.png`.

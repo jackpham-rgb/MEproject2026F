@@ -16,7 +16,10 @@ No git? On GitHub, switch to the branch, then **Code → Download ZIP**.
 
 | What | How |
 |---|---|
-| Notes doc to share | `docs/Project_Notes_ConceptA.docx` (Word or Google Docs) |
+| Concept notes (PDR draft only) | `docs/draft/Project_Notes_ConceptA.docx` |
+| Wiring diagram | `docs/wiring/wiring_diagram.png` |
+| BOM | `docs/05_bom.md` / `docs/bom.csv` |
+| Detail CAD, animated | Double-click `viewer/concept_a_detail.html` |
 | All four concepts, animated | Double-click `viewer/concepts.html`. It needs internet, because three.js loads from a CDN |
 | GIFs for docs and slides | `viewer/gifs/` |
 | Plots | `sim/out/concept_a_*.png` |
@@ -30,7 +33,7 @@ No git? On GitHub, switch to the branch, then **Code → Download ZIP**.
    folder name to match the `.ino`.
 3. **Tools → Board → Arduino Uno**, pick the port, then **Verify** (✓). It should report about
    19 % flash.
-4. Wire the servos per `docs/04_wiring_and_bom.md`, upload, open the Serial Monitor at
+4. Wire the servos per `docs/04_wiring.md`, upload, open the Serial Monitor at
    **9600 baud**, and press the button. Each step is printed: GRIP, LIFT, FLIP, TURN, LOWER,
    RELEASE, DONE.
 5. **Calibrate:** change the angle constants at the top of the file (`TURN_START`, `LIFT_UP`,
@@ -56,15 +59,16 @@ Optional:
 
 ```bash
 pip install cadquery               # ~300 MB; regenerates the STEP/STL files
-python3 cad/build_cad_concept_a.py # -> cad/out/concept_a/
+python3 cad/export.py              # -> cad/out/ (STEP assembly, per-part STEP/STL)
+python3 cad/check.py               # motion + collision check, ~5 min -> cad/out/check_report.txt
 ```
 
 ## 4. Fusion 360 (animate the CAD)
 
-Fusion 360 is free with an education licence (autodesk.com/education). Open
-`cad/out/concept_a/concept_a_assembly.step` and follow `cad/README.md`: ground `fixed`, then add
-a revolute joint (turret), a slider (lift) and a revolute joint (wrist). SolidWorks can open the
-same STEP.
+Fusion 360 is free with an education licence (autodesk.com/education). Run the script in
+`cad/fusion_animate/` (Utilities → Add-Ins → Scripts → +): it imports
+`cad/out/concept_a_detail_assembly.step` and plays the firmware sequence with an interference
+check at every move. SolidWorks opens the same STEP; the mates are in `cad/README.md`.
 
 ## 5. AVR emulator (optional; Linux or WSL only)
 
@@ -74,21 +78,3 @@ tools/emulate_concept_a.sh         # compiles the sketch and runs it on an emula
 ```
 
 Skip this on macOS. Tinkercad or Wokwi test the same code in the browser.
-
-## 6. Concept D (alternative) tools
-
-D's closed-loop firmware and sims are still in the repo: `firmware/can_flipper/`,
-`make -C firmware/host_test`, `tools/emulate_uno.sh`, `python3 sim/flip_control.py`,
-`viewer/index.html`. Their docs are in `docs/concept_d/`.
-
-## 7. Logging real runs (Concept D firmware only)
-
-Close the IDE Serial Monitor first, because only one program can use the port.
-
-```bash
-python3 tools/capture_serial.py --list                              # find the port
-python3 tools/capture_serial.py --port COM5 --out runs/run1.csv     # macOS: /dev/cu.usbmodem…
-python3 sim/plot_telemetry.py runs/run1.csv                         # plot + tracking/landing/grip metrics
-```
-
-The same plotter reads the emulator log, so you can compare simulated and measured runs directly.

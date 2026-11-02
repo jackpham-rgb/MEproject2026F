@@ -19,15 +19,16 @@ bench measurements.
 
 ## 2. Why it needs a lift (`concept_a_clearance.png`)
 
-The can is gripped at mid-height, 2.35 in above the table. Its bottom corner is
-√(1.2² + 2.35²) = **2.64 in** from the grip point, so it swings **0.29 in into the table** during the
-flip. The worst point is 27° into the roll, and again at 153°.
+The can is a standard empty 12 oz Coke can, 66.2 mm (2.61 in) across and 122.2 mm (4.81 in) tall.
+It is gripped at mid-height, 2.41 in above the table. Its bottom corner is
+√(1.30² + 2.41²) = **2.74 in** from the grip point, so it swings **0.33 in into the table** during the
+flip. The worst point is 28° into the roll, and again at 152°.
 
 | Lift | Lowest point of the can during the flip |
 |---|---|
-| 0 | −0.29 in (hits the table) |
-| 0.3 in | +0.01 in (too close) |
-| **0.6 in (design)** | **+0.31 in** |
+| 0 | −0.33 in (hits the table) |
+| 0.3 in | −0.03 in (still hits) |
+| **0.6 in (design)** | **+0.27 in** |
 
 ## 3. Motion profile (`concept_a_sequence.png`)
 
@@ -56,7 +57,7 @@ both ends.
 
 | Joint | Load | Needed | Servo (rating) | Margin |
 |---|---|---|---|---|
-| Turntable | inertia 8.2 kg·cm², α = 4.0 rad/s² | 0.03 | MG996R (9.4) | large. The lazy-susan carries the weight, and the big servo is there for stiffness, not torque |
+| Turntable | inertia 8.2 kg·cm², α = 4.0 rad/s² | 0.03 | MG996R (9.4) | large. The 6807 bearing carries the weight, and the big servo is there for stiffness, not torque |
 | Lift, LM6UU bushings | 112 g moving, CG 2.9 in out from the column | 0.10 | MG90S (1.8) | ~18× |
 | Wrist | gripper + can ≈ 47 g, CG ~0.25 in off the axis (**EST**) | 0.03 | micro servo (1.8) | large |
 | Gripper | pad squeeze 1–2 N | — | SG90 (1.6) | fine |
