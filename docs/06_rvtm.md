@@ -17,7 +17,7 @@ Update the Status column as evidence comes in. It feeds Part C item 4a.
 
 | ID | Requirement | Design feature | Method | Evidence | Status |
 |---|---|---|---|---|---|
-| TO1 | Start: can upright, free-standing, at the initial location | Gripper closes at START; optional IR check | D | Firmware (`USE_IR_SENSOR`) | Design ✔ |
+| TO1 | Start: can upright, free-standing, at the initial location | Can placed against the bumper; gripper closes at START | D | Firmware `GRIP` step, `cad/out/check_report.txt` | Design ✔ |
 | TO2a | Turn the can upside down | Wrist rolls 180° about the radial line through the can's centre | A, T | `sim/concept_a.py` § 1 | Analysis ✔ |
 | TO2b | Move ~90° about the robot at ~5 in | Turntable 90°, can held at r = 5.0 in | A, T | Error budget: 2° → 0.17 in | Analysis ✔ |
 | TO3 | Ends free-standing, inverted, at the target | Lowered back the same 0.6 in, so it's set down, not dropped | A, T | `02_design_analysis.md` § 1, § 6 | Analysis ✔, bench pending |

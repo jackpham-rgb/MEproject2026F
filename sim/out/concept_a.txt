@@ -15,7 +15,7 @@ CONCEPT A - design calculations (angles/times read from firmware/concept_a/conce
 3. Grip
    worst load on the pads: g + turn accel = 10.52 m/s^2 (the can hangs upside down in the arms)
    minimum squeeze per arm = SF*m*a/(2*mu) = 3.0*0.015*10.52/(2*0.6) = 0.39 N
-   dent onset ~8 N per arm (EST): set GRIP_CLOSED so the pads squeeze ~1-2 N
+   dent onset ~8 N per arm (EST): set GRIP_CLOSED so the pads squeeze ~0.5-1 N per arm (SG90 max ~1.8 N, see EE/README.md)
 
 4. Servo loads (torques in kg*cm, stall ratings at 5 V)
    turntable: inertia 8.2 kg*cm^2, accel torque 0.034 kg*cm vs MG996R 9.4 (the 6807 bearing carries the weight)

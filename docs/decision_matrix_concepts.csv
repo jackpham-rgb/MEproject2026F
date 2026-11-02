@@ -1,0 +1,12 @@
+#,"criterion (1 = yes / good, 0 = no / bad)",A: claw + wrist flip + turntable,A: claw + wrist flip + turntable: why,B: cradle flip + drag,B: cradle flip + drag: why,C: multi-DOF pincer arm,C: multi-DOF pincer arm: why,D: mirror flip (diagonal axis),D: mirror flip (diagonal axis): why
+1,Robot visibly turns 90° about its own location,1,Turntable at the corner turns 90°; can stays 5 in (127 mm) out,1,"Same turntable, 90°",1,Base yaw joint turns 90°,0,"One 180° roll about a 45° axis; the robot never rotates, the 90° only shows in plan view"
+2,Can is held for the whole move (never slid or dropped),1,Held GRIP → RELEASE; lowered to z = 0.00 mm before opening (CAD check),0,Dragged 7.9 in (5 in × π/2) on its thin rim,1,Held until set down,1,Held; released 2 mm (0.08 in) above the table
+3,"Landing spot set by geometry, not fine tuning",1,Flip about the can centre: lowering 0.6 in = lift 0.6 in; ±2° turn = ±0.17 in,0,Rim friction on the table decides where it stops,0,3-joint inverse kinematics; ~1° backlash per servo stacks to ~0.3 in,1,Exact by symmetry of the 180° roll
+4,3 or fewer actuators (fewer failure points),0,4 servos,0,4 actuators,0,5 servos,1,2: gearmotor + grip servo
+5,"Hobby servos only (no encoder, motor driver or PID)",1,"4 servos, open loop",1,Servos,1,Servos,0,Gearmotor + encoder + driver; closed loop needed (overshoot > 0.9° hits the table)
+6,"One move at a time, each testable on its own",1,"6 steps: grip, lift, flip, turn, lower, release",1,"Clamp, lift, flip, drag, release",0,Joints must move together for a straight path,1,One flip move
+7,No build-critical dimension tighter than ±1 mm,1,Lift gives +0.27 in (6.9 mm) table clearance; slots and pilots from the tolerance coupon,1,Cradle fits loosely around the can,0,Link lengths feed the IK; errors add up at the 5 in reach,0,Axis height ±0.04 in (±1 mm) or the rim hits the table
+8,Servo torque margin ≥ 3×,1,"CAD loads: lift 5×, wrist 30×, turntable > 100× (weight on the bearing)",1,Similar servos and loads to A,0,Shoulder holds arm + can at 5 in: ~1.5 kg·cm vs 1.8 for an MG90S (1.2×),1,18 mN·m (0.18 kg·cm) after the counterweight
+9,Can path stays clear of the robot body,1,No collisions in 289 poses (CAD solid check),1,Can stays outside the base,1,Can stays outside the base,0,Can passes over the robot; base must stay low
+10,No separate lift axis needed,0,Needs a 0.6 in lift: without it the can digs 0.33 in into the table,0,"Same in-place flip, same lift",1,Shoulder lifts the can,1,Can arrives moving straight down; +0.06 in clearance mid-flip
+,TOTAL,8,,6,,5,,6,

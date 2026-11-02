@@ -48,10 +48,11 @@ both ends.
   hangs upside down in the arms.
 - **Minimum squeeze per arm:** SF·m·a / (2μ) = 3 × 0.015 × 10.5 / (2 × 0.6) = **0.39 N**.
 - **Dent onset:** about 8 N per arm (**EST**).
-- **Setting:** `GRIP_CLOSED` is set just past pad contact, so the soft pads squeeze about 1–2 N.
+- **Setting:** `GRIP_CLOSED` is set just past pad contact, so the soft pads squeeze about 0.5–1 N per arm (the SG90 can make at most 1.8 N per arm through the 44 mm finger lever; see `EE/README.md`).
   That's well inside the 0.4–8 N window.
 - **Why a fixed angle:** a hobby servo can't report when it has stopped, so the code goes to a
-  fixed angle. The FSR option (`USE_FSR 1`) stops early at a measured force instead.
+  fixed angle, calibrated once on a real can. No force sensor: the soft pads and the
+  0.4–8 N window make a fixed angle safe.
 
 ## 5. Servo sizing (torques in kg·cm; stall ratings at 5 V)
 
@@ -60,7 +61,7 @@ both ends.
 | Turntable | inertia 8.2 kg·cm², α = 4.0 rad/s² | 0.03 | MG996R (9.4) | large. The 6807 bearing carries the weight, and the big servo is there for stiffness, not torque |
 | Lift, LM6UU bushings | 112 g moving, CG 2.9 in out from the column | 0.10 | MG90S (1.8) | ~18× |
 | Wrist | gripper + can ≈ 47 g, CG ~0.25 in off the axis (**EST**) | 0.03 | micro servo (1.8) | large |
-| Gripper | pad squeeze 1–2 N | — | SG90 (1.6) | fine |
+| Gripper | pad squeeze 0.5–1 N per arm (0.72 kg·cm at 0.8 N) | 0.72 | SG90 (1.6) | 2.2×; holding draws ~0.3 A (`EE/README.md`) |
 
 ### Lift carriage: the jamming check (the drawer effect)
 
@@ -78,7 +79,7 @@ both ends.
 | Error | Effect | Tolerance |
 |---|---|---|
 | Turntable 1° / 2° / 3° off | Can lands 0.09 / 0.17 / 0.26 in from the target | Spec says "approximately", so ±2° is fine. Calibrate `TURN_TARGET` |
-| Wrist short of 180° by d° | Can tilted d° at release | Tip-over at 24°, so a few degrees is harmless. **Check the servo really reaches 180°**, or use a 270° servo (`WRIST_RANGE 270`) |
+| Wrist short of 180° by d° | Can tilted d° at release | Tip-over at 24°, so a few degrees is harmless. **Check the servo really reaches 180°**: the code widens the wrist pulse range to 500–2500 µs so an MG90S can |
 | `LIFT_DOWN` too high by h | Can drops h | Calibrate on a real can |
 | `LIFT_DOWN` too low | Pads slide on the can as it's pushed down | Calibrate on a real can |
 | Can placed off-centre at START | V-arms re-centre it sideways; a radial error carries straight over to TARGET | Place within ~0.25 in |
@@ -89,12 +90,10 @@ both ends.
   footprint + 0.25 in). It can extend behind the corner freely.
 - **Tip-over:** the outboard moment is only 0.019 N·m. Add washers and rubber feet anyway, so the
   reaction from the turntable doesn't slide the base.
-- **Servo current:**
-  - Stall: MG996R 2.5 A, MG90S 0.7 A, micro 0.7 A, SG90 0.65 A. If all four stall at once
-    that's up to 4.6 A.
-  - The moves run one at a time, so normal draw is < 1.5 A.
-- **Supply:** 5–6 V, **≥ 5 A**, with a 1000 µF capacitor, separate from the Uno's 5 V. The grounds
-  are joined.
+- **Electronics:** all electrical calculations (servo PWM signals in firmware order, current
+  budget, rail voltage, LED / button values, LTspice circuit) are in **`EE/README.md`**. In short:
+  one 5 V, 4 A wall adapter; peak normal draw ≈ 0.65 A; the Uno's 5V pin stays ≥ 4.86 V (ngspice).
+  The power-source comparison is in `docs/04_wiring.md` and `docs/decision_matrix_and_bom.xlsx`.
 
 ## 8. Firmware (`firmware/concept_a/concept_a.ino`)
 
@@ -104,8 +103,8 @@ both ends.
   servos plus a move time, and the code blends from the current pose to the next.
 - **Tunable angles:** all servo angles are named constants at the top of the file (`TURN_START`,
   `LIFT_UP`, `GRIP_CLOSED`…). Calibration never touches the logic.
-- **Optional sensors:** the IR can check (`USE_IR_SENSOR`) and the FSR grip / slip check
-  (`USE_FSR`). On a slip it **freezes instead of opening**, so the can isn't dropped in mid-air.
+- **No sensors beyond the START button:** each servo goes to a calibrated angle. The CAD
+  check shows every pose is reachable without collisions, so no feedback is needed to finish.
 - **Homing only after the can is removed:** after release, the open arms are still on both sides
   of the can. Turning back would knock it over.
 - **Tested:** it compiles for the Uno at 6.3 KB (19 % flash). On an emulated ATmega328P it runs

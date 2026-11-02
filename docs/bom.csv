@@ -1,39 +1,34 @@
-type,part_no,item,spec / material,qty,unit,source,unit_price_usd_est,mass_g,used_for
-designed,CA-101,Base,PETG,1,ea,3D print,,109.2,"Bearing tower, MG996R pocket, ballast pockets, sweep sector cut away"
-designed,CA-102,Electronics tray,PETG,1,ea,3D print,,57.0,"Uno, buck, breadboard, button/LED/DC-jack panel"
-designed,CA-201,Turret plate,PETG,1,ea,3D print,,24.4,"D plate + hub pressed into the 6807 bore, rod bosses"
-designed,CA-202,Spine,PETG,1,ea,3D print,,22.4,Column back + lift-servo bracket
-designed,CA-203,Top cap,PETG,1,ea,3D print,,10.5,Captures the rod tops
-designed,CA-301,Carriage + arm,PETG,1,ea,3D print,,46.0,"4 LM6UU pockets, arm, wrist-servo bracket"
-designed,CA-302,Lift link,PETG,1,ea,3D print,,0.2,Crank pin to carriage
-designed,CA-401,Gripper frame,PETG,1,ea,3D print,,11.8,Flange + 2 plates + posts
-designed,CA-402,"Finger, right",PETG,1,ea,3D print,,9.7,Gear m1 16T + arm + curved pad
-designed,CA-403,"Finger, left",PETG,1,ea,3D print,,9.7,Mirror; gear has the servo-spline socket
-designed,CA-404,Can bumper,TPU,1,ea,3D print,,0.2,Glued to the gripper frame
-designed,CA-900,Tolerance coupon,PETG,1,ea,3D print,,8.2,Print first; checks all hole fits
-purchased,CA-P01,Arduino Uno R3,ATmega328P board + USB cable,1,ea,Kit (have),0,,Controller
-purchased,CA-P02,Servo MG996R,"Metal gear, 180°, 9.4 kg·cm",1,ea,Amazon,9,,Turntable (D9)
-purchased,CA-P03,Servo MG90S,"Metal gear micro, 1.8 kg·cm",1,ea,Amazon,4,,Lift (D10)
-purchased,CA-P04,"Servo, micro full-180° (or 270°)","MG90S-size, check it reaches 180°",1,ea,Amazon,6,,Wrist (D6)
-purchased,CA-P05,Servo SG90,"Micro, 1.6 kg·cm",1,ea,Kit (have),0,,Gripper (D5)
-purchased,CA-P06,Ball bearing 6807-2RS,35 × 47 × 7 mm,1,ea,Amazon / VXB,5,,Turntable
-purchased,CA-P07,Linear bearing LM6UU,6 mm ID × 12 mm OD × 19 mm,4,ea,Amazon,1,,Lift carriage
-purchased,CA-P08,"Steel rod 6 mm (h6), 300 mm long",Cut to 2 × 112 mm,1,ea,Amazon,5,,Lift guide rods
-purchased,CA-P09,Buck converter XL4015,"5 A, set to 6.0 V",1,ea,Amazon,5,,Servo power
-purchased,CA-P10,Wall adapter,"7.5–12 V DC, ≥ 3 A, 5.5 × 2.1 mm plug",1,ea,Amazon / lab,9,,Main power
-purchased,CA-P11,DC panel jack,"5.5 × 2.1 mm, panel mount",1,ea,Amazon,1,,Power input
-purchased,CA-P12,Electrolytic capacitor,"1000 µF, ≥ 10 V",1,ea,Kit (have),0,,Servo rail
-purchased,CA-P13,Push button,12 mm momentary,1,ea,Kit (have),0,,START (D4)
-purchased,CA-P14,LED + 220 Ω resistor,5 mm,1,set,Kit (have),0,,Status (D13)
-purchased,CA-P15,Mini breadboard,170 tie points,1,ea,Kit (have),0,,Servo power rails
-purchased,CA-P16,Jumper wires,M-M / M-F,20,ea,Kit (have),0,,"Signals, ground"
-purchased,CA-P17,Servo extension lead,300 mm,3,ea,Amazon,1,,"Lift, wrist, gripper"
-purchased,CA-P18,Machine screw #6-32 × ½″,"Pan Phillips, HF kit #67675",8,ea,Have,0,,"Tray 2, spine 2, top cap 2, link 1, gear axle 1"
-purchased,CA-P19,Machine screw #8-32 × ½″,"Pan Phillips, HF kit #67675",4,ea,Have,0,,MG996R flange
-purchased,CA-P20,Servo-bag screws,Come with the servos,14,ea,With servos,0,,"Servo tabs, horns, crank"
-purchased,CA-P21,M2 self-tapping screws,M2 × 6/8 mm pack,1,pack,Amazon,5,,Spare for servo tabs
-purchased,CA-P22,Pad liner,TPU filament or 1–2 mm silicone sheet,1,small,Amazon,2,,Finger pads
-purchased,CA-P23,Steel washers (ballast) + rubber feet,~100 g,1,set,Hardware store,3,,"Base weight, grip on table"
-purchased,CA-P24,PETG filament,1.75 mm,0.35,kg,Have,0,,Printed parts (~330 g incl. supports)
-purchased,CA-P25,IR sensor TCRT5000 / KY-032 (optional),Digital out,1,ea,Kit / Amazon,2,,Can present (D11)
-purchased,CA-P26,FSR 402 + 10 kΩ (optional),Force sensor,1,ea,Amazon,7,,Grip force (A0)
+type,part_no,item,spec / material,qty,source,unit_price_usd_est,mass_g,what it does / used for,why we need it,alternative considered → why not
+designed,CA-101,Base,PETG,1,3D print,,109.2,"Bearing tower, MG996R pocket, ballast pockets; sweep sector cut away",Holds the turntable and gives the robot its footprint (CG stays ≥ 39 mm inside it in every pose),"Flat plywood/acrylic plate → the tower, servo pocket and sweep cut-out would be several glued pieces"
+designed,CA-102,Electronics tray,PETG,1,3D print,,56.5,"Uno, 5 V rail, button / LED / DC-jack panel",Keeps the electronics and wires out of the arm's 175° sweep,Loose on the table → wires can snag the turning arm and the button moves around
+designed,CA-201,Turret plate,PETG,1,3D print,,24.4,"D plate + hub pressed into the 6807 bore, rod bosses","Puts the column's weight and tipping load on the bearing, so the servo only turns it",Column screwed to the servo horn → the servo spline carries all the bending load
+designed,CA-202,Spine,PETG,1,3D print,,22.4,Column back + lift-servo bracket,Ties the rods to the turret and holds the lift servo,Aluminium extrusion → extra cost and brackets for no gain at this load
+designed,CA-203,Top cap,PETG,1,3D print,,10.5,Captures the rod tops,Keeps the 2 rods parallel so the 4 LM6UU slide without binding,Rods held only at the bottom → they splay and the carriage jams
+designed,CA-301,Carriage + arm,PETG,1,3D print,,46.0,"4 LM6UU pockets, arm, wrist-servo bracket",One print: the arm can't work loose; bearings 43 mm apart keep the jam ratio at 0.018,Separate arm screwed on → the joint sags under the can's 2.6 in offset
+designed,CA-302,Lift link,PETG,1,3D print,,0.2,Crank pin to carriage,Turns the lift servo's 45° swing into a 15.3 mm (0.6 in) straight lift,"Printed rack and pinion → more teeth to print, more backlash"
+designed,CA-401,Gripper frame,PETG,1,3D print,,11.8,Flange + 2 plates + posts,Holds the gripper servo and both finger axles on the wrist horn,Servo bracket from a kit → doesn't hold geared fingers at the right centre distance (16.2 mm)
+designed,CA-402,"Finger, right",PETG,1,3D print,,9.7,Gear m1 16T + arm + curved pad,Geared to the left finger so one servo closes both arms equally and centres the can,One fixed + one moving arm → pushes the can off-centre
+designed,CA-403,"Finger, left",PETG,1,3D print,,9.7,Mirror; gear has the servo-spline socket,As CA-402,As CA-402
+designed,CA-404,Can bumper,Silicone sheet,1,Cut,,0.2,"Cut from the pad sheet, glued to the gripper frame","Sets how deep the can sits in the gripper, so every grip and landing is the same",No stop → grip depth varies with how the can is placed
+designed,CA-900,Tolerance coupon,PETG,1,3D print,,8.2,6 test holes,"Checks screw, rod and bearing fits on our printer before ~300 g of parts",Print the parts first → one wrong fit wastes hours of printing
+purchased,CA-P01,Arduino Uno R3,ATmega328P board + USB cable,1,Kit (have),0,,Controller,Required by the assignment; runs the 4 servos and the button,"Nano / ESP32 → no benefit, the Uno is in the kit"
+purchased,CA-P02,Servo MG996R,"Metal gear, 180°, 9.4 kg·cm",1,Amazon,9,,Turntable (D9),Metal gears keep the swinging arm from wobbling at the 5 in reach,"SG90 → plastic gears, backlash shows up as ±0.1 in at the can"
+purchased,CA-P03,Servo MG90S,"Metal gear micro, 1.8 kg·cm",2,Amazon,4,,Lift (D10) + wrist (D6),"Lift margin 5×, wrist 30×; metal gears so the wrist lands at 180° (500–2500 µs pulse in code)",Stepper motors → need drivers and homing switches; 270° servo → a 2nd servo type for no gain
+purchased,CA-P04,Servo SG90,"Micro, 1.6 kg·cm",1,Kit (have),0,,Gripper (D5),"A light squeeze is what we want: 0.4 N holds the can, it dents at ~8 N per arm","MG90S → stronger than needed, more risk of crushing the can"
+purchased,CA-P05,Ball bearing 6807-2RS,35 × 47 × 7 mm,1,Amazon / VXB,5,,Turntable,Carries the arm's weight and tipping moment so the servo only turns it,"4 in lazy-susan → too tall, it collided with the wrist in the CAD check; servo alone → side load on the spline"
+purchased,CA-P06,Linear bearing LM6UU,6 mm ID × 12 mm OD × 19 mm,4,Amazon,1,,Lift carriage,"Jam ratio 0.018, the lift can't stick","Printed slide → jam ratio 0.55, it can bind"
+purchased,CA-P07,"Steel rod 6 mm (h6), 300 mm long",Cut to 2 × 112 mm,1,Amazon,5,,Lift guide rods,"Straight, hard track for the LM6UU",Printed rails → too rough and soft for the bearings
+purchased,CA-P08,"Wall adapter 5 V, 4 A","Regulated, 5.5 × 2.1 mm plug",1,Amazon,9,,All power,"Scores 8/9 in the power matrix: covers a 2.5 A stall, one plug, no regulator, no charging",9 V battery → can't supply 2.5 A and would need a regulator (4/9); 12 V + buck → extra board to set (5/9)
+purchased,CA-P09,DC panel jack,"5.5 × 2.1 mm, panel mount",1,Amazon,1,,Power input,Adapter plugs into the robot; no loose wires to pull out,Screw terminal → wires pull out when bumped
+purchased,CA-P10,Electrolytic capacitor,"1000 µF, ≥ 10 V",1,Kit (have),0,,5 V rail,"Covers the voltage dip when a servo starts, so the Uno (on the same rail) doesn't reset",None → resets are likely
+purchased,CA-P11,Push button,12 mm momentary,1,Kit (have),0,,START (D4),"Spec: one start, then no human input. A button is one wire, one pin, nothing to pair or lose","IR remote → receiver + library + batteries, stray IR can trigger it; timer → can't choose when it starts"
+purchased,CA-P12,LED + 220 Ω resistor,5 mm,1,Kit (have),0,,Status (D13),"Blinking = moving, on = done: tells you when to lift the can off before homing",Serial Monitor only → needs a laptop at the demo
+purchased,CA-P13,Mini breadboard,170 tie points,1,Kit (have),0,,5 V / GND rails,Splits the adapter's 5 V to 4 servos and the Uno,Soldered perfboard → harder to change while calibrating
+purchased,CA-P14,Jumper wires,M-M / M-F,20,Kit (have),0,,"Signals, ground","Connects the servo signals, button and LED",Soldered wires → harder to fix
+purchased,CA-P15,Servo extension lead,300 mm,3,Amazon,1,,"Lift, wrist, gripper",These servos ride on the column; stock leads (~250 mm) can't reach the tray with a loop for the 90° turn,None → leads pull tight at the end of the turn
+purchased,CA-P16,Machine screw #6-32 × ½″,"Pan Phillips, HF kit #67675",8,Have,0,,"Tray 2, spine 2, top cap 2, link 1, gear axle 1","Threads into printed pilots, no nuts needed",Glue → can't take apart to fix or adjust
+purchased,CA-P17,Machine screw #8-32 × ½″,"Pan Phillips, HF kit #67675",4,Have,0,,MG996R flange,The MG996R's 4.6 mm flange holes fit #8,#6 → loose in the flange
+purchased,CA-P18,Servo-bag screws,Come with the servos,14,With servos,0,,"Servo tabs, horns, crank",Sized for the servo tabs and horns,Kit screws → too big for the micro-servo tabs
+purchased,CA-P19,Silicone rubber sheet,"3/32 in (2.4 mm), ~6 × 6 in",1,Amazon,6,,Finger pads + can bumper,"Grippy pads (μ ≈ 0.6) keep the squeeze needed low (0.4 N), so the can isn't dented","Bare PETG pads → slippery, needs a harder squeeze; TPU → a second filament for 1 g of parts"
+purchased,CA-P20,Steel washers + rubber feet,"~100 g of washers, 4 feet",1,Hardware store,3,,Base,Weight and friction so the turning reaction doesn't slide the base,Clamp to the table → the demo table may not allow it
+purchased,CA-P21,PETG filament,"1.75 mm, ~0.35 kg",1,Have,0,,Printed parts,"Tougher than PLA and creeps less under the press fits (bearing, LM6UU, rods)",PLA → press fits loosen over time

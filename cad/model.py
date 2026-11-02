@@ -4,7 +4,7 @@ Units: millimetres. World frame at the HOME pose: origin = turntable axis on the
 (the robot's location, Figure 2 vertex), +Y -> START can (0, 127), +X -> TARGET can (127, 0), +Z up.
 
 Groups (one rigid body each, so they map 1:1 to Fusion/SolidWorks components and joints):
-  fixed    base (with bearing tower), 6807 bearing, electronics tray, MG996R, Arduino, buck, breadboard
+  fixed    base (with bearing tower), 6807 bearing, electronics tray, MG996R, Arduino, breadboard
   turret   turret plate + hub, horn, rods, spine, top cap, lift servo + bracket
   crank    lift crank (rotates about the lift-servo shaft, an X-axis line)
   lift     carriage, 4x LM6UU, beam, wrist bracket, wrist servo, link
@@ -70,7 +70,7 @@ TOL = dict(
     rod_press=6.0,     # 6 mm rod: nominal hole prints ~0.1 mm under -> light press fit
     lm_press=12.15,    # LM6UU 12 mm OD: +0.15 -> snug press fit
     run_bore=3.9,      # gear on a #6 screw axle: running clearance
-    peg=2.8,           # printed peg for 3.2 mm board holes (Uno), 3.0 mm (buck) -> 2.6
+    peg=2.8,           # printed peg for 3.2 mm board holes (Uno)
     bear_shaft=34.95,  # printed hub into the 35 mm bearing bore (prints ~+0.05)
     bear_housing=47.1, # bearing outer race into the printed tower
     gap_moving=0.5,    # minimum gap between parts that move relative to each other
@@ -256,13 +256,8 @@ def build_parts():
     for hx, hy in uno_holes:                                                             # standoff + 3 mm peg (no #4 screws in the kit)
         x, y = uno_o[0] + hx, uno_o[1] + hy
         tray = tray.union(cyl(x, y, 3.0, p["tray_t"], p["tray_t"] + 6)).union(cyl(x, y, TOL["peg"] / 2, p["tray_t"] + 6, p["tray_t"] + 9))
-    # buck converter standoffs (XL4015 5 A module, 54 x 23, holes ~48 x 17  VERIFY)
-    bk_o = (8.0, ty0 + 10.0)
-    for hx, hy in ((3, 3), (51, 3), (3, 20), (51, 20)):
-        x, y = bk_o[0] + hx, bk_o[1] + hy
-        tray = tray.union(cyl(x, y, 3.0, p["tray_t"], p["tray_t"] + 5)).union(cyl(x, y, 1.3, p["tray_t"] + 5, p["tray_t"] + 8))
     add("electronics_tray", "fixed", tray, "PETG", note="2x #6-32x1/2 up through the tabs into the base. "
-        "Uno and buck sit on printed pegs (dab of hot glue); mini breadboard is self-adhesive.")
+        "The Uno sits on printed pegs (dab of hot glue); mini breadboard is self-adhesive.")
 
     # ---------------- fixed: purchased ----------------
     bear = cyl(0, 0, p["bear_od"] / 2, H - p["bear_w"], H).cut(cyl(0, 0, p["bear_id"] / 2, H - p["bear_w"] - 1, H + 1))
@@ -272,10 +267,8 @@ def build_parts():
     uno = box(uno_o[0], uno_o[0] + 68.6, uno_o[1], uno_o[1] + 53.3, p["tray_t"] + 6, p["tray_t"] + 7.6)
     uno = uno.union(box(uno_o[0] - 6, uno_o[0] + 10, uno_o[1] + 32, uno_o[1] + 44, p["tray_t"] + 7.6, p["tray_t"] + 18.6))
     add("arduino_uno", "fixed", uno, "buy", mass=25.0)
-    add("buck_XL4015", "fixed", box(bk_o[0], bk_o[0] + 54, bk_o[1], bk_o[1] + 23, p["tray_t"] + 5, p["tray_t"] + 19),
-        "buy", mass=25.0, note="5 A buck set to 6.0 V for the servos  VERIFY footprint")
     add("mini_breadboard", "fixed", box(8, 55, ty0 + 45, ty0 + 80, p["tray_t"], p["tray_t"] + 8.5), "buy", mass=10.0,
-        note="power distribution + 1000 uF capacitor")
+        note="5 V rail from the wall adapter + 1000 uF capacitor")
 
     # ---------------- turret ----------------
     tz0, tz1 = p["turret_z0"], p["turret_z1"]
@@ -387,7 +380,7 @@ def build_parts():
         gr = gr.union(box(hx - 3, hx + 3, pvy - 3, pvy + 3, pt[1], tab_z)).cut(cyl(hx, pvy, 0.85, tab_z - 6, tab_z + 1))
     add("gripper_frame", "wrist", gr, "PETG", note="Flange + 2 plates + posts in one print. Wrist horn: 4 servo-bag "
         "screws. Right gear axle: #6-32x1/2 from the top. Left gear rides on the gripper-servo horn. Servo: 2 servo-bag screws.")
-    add("can_bumper", "wrist", box(-4.5, 4.5, py1, py1 + 2.4, pb[0], pt[1]), "TPU", note="can stop: place the can against it")
+    add("can_bumper", "wrist", box(-4.5, 4.5, py1, py1 + 2.4, pb[0], pt[1]), "silicone", note="can stop, cut from the 3/32 in silicone sheet: place the can against it")
     gsrv = moved(micro_servo_local(), trsf_axes((-pvx, pvy, gs_face - 5.8), (-1, 0, 0), (0, 0, -1)))
     add("gripper_servo_SG90", "wrist", gsrv, "buy", mass=9.0)
     add("axle_R", "wrist", cyl(pvx, pvy, 1.75, pt[1] - 12.7, pt[1]), "buy", mass=1.6, note="#6-32x1/2 (kit), right-gear axle")
@@ -412,7 +405,7 @@ def build_parts():
     fR = arm.union(pad).union(gear_disc).cut(cyl(pvx, pvy, TOL["run_bore"] / 2, fz0 - 1, fz1 + 1))
     fL = arm.union(pad).union(gear_disc).mirror("YZ").cut(cyl(-pvx, pvy, 3.0, fz0 + 2, fz1 + 1))   # spline / horn socket
     add("finger_R", "finger_R", fR, "PETG", note="Gear (m1, 16T, pitch r 8 mm, +0.2 backlash) + arm + can pad. Print "
-        "flat. Runs on a #6-32 axle (3.9 mm bore). Line the pad with 2 mm TPU or silicone.")
+        "flat. Runs on a #6-32 axle (3.9 mm bore). Line the pad with the 3/32 in silicone sheet.")
     add("finger_L", "finger_L", fL, "PETG", note="Mirror of finger_R; its gear has the servo-spline socket.")
 
     # ---------------- tolerance test coupon (print first; not part of the assembly) ----------------

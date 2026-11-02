@@ -99,6 +99,30 @@ criterion matters to the team, and the weights sum to 1.00.
 - The price is more failure points (4 servos in series) and a lift that must slide freely. Both
   are handled in `02_design_analysis.md`.
 
+### Binary matrix (yes = 1, no = 0)
+
+Every score is a plain yes/no with the number behind it. Totals and ranks are formulas in
+`docs/decision_matrix_and_bom.xlsx` (sheet *Concepts*); also `docs/decision_matrix_concepts.csv`.
+
+| # | Criterion | A | B | C | D |
+|---|---|:-:|:-:|:-:|:-:|
+| 1 | Robot visibly turns 90° about its own location | 1 | 1 | 1 | 0 |
+| 2 | Can is held for the whole move (never slid or dropped) | 1 | 0 | 1 | 1 |
+| 3 | Landing spot set by geometry, not fine tuning | 1 | 0 | 0 | 1 |
+| 4 | 3 or fewer actuators (fewer failure points) | 0 | 0 | 0 | 1 |
+| 5 | Hobby servos only (no encoder, motor driver or PID) | 1 | 1 | 1 | 0 |
+| 6 | One move at a time, each testable on its own | 1 | 1 | 0 | 1 |
+| 7 | No build-critical dimension tighter than ±1 mm | 1 | 1 | 0 | 0 |
+| 8 | Servo torque margin ≥ 3× | 1 | 1 | 0 | 1 |
+| 9 | Can path stays clear of the robot body | 1 | 1 | 1 | 0 |
+| 10 | No separate lift axis needed | 0 | 0 | 1 | 1 |
+| | **Total** | **8** | **6** | **5** | **6** |
+
+B and D tie on 6. The tie goes to B because it meets criterion 1 (the spec's visible 90°
+turn), giving **A → B → D → C**, the same order as the weighted team matrix. The reasons for
+each score are in the spreadsheet's *Why* columns, e.g. A loses only on actuator count (4) and
+on needing a lift (the can digs 0.33 in into the table without it).
+
 ### First-pass engineering matrix (superseded)
 
 The first scoring weighted landing reliability and actuator count most, and it favoured D.

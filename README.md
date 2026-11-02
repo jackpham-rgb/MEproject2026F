@@ -27,13 +27,15 @@ A 3.85 → B 3.30 → D 3.00 → C 2.75.
 | `docs/01_concepts_and_decision_matrix.md` | 4 concepts, team decision matrix with the calculation |
 | `docs/02_design_analysis.md` | Lift clearance, motion profile, grip force, servo sizing, lift jam check, error budget, power |
 | `docs/03_detail_design.md` | **Detail design**: what the motion check found and fixed, tolerances, fasteners, parts |
-| `docs/04_wiring.md`, `docs/wiring/` | **Wiring diagram** (Fritzing-style PNG/SVG) and wire list |
-| `docs/05_bom.md`, `docs/bom.csv` | **Bill of materials**: designed (printed) + purchased parts |
+| `docs/04_wiring.md`, `docs/wiring/` | **Wiring diagram** (Fritzing-style PNG/SVG), wire list, why a 5 V wall adapter and not a battery |
+| `docs/05_bom.md`, `docs/bom.csv` | **Bill of materials**: every part with why we need it and the alternative we rejected |
+| `docs/decision_matrix_and_bom.xlsx` | **Excel**: binary decision matrices (concepts, power source) + BOM, totals as formulas. CSVs: `docs/decision_matrix_*.csv` |
 | `docs/06_rvtm.md` | Requirements traceability matrix (Part C 4a) |
 | `docs/07_pdr_outline.md` | Slide-by-slide PDR plan with GIFs and timing |
 | `docs/draft/` | Early concept notes (PDR stage). **A draft only**: the docs above supersede it |
 | `cad/` | **Detail CAD**: `model.py` (all parts + kinematics), `check.py` (collision / mass / load check over the firmware sequence), `export.py` (STEP for SolidWorks/Fusion, STL), `fusion_animate/` (Fusion 360 motion script), `out/` (STEP, STL, check report) |
-| `firmware/concept_a/concept_a.ino` | **The Arduino code** (4 servos, eased moves, optional IR / FSR) |
+| `EE/` | **Electronics calculations**: servo PWM signals in firmware order, current budget, rail voltage, **LTspice circuit** (`EE/ltspice/`), run with `python3 EE/ee_calcs.py` |
+| `firmware/concept_a/concept_a.ino` | **The Arduino code** (4 servos, eased moves, one START button) |
 | `wokwi/concept_a/`, `docs/tinkercad_concept_a.md` | Breadboard simulation: Wokwi diagram, Tinkercad step by step |
 | `sim/concept_a.py` | Design calcs (reads the angles and times from the firmware) → `sim/out/` |
 | `viewer/concept_a_detail.html` | Detail CAD animated through the firmware sequence, with the check results |
@@ -52,8 +54,9 @@ pip install -r sim/requirements.txt cadquery
 python3 sim/concept_a.py                 # design calcs -> sim/out/
 python3 cad/check.py                     # motion + collision check (~5 min) -> cad/out/check_report.txt
 python3 cad/export.py                    # STEP / STL -> cad/out/
-python3 tools/make_bom.py                # docs/05_bom.md + docs/bom.csv
+python3 tools/make_tables.py             # BOM + decision matrices (md, csv, xlsx; needs openpyxl)
 python3 tools/make_wiring_diagram.py     # docs/wiring/wiring_diagram.svg
+python3 EE/ee_calcs.py                   # servo signals, current, rail voltage, LTspice files (ngspice optional)
 tools/emulate_concept_a.sh               # emulated Uno run (apt install gcc-avr avr-libc simavr)
 ```
 
@@ -67,7 +70,7 @@ Done (laptop only):
 - [x] Design calcs: lift clearance, grip force, servo loads, lift jam check, error budget, power
 - [x] Detail CAD with PETG tolerances and kit screws; no collisions over the full firmware sequence
 - [x] Arduino code, verified on an emulated Uno; Tinkercad and Wokwi wiring
-- [x] Wiring diagram, BOM, RVTM, PDR plan
+- [x] Wiring diagram, BOM with reasons, binary decision matrices (Excel), RVTM, PDR plan
 
 Still to do:
 - [ ] Hand sketches of the 4 concepts; PDR deck from `docs/07_pdr_outline.md`

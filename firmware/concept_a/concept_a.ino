@@ -6,43 +6,37 @@
 //
 // Wiring (see docs/tinkercad_concept_a.md):
 //   D9  turntable servo      D10 lift servo       D6 wrist servo     D5 gripper servo
-//   D4  start button to GND  D13 LED (+220 ohm)   D11 IR sensor OUT (optional, LOW = can)
-//   A0  FSR divider (optional: 5V - FSR - A0 - 10k - GND)
-// Real robot: power the servos from their own 5-6 V supply, grounds joined to the Uno.
+//   D4  start button to GND  D13 LED (+220 ohm)
+// Real robot: one 5 V 4 A wall adapter feeds the servo rail and the Uno 5V pin (docs/04_wiring.md).
 //
 // Button: press to run. After DONE, take the can away, then press again to go home.
 // (Going home with the can still there would knock it over: the open arms are on both sides.)
 
 #include <Servo.h>
 
-// ---------- Options ----------
-#define USE_IR_SENSOR 0     // 1 = check a can is in the arms before starting
-#define USE_FSR       0     // 1 = stop closing when the force sensor says "held"
+// ---------- Debug ----------
 #define PRINT_ANGLES  0     // 1 = print the 4 servo angles (open the Serial Plotter to see the smooth moves)
 
 // ---------- Servo angles (degrees). Find the real values by testing. ----------
 const int TURN_START  = 135;   // arm pointing at the start spot
 const int TURN_TARGET = 45;    // 90 degrees later, pointing at the target spot
-const int LIFT_DOWN   = 30;    // gripper at can mid-height (2.35 in)
+const int LIFT_DOWN   = 30;    // gripper at can mid-height (2.41 in, Coke can)
 const int LIFT_UP     = 75;    // about 0.6 in higher
 const int WRIST_UP    = 0;     // can upright
-const int WRIST_FLIP  = 180;   // can upside down (real angle, see WRIST_RANGE)
+const int WRIST_FLIP  = 180;   // can upside down
 const int GRIP_OPEN   = 20;
 const int GRIP_CLOSED = 95;    // just past where the pads touch the can
 const int GRIP_RELEASE = 70;   // at the target the gripper is upside down: open only ~25 deg so the
                                // arms clear the can but don't swing down into the base (CAD check)
-const int WRIST_RANGE = 180;   // set to 270 if the wrist is a 270-degree servo
 
 // ---------- Move times (ms) ----------
 const unsigned long T_GRIP = 800, T_LIFT = 1000, T_FLIP = 1500, T_TURN = 1500, T_RELEASE = 600;
 
-// ---------- Optional sensors ----------
-const int FSR_HELD = 300;      // analogRead value that means "can is held" (calibrate)
-const int FSR_LOST = 120;      // below this while moving = can slipped
-
 // ---------- Pins ----------
 const int PIN_TURN = 9, PIN_LIFT = 10, PIN_WRIST = 6, PIN_GRIP = 5;
-const int PIN_BUTTON = 4, PIN_LED = 13, PIN_IR = 11, PIN_FSR = A0;
+const int PIN_BUTTON = 4, PIN_LED = 13;
+// The wrist needs a full 180 deg: a wider pulse range (500-2500 us) lets an MG90S reach it.
+const int WRIST_MIN_US = 500, WRIST_MAX_US = 2500;
 
 Servo turnServo, liftServo, wristServo, gripServo;
 
@@ -51,7 +45,6 @@ Pose makePose(int turn, int lift, int wrist, int grip) { Pose p; p.turn = turn; 
 
 // The run, one move per step. Each row = where every servo should be at the END of the step.
 struct Step { const char* name; Pose to; unsigned long ms; };
-Pose gripAngle = {0, 0, 0, GRIP_CLOSED};   // grip angle can be shortened by the FSR
 
 Step RUN[] = {
   {"GRIP",    {TURN_START,  LIFT_DOWN, WRIST_UP,   GRIP_CLOSED}, T_GRIP},
@@ -75,7 +68,7 @@ Step HOMING[] = {
 };
 const int HOME_STEPS = sizeof(HOMING) / sizeof(HOMING[0]);
 
-enum Mode { IDLE, RUNNING, DONE, RETURNING, FAULT };
+enum Mode { IDLE, RUNNING, DONE, RETURNING };
 Mode mode = IDLE;
 Step* steps = RUN;
 int stepCount = RUN_STEPS, stepIndex = 0;
@@ -94,7 +87,7 @@ int blend(int a, int b, float e) { return a + (int)((b - a) * e + (b > a ? 0.5 :
 void writePose(const Pose& p) {
   turnServo.write(p.turn);
   liftServo.write(p.lift);
-  wristServo.write((long)p.wrist * 180 / WRIST_RANGE);   // 270-degree servo: 180 real = 120 command
+  wristServo.write(p.wrist);
   gripServo.write(p.grip);
 }
 
@@ -112,22 +105,16 @@ void startSteps(Step* list, int count, Mode m) {
   Serial.print(F("> ")); Serial.println(steps[0].name);
 }
 
-void fault(const __FlashStringHelper* why) {
-  mode = FAULT;                            // freeze where we are: opening mid-air would drop the can
-  Serial.print(F("FAULT: ")); Serial.println(why);
-}
-
 // ---------- setup / loop ----------
 void setup() {
   Serial.begin(9600);
   pinMode(PIN_BUTTON, INPUT_PULLUP);
-  pinMode(PIN_IR, INPUT_PULLUP);
   pinMode(PIN_LED, OUTPUT);
   now = makePose(TURN_START, LIFT_DOWN, WRIST_UP, GRIP_OPEN);
   writePose(now);                          // set the angle before attach so nothing jumps
   turnServo.attach(PIN_TURN);
   liftServo.attach(PIN_LIFT);
-  wristServo.attach(PIN_WRIST);
+  wristServo.attach(PIN_WRIST, WRIST_MIN_US, WRIST_MAX_US);
   gripServo.attach(PIN_GRIP);
   writePose(now);
   Serial.println(F("Concept A ready. Press the button to start."));
@@ -140,42 +127,27 @@ void loop() {
   if (!autoDone && millis() > 1000) { pressed = true; autoDone = true; }
 #endif
 
-  // LED: off = idle, slow blink = moving, on = done, fast blink = fault
+  // LED: off = idle, blinking = moving, on = done
   unsigned long t = millis();
-  digitalWrite(PIN_LED, mode == DONE ? HIGH : mode == FAULT ? (t / 100) % 2 : (mode == IDLE ? LOW : (t / 400) % 2));
+  digitalWrite(PIN_LED, mode == DONE ? HIGH : (mode == IDLE ? LOW : (t / 400) % 2));
 
   switch (mode) {
     case IDLE:
-      if (pressed) {
-        if (USE_IR_SENSOR && digitalRead(PIN_IR) != LOW) { Serial.println(F("No can in the arms.")); break; }
-        startSteps(RUN, RUN_STEPS, RUNNING);
-      }
+      if (pressed) startSteps(RUN, RUN_STEPS, RUNNING);
       break;
 
     case DONE:
       if (pressed) { Serial.println(F("Going home (can should be removed).")); startSteps(HOMING, HOME_STEPS, RETURNING); }
       break;
 
-    case FAULT:
-      if (pressed) { Serial.println(F("Reset: remove the can, going home.")); startSteps(HOMING, HOME_STEPS, RETURNING); }
-      break;
-
     case RUNNING:
     case RETURNING: {
       Step& st = steps[stepIndex];
       Pose to = st.to;
-      if (mode == RUNNING && to.grip == GRIP_CLOSED) to.grip = gripAngle.grip;   // FSR may stop the grip early
       float e = ease((float)(millis() - stepStart) / st.ms);
       now = makePose(blend(from.turn, to.turn, e), blend(from.lift, to.lift, e),
                      blend(from.wrist, to.wrist, e), blend(from.grip, to.grip, e));
 
-      if (USE_FSR && mode == RUNNING) {
-        int f = analogRead(PIN_FSR);
-        if (stepIndex == 0 && f >= FSR_HELD) {           // held firmly: stop closing here
-          gripAngle.grip = now.grip; to.grip = now.grip; e = 1;
-        }
-        if (stepIndex >= 1 && stepIndex <= 4 && f < FSR_LOST) { fault(F("can slipped")); break; }
-      }
       writePose(now);
 #if PRINT_ANGLES
       Serial.print(now.turn); Serial.print(' '); Serial.print(now.lift); Serial.print(' ');

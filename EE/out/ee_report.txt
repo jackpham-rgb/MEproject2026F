@@ -1,0 +1,61 @@
+CONCEPT A ELECTRONICS (EE/ee_calcs.py)
+
+1. SERVO SIGNAL (PWM) BASICS
+   Servo library on a Uno: Timer1, prescaler 8 -> 0.5 us resolution; one 20 ms frame (50 Hz) for all servos.
+   In each frame the pulses go out back to back in attach order: D9 turntable, D10 lift, D6 wrist, D5 gripper.
+   width_us = map(angle, 0, 180, min_us, max_us); default 544-2400 us, wrist attached with 500-2500 us.
+   (The library subtracts a 2 us trim; ISR latency adds ~1-2 us. Both are inside the servos' deadband.)
+   Duty cycle range: 2.7% (0 deg) to 12.0% (180 deg); wrist 2.5% to 12.5%.
+   Longest frame use: 4 pulses <= 2400 + 2400 + 2500 + 2400 = 9.7 ms, so all 4 fit in the 20 ms frame.
+
+2. PULSE WIDTHS AT THE END OF EACH STEP, IN FIRMWARE ORDER
+   step      t (s)   | D9 turn  deg/us | D10 lift  deg/us | D6 wrist deg/us | D5 grip  deg/us
+   HOME      0.00    |  135 / 1936   |   30 /  853   |    0 /  500   |   20 /  750  
+   GRIP      1.80    |  135 / 1936   |   30 /  853   |    0 /  500   |   95 / 1523  
+   LIFT      2.80    |  135 / 1936   |   75 / 1317   |    0 /  500   |   95 / 1523  
+   FLIP      4.30    |  135 / 1936   |   75 / 1317   |  180 / 2500   |   95 / 1523  
+   TURN      5.80    |   45 / 1008   |   75 / 1317   |  180 / 2500   |   95 / 1523  
+   LOWER     6.80    |   45 / 1008   |   30 /  853   |  180 / 2500   |   95 / 1523  
+   RELEASE   7.40    |   45 / 1008   |   30 /  853   |  180 / 2500   |   70 / 1265  
+   H-LIFT    10.40   |   45 / 1008   |   75 / 1317   |  180 / 2500   |   70 / 1265  
+   H-CLOSE   11.20   |   45 / 1008   |   75 / 1317   |  180 / 2500   |   95 / 1523  
+   H-WRIST   12.70   |   45 / 1008   |   75 / 1317   |    0 /  500   |   95 / 1523  
+   H-TURN    14.20   |  135 / 1936   |   75 / 1317   |    0 /  500   |   95 / 1523  
+   H-LOWER   15.20   |  135 / 1936   |   30 /  853   |    0 /  500   |   95 / 1523  
+   H-OPEN    16.00   |  135 / 1936   |   30 /  853   |    0 /  500   |   20 /  750  
+   (t = time the step ends; the START press is at 1.00 s and the homing press 2 s after DONE.)
+
+3. CURRENT BUDGET (EST model: idle + speed share of running current + holding torque share of stall current)
+   GRIP      peak 0.26 A   turn 0.01  lift 0.13  wrist 0.02  grip 0.05
+   LIFT      peak 0.56 A   turn 0.01  lift 0.16  wrist 0.03  grip 0.30
+   FLIP      peak 0.60 A   turn 0.01  lift 0.14  wrist 0.09  grip 0.30
+   TURN      peak 0.65 A   turn 0.13  lift 0.14  wrist 0.03  grip 0.30
+   LOWER     peak 0.56 A   turn 0.01  lift 0.16  wrist 0.03  grip 0.30
+   RELEASE   peak 0.24 A   turn 0.01  lift 0.13  wrist 0.02  grip 0.03
+   H-LIFT    peak 0.24 A   turn 0.01  lift 0.15  wrist 0.02  grip 0.01
+   H-CLOSE   peak 0.24 A   turn 0.01  lift 0.13  wrist 0.02  grip 0.02
+   H-WRIST   peak 0.28 A   turn 0.01  lift 0.13  wrist 0.08  grip 0.01
+   H-TURN    peak 0.34 A   turn 0.13  lift 0.13  wrist 0.02  grip 0.01
+   H-LOWER   peak 0.24 A   turn 0.01  lift 0.15  wrist 0.02  grip 0.01
+   H-OPEN    peak 0.26 A   turn 0.01  lift 0.13  wrist 0.02  grip 0.05
+   Peak of the whole run: 0.65 A. Adapter rating 4 A -> 6.2x margin.
+   Gripper hold: 0.8 N per arm x 44 mm lever x 2 arms = 0.72 kg*cm = 45% of the SG90 stall torque -> ~0.29 A while it holds the can.
+   The SG90 can make at most 1.78 N per arm here; squeeze 0.5-1 N (0.39 N minimum, SF 3).
+   Worst cases outside the normal run: one MG996R stall 2.5 A; all 4 servos jumping at power-up 4.6 A (> 4 A:
+   power up with the robot at home; the code writes the home pose before attach so nothing jumps).
+
+4. OTHER CIRCUIT VALUES
+   Status LED: (5.0 - 2.0 V) / 220 ohm = 13.6 mA  (Uno pin limit 20 mA recommended, 40 mA absolute)
+   START button: INPUT_PULLUP 20-50 kOhm -> 0.1-0.25 mA when pressed; debounced 40 ms in code
+   Servo signal inputs draw < 1 mA each from D9/D10/D6/D5
+   Supply path: adapter 0.06 + cord 0.1 + jack 0.01 + rail 0.05 ohm (EST)
+   Hand calc, rail drop at the run peak: 0.65 A x 0.22 ohm = 0.14 V
+   Hand calc, rail drop in an MG996R stall: 3.15 A x 0.22 ohm = 0.69 V
+   1000 uF capacitor: a 1 A step for 100 us (adapter response, EST) droops it 1 A x 100 us / 1000 uF = 0.10 V
+
+5. NGSPICE RESULTS (same netlist as EE/ltspice/concept_a_run.cir / _stall.cir)
+   normal run : min rail 4.86 V, min Uno 5V 4.86 V, min at MG996R 4.85 V, min at gripper 4.82 V
+   MG996R stall: min rail 4.31 V, min Uno 5V 4.31 V, min at MG996R 4.10 V, min at gripper 4.27 V
+   Normal run: Uno stays above 4.5 V -> PASS.
+   Stall: Uno dips to 4.31 V. Below its 4.5 V / 16 MHz spec but far above the 2.7 V brown-out,
+   so it keeps running (no reset). Shorter / thicker cord or the MG996R wired straight to the jack lowers the dip.

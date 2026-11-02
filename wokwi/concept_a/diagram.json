@@ -3,35 +3,182 @@
   "author": "ME 2331 Project 2 - Concept A",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0, "left": 0, "attrs": {} },
-    { "type": "wokwi-servo", "id": "turn", "top": -260, "left": -40, "attrs": { "label": "TURNTABLE" } },
-    { "type": "wokwi-servo", "id": "lift", "top": -260, "left": 150, "attrs": { "label": "LIFT" } },
-    { "type": "wokwi-servo", "id": "wrist", "top": -260, "left": 340, "attrs": { "label": "WRIST" } },
-    { "type": "wokwi-servo", "id": "grip", "top": -130, "left": 400, "attrs": { "label": "GRIPPER" } },
-    { "type": "wokwi-pushbutton", "id": "btn", "top": 260, "left": 320, "attrs": { "color": "green", "label": "START" } },
-    { "type": "wokwi-slide-switch", "id": "ir", "top": 260, "left": 180, "attrs": { "value": "0" } },
-    { "type": "wokwi-potentiometer", "id": "fsr", "top": 250, "left": 20, "attrs": {} }
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "turn",
+      "top": -260,
+      "left": -40,
+      "attrs": {
+        "label": "TURNTABLE"
+      }
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "lift",
+      "top": -260,
+      "left": 150,
+      "attrs": {
+        "label": "LIFT"
+      }
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "wrist",
+      "top": -260,
+      "left": 340,
+      "attrs": {
+        "label": "WRIST"
+      }
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "grip",
+      "top": -130,
+      "left": 400,
+      "attrs": {
+        "label": "GRIPPER"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn",
+      "top": 260,
+      "left": 320,
+      "attrs": {
+        "color": "green",
+        "label": "START"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led",
+      "top": 250,
+      "left": 120,
+      "attrs": {
+        "color": "yellow",
+        "label": "STATUS"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 330,
+      "left": 110,
+      "attrs": {
+        "value": "220"
+      }
+    }
   ],
   "connections": [
-    [ "uno:9", "turn:PWM", "orange", [] ],
-    [ "uno:10", "lift:PWM", "orange", [] ],
-    [ "uno:6", "wrist:PWM", "orange", [] ],
-    [ "uno:5", "grip:PWM", "orange", [] ],
-    [ "uno:5V", "turn:V+", "red", [] ],
-    [ "uno:5V", "lift:V+", "red", [] ],
-    [ "uno:5V", "wrist:V+", "red", [] ],
-    [ "uno:5V", "grip:V+", "red", [] ],
-    [ "uno:GND.1", "turn:GND", "black", [] ],
-    [ "uno:GND.1", "lift:GND", "black", [] ],
-    [ "uno:GND.1", "wrist:GND", "black", [] ],
-    [ "uno:GND.1", "grip:GND", "black", [] ],
-    [ "uno:4", "btn:1.l", "green", [] ],
-    [ "uno:GND.2", "btn:2.l", "black", [] ],
-    [ "uno:11", "ir:2", "purple", [] ],
-    [ "uno:GND.2", "ir:1", "black", [] ],
-    [ "uno:A0", "fsr:SIG", "yellow", [] ],
-    [ "uno:5V", "fsr:VCC", "red", [] ],
-    [ "uno:GND.3", "fsr:GND", "black", [] ]
+    [
+      "uno:9",
+      "turn:PWM",
+      "orange",
+      []
+    ],
+    [
+      "uno:10",
+      "lift:PWM",
+      "orange",
+      []
+    ],
+    [
+      "uno:6",
+      "wrist:PWM",
+      "orange",
+      []
+    ],
+    [
+      "uno:5",
+      "grip:PWM",
+      "orange",
+      []
+    ],
+    [
+      "uno:5V",
+      "turn:V+",
+      "red",
+      []
+    ],
+    [
+      "uno:5V",
+      "lift:V+",
+      "red",
+      []
+    ],
+    [
+      "uno:5V",
+      "wrist:V+",
+      "red",
+      []
+    ],
+    [
+      "uno:5V",
+      "grip:V+",
+      "red",
+      []
+    ],
+    [
+      "uno:GND.1",
+      "turn:GND",
+      "black",
+      []
+    ],
+    [
+      "uno:GND.1",
+      "lift:GND",
+      "black",
+      []
+    ],
+    [
+      "uno:GND.1",
+      "wrist:GND",
+      "black",
+      []
+    ],
+    [
+      "uno:GND.1",
+      "grip:GND",
+      "black",
+      []
+    ],
+    [
+      "uno:4",
+      "btn:1.l",
+      "green",
+      []
+    ],
+    [
+      "uno:GND.2",
+      "btn:2.l",
+      "black",
+      []
+    ],
+    [
+      "uno:13",
+      "led:A",
+      "yellow",
+      []
+    ],
+    [
+      "led:C",
+      "r1:1",
+      "black",
+      []
+    ],
+    [
+      "r1:2",
+      "uno:GND.3",
+      "black",
+      []
+    ]
   ],
   "dependencies": {}
 }

@@ -96,7 +96,7 @@ def main():
     tip_worst = (1e9, None)
     masses = {}
     for p in parts:
-        if p["material"] in ("PETG", "TPU"):
+        if p["material"] in ("PETG", "TPU", "silicone"):
             masses[p["name"]] = p["shape"].val().Volume() / 1000.0 * (1.27 if p["material"] == "PETG" else 1.21) * M.P["print_fill"]
         else:
             masses[p["name"]] = p["mass"] or 0.0
@@ -225,7 +225,7 @@ def main():
         sh = p["shape"].val()
         vol = sh.Volume() / 1000.0                                 # cm^3
         c = sh.Center()
-        if p["material"] in ("PETG", "TPU"):
+        if p["material"] in ("PETG", "TPU", "silicone"):
             m = vol * (1.27 if p["material"] == "PETG" else 1.21) * M.P["print_fill"]
         else:
             m = p["mass"] or 0.0
@@ -240,7 +240,7 @@ def main():
         f.write("part,group,material,volume_cm3,mass_g,cg_x_mm,cg_y_mm,cg_z_mm\n")
         for r in rows:
             f.write(f"{r[0]},{r[1]},{r[2]},{r[3]:.1f},{r[4]:.1f},{r[5]:.1f},{r[6]:.1f},{r[7]:.1f}\n")
-    printed = sum(r[4] for r in rows if r[2] in ("PETG", "TPU"))
+    printed = sum(r[4] for r in rows if r[2] in ("PETG", "TPU", "silicone"))
     filament = sum(r[3] for r in rows if r[2] == "PETG") * 1.27 * M.P["print_fill"]
     lines.append(f"  robot total {tot:.0f} g (printed {printed:.0f} g, purchased {tot - printed:.0f} g), can 15 g")
     lines.append(f"  PETG filament ~{filament:.0f} g (+ supports / purge ~15 %)")

@@ -22,8 +22,8 @@
 
 ## Risks to state
 
-1. **Wrist servo range.** Many micro servos stop around 170°. Mitigation: test on arrival; 270°
-   servo as backup (`WRIST_RANGE 270`).
+1. **Wrist servo range.** Many micro servos stop around 170°. Mitigation: the code widens the
+   wrist pulse range (500–2500 µs) so an MG90S reaches 180°; test on arrival.
 2. **Lift binding.** Mitigation: LM6UU bushings, ≥ 1.6 in spacing (jam ratio 0.04).
 3. **4 servos in series.** Mitigation: each move is tested on its own; angles are constants at the
    top of the code.

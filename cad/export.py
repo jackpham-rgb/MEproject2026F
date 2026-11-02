@@ -27,9 +27,9 @@ def colour(h):
     return cq.Color(*(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)))
 
 
-MAT_COL = {"PETG": "#3d7be0", "TPU": "#2f2f2f", "buy": "#1f2329", "can": "#c0202a"}
+MAT_COL = {"PETG": "#3d7be0", "TPU": "#2f2f2f", "silicone": "#2f2f2f", "buy": "#1f2329", "can": "#c0202a"}
 NAME_COL = {"finger_L": "#e0a33d", "finger_R": "#e0a33d", "rod_L": "#b8bcc2", "rod_R": "#b8bcc2",
-            "bearing_6807": "#b8bcc2", "axle_R": "#b8bcc2", "arduino_uno": "#1d6b4a", "buck_XL4015": "#2b5d8a",
+            "bearing_6807": "#b8bcc2", "axle_R": "#b8bcc2", "arduino_uno": "#1d6b4a",
             "mini_breadboard": "#e8e8e8", "base": "#9aa3ad", "electronics_tray": "#9aa3ad",
             "turret_plate": "#5b8def", "spine": "#5b8def", "top_cap": "#5b8def", "lift_link": "#5b8def",
             "lift_crank": "#e8e8e8", "turntable_horn": "#e8e8e8", "wrist_horn": "#e8e8e8"}
@@ -45,7 +45,7 @@ def main():
     for p in parts:
         sh = p["shape"]
         cq.exporters.export(sh, os.path.join(OUT, "parts", p["name"] + ".step"))
-        if p["material"] in ("PETG", "TPU") or p["group"] == "coupon":
+        if p["material"] in ("PETG", "TPU", "silicone") or p["group"] == "coupon":
             cq.exporters.export(sh, os.path.join(OUT, "parts", p["name"] + ".stl"), tolerance=0.05, angularTolerance=0.1)
         if p["group"] == "coupon":
             continue

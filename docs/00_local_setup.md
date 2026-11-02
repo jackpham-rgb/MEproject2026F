@@ -18,7 +18,7 @@ No git? On GitHub, switch to the branch, then **Code → Download ZIP**.
 |---|---|
 | Concept notes (PDR draft only) | `docs/draft/Project_Notes_ConceptA.docx` |
 | Wiring diagram | `docs/wiring/wiring_diagram.png` |
-| BOM | `docs/05_bom.md` / `docs/bom.csv` |
+| BOM + decision matrices | `docs/05_bom.md`, `docs/decision_matrix_and_bom.xlsx` |
 | Detail CAD, animated | Double-click `viewer/concept_a_detail.html` |
 | All four concepts, animated | Double-click `viewer/concepts.html`. It needs internet, because three.js loads from a CDN |
 | GIFs for docs and slides | `viewer/gifs/` |

@@ -1,0 +1,11 @@
+#,"criterion (1 = yes / good, 0 = no / bad)",9 V battery (PP3) + buck,9 V battery (PP3) + buck: why,4×AA NiMH (servos) + 9 V (Uno),4×AA NiMH (servos) + 9 V (Uno): why,2S LiPo 7.4 V + buck,2S LiPo 7.4 V + buck: why,12 V wall adapter + XL4015 buck (old),12 V wall adapter + XL4015 buck (old): why,"5 V 4 A wall adapter, direct (selected)","5 V 4 A wall adapter, direct (selected): why"
+1,Delivers a servo stall (MG996R 2.5 A) without sagging,0,A PP3 gives ~0.5–1 A; under 2.5 A it sags and the Uno resets,1,NiMH AA cells handle 2–3 A,1,LiPo handles > 10 A,1,Buck rated 5 A,1,4 A ≥ 2.5 A stall + ~0.3 A idle servos and Uno
+2,"No batteries to charge, replace or monitor",0,"~500 mAh, voltage drops as it drains",0,Two packs to keep charged,0,Needs balance charging,1,Wall power,1,Wall power
+3,One power source for the whole robot,1,One battery,0,Two packs (servos and Uno),1,One pack,1,One plug,1,One plug
+4,No adjustment before first use,0,Buck output must be set with a meter,1,4.8 V fixed,0,Buck must be set,0,Buck must be set to 6.0 V before connecting servos,1,"Fixed, regulated 5 V"
+5,No extra power board on the robot,0,Buck converter,1,None,0,Buck converter,0,Buck converter,1,None
+6,Servo voltage inside the 4.8–6 V rating without a regulator,0,9 V would burn the servos,1,4.8 V,0,7.4–8.4 V,0,12 V,1,5.0 V
+7,Uno powered through a protected input (barrel / VIN / USB),1,VIN,1,9 V into the barrel jack,1,VIN,1,VIN,0,Feeds the 5V pin: don't plug in USB while the adapter is in
+8,"No special charger, no fire-risk cell",1,"Alkaline, disposable",0,Needs a NiMH charger,0,LiPo charger + fire-safe bag,1,None,1,None
+9,Power parts cost ≤ $12,1,~$3 battery + $5 buck,0,~$12 cells + $2 holder + $15 charger,0,~$15 pack + $20 charger + $5 buck,0,~$9 adapter + $5 buck = $14,1,~$9 adapter
+,TOTAL,4,,5,,3,,5,,8,

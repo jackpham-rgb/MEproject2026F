@@ -104,7 +104,7 @@ def main():
     L.append("3. Grip")
     L.append(f"   worst load on the pads: g + turn accel = {a_max:.2f} m/s^2 (the can hangs upside down in the arms)")
     L.append(f"   minimum squeeze per arm = SF*m*a/(2*mu) = {SF}*{CAN_M}*{a_max:.2f}/(2*{MU_PAD}) = {f_min:.2f} N")
-    L.append("   dent onset ~8 N per arm (EST): set GRIP_CLOSED so the pads squeeze ~1-2 N")
+    L.append("   dent onset ~8 N per arm (EST): set GRIP_CLOSED so the pads squeeze ~0.5-1 N per arm (SG90 max ~1.8 N, see EE/README.md)")
     L.append("")
 
     # 4. Servo torques

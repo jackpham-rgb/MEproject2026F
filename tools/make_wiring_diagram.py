@@ -43,40 +43,30 @@ RED, BLK, ORG, GRN, BLU, YEL, PUR, CYN = "#d7261e", "#1b1b1b", "#f08a00", "#1f9d
 
 # ---------------- title ----------------
 text(30, 42, "ME 2331 Project 2 · Concept A wiring", 26, weight="700")
-text(30, 68, "Arduino Uno + 4 servos. Servos run from their own 6.0 V supply (XL4015 buck), never from the Uno 5 V pin. All grounds are joined.", 15, "#4a5563")
+text(30, 68, "Arduino Uno + 4 servos on one 5 V, 4 A wall adapter. The adapter feeds the servo rail; the rail feeds the Uno 5V pin. All grounds are joined.", 15, "#4a5563")
 
-# ---------------- DC jack + buck ----------------
-rect(40, 120, 150, 90, "#e9edf2")
-text(115, 150, "DC jack", 16, anchor="middle", weight="700")
-text(115, 172, "7.5–12 V, ≥3 A", 13, "#4a5563", "middle")
-text(115, 192, "wall adapter", 13, "#4a5563", "middle")
-jack_p, jack_n = (190, 140), (190, 190)
+# ---------------- DC jack (5 V adapter, no regulator needed) ----------------
+rect(40, 120, 190, 90, "#e9edf2")
+text(135, 150, "DC jack", 16, anchor="middle", weight="700")
+text(135, 172, "5 V, 4 A regulated", 13, "#4a5563", "middle")
+text(135, 192, "wall adapter", 13, "#4a5563", "middle")
+jack_p, jack_n = (230, 140), (230, 190)
 dot(*jack_p, RED); dot(*jack_n, BLK)
-
-rect(270, 110, 190, 120, "#2b5d8a", "#1b3a57")
-text(365, 140, "XL4015 buck", 16, "#ffffff", "middle", "700")
-text(365, 162, "5 A · set to 6.0 V", 13, "#d6e4f2", "middle")
-text(365, 182, "(turn the pot before", 12, "#d6e4f2", "middle")
-text(365, 198, "connecting servos)", 12, "#d6e4f2", "middle")
-bin_p, bin_n, bout_p, bout_n = (270, 140), (270, 200), (460, 140), (460, 200)
-for p_, c in ((bin_p, RED), (bin_n, BLK), (bout_p, RED), (bout_n, BLK)):
-    dot(*p_, c)
-text(278, 132, "IN+", 11, "#ffffff"); text(278, 218, "IN−", 11, "#ffffff")
-text(452, 132, "OUT+", 11, "#ffffff", "end"); text(452, 218, "OUT−", 11, "#ffffff", "end")
-wire([jack_p, (230, 140), bin_p], RED)
-wire([jack_n, (230, 190), (230, 200), bin_n], BLK)
+text(60, 300, "No buck converter: the adapter", 12, "#4a5563")
+text(60, 316, "already gives the 5 V that the", 12, "#4a5563")
+text(60, 332, "servos and the Uno need.", 12, "#4a5563")
 
 # ---------------- servo power rails (mini breadboard) ----------------
 rx0, rx1 = 520, 1440
 rect(rx0, 250, rx1 - rx0, 70, "#f4f1e8", "#c9c3b3", rx=8)
 wire([(rx0 + 15, 268), (rx1 - 15, 268)], RED, 3)
 wire([(rx0 + 15, 302), (rx1 - 15, 302)], BLU, 3)
-text(rx0 + 18, 262, "+6 V servo rail", 12, RED, weight="600")
+text(rx0 + 18, 262, "+5 V rail", 12, RED, weight="600")
 text(rx0 + 18, 318, "GND rail", 12, BLU, weight="600")
 for x in range(rx0 + 30, rx1 - 20, 20):
     dot(x, 268, "#9b9583", 2.5); dot(x, 302, "#9b9583", 2.5)
-wire([bout_p, (490, 140), (490, 268), (rx0 + 30, 268)], RED)
-wire([bout_n, (480, 200), (480, 302), (rx0 + 30, 302)], BLK)
+wire([jack_p, (490, 140), (490, 268), (rx0 + 30, 268)], RED)
+wire([jack_n, (480, 190), (480, 302), (rx0 + 30, 302)], BLK)
 # capacitor
 rect(600, 272, 34, 26, "#2a3f6e", "#111", rx=4, sw=1)
 text(617, 289, "C", 12, "#fff", "middle", "700")
@@ -85,7 +75,7 @@ text(270, 270, "(− leg to GND)", 12, "#4a5563")
 wire([(610, 268), (610, 272)], RED, 3); wire([(624, 298), (624, 302)], BLK, 3)
 
 # ---------------- servos ----------------
-servos = [("Lift", "MG90S", 10, 760), ("Turntable", "MG996R", 9, 960), ("Wrist", "micro 180°/270°", 6, 1160), ("Gripper", "SG90 / MG90S", 5, 1340)]
+servos = [("Lift", "MG90S", 10, 760), ("Turntable", "MG996R", 9, 960), ("Wrist", "MG90S", 6, 1160), ("Gripper", "SG90", 5, 1340)]
 uno_x, uno_y, uno_w, uno_h = 300, 520, 560, 300
 # Uno header: digital pins along the top edge, D13 left ... D0 right (as on the board)
 dpin = {n: (uno_x + 70 + (13 - n) * 34, uno_y + 34) for n in range(14)}
@@ -118,12 +108,12 @@ rect(uno_x - 26, uno_y + 60, 40, 46, "#b8bcc2", "#555", rx=3, sw=1)
 text(uno_x + 22, uno_y + 88, "USB", 11, "#d4f1f4")
 
 # Uno power from the jack (VIN) and the common ground
-wire([jack_p, (205, 140), (205, 100), (20, 100), (20, 905), (apins["VIN"][0], 905), apins["VIN"]], RED)
-wire([jack_n, (215, 190), (215, 230), (32, 230), (32, 920), (apins["GND"][0], 920), apins["GND"]], BLK)
+wire([jack_p, (250, 140), (250, 100), (20, 100), (20, 905), (apins["5V"][0], 905), apins["5V"]], RED)
+wire([jack_n, (258, 190), (258, 230), (32, 230), (32, 920), (apins["GND"][0], 920), apins["GND"]], BLK)
 wire([(rx1 - 15, 302), (rx1 - 15, 470), (uno_x + uno_w + 40, 470), (uno_x + uno_w + 40, 930),
       (apins["GND"][0] + 8, 930), (apins["GND"][0] + 8, apins["GND"][1])], BLK, 3)
 text(uno_x + uno_w + 48, 560, "common GND", 12, "#1b1b1b")
-text(apins["VIN"][0] - 8, 898, "VIN ← jack +", 12, RED, "end", "600")
+text(apins["GND"][0] - 14, 898, "Uno 5V ← adapter +", 12, RED, "end", "600")
 
 # ---------------- start button, LED ----------------
 bx, by = 1010, 600
@@ -146,27 +136,16 @@ wire([(px, py), (px, 490), (lx + 30, 490), (lx + 30, ly + 6)], YEL)
 wire([(lx + 30, ly + 34), (lx + 30, ly + 70)], "#333", 3)
 wire([(lx + 30, ly + 120), (lx + 30, 930), (bx + 140, 930)], BLK, 3)
 
-# ---------------- optional sensors ----------------
-ox, oy = 60, 600
-rect(ox, oy, 220, 110, "#ffffff", "#8e44ad", sw=2, dash="7 5")
-text(ox + 110, oy + 26, "optional: IR can sensor", 14, PUR, "middle", "700")
-text(ox + 110, oy + 46, "TCRT5000 / KY-032", 12, "#4a5563", "middle")
-text(ox + 110, oy + 66, "VCC → 5V · GND → GND", 12, "#4a5563", "middle")
-text(ox + 110, oy + 84, "OUT → D11 (LOW = can)", 12, "#4a5563", "middle")
-text(ox + 110, oy + 102, "USE_IR_SENSOR 1", 11, PUR, "middle", family="Menlo, monospace")
-px, py = dpin[11]
-wire([(ox + 110, oy), (ox + 110, 505), (px, 505), (px, py)], PUR, 3, "8 6")
-
-fx, fy = 60, 760
-rect(fx, fy, 220, 110, "#ffffff", CYN, sw=2, dash="7 5")
-text(fx + 110, fy + 26, "optional: FSR 402", 14, CYN, "middle", "700")
-text(fx + 110, fy + 48, "5V — FSR — A0", 12, "#4a5563", "middle")
-text(fx + 110, fy + 66, "A0 — 10 kΩ — GND", 12, "#4a5563", "middle")
-text(fx + 110, fy + 90, "USE_FSR 1", 11, CYN, "middle", family="Menlo, monospace")
-wire([(fx + 220, fy + 50), (apins["A0"][0], fy + 50), apins["A0"]], CYN, 3, "8 6")
+# ---------------- upload rule ----------------
+rect(50, 640, 210, 120, "#fff7e0", "#e2b100", sw=2)
+text(155, 666, "Uploading code", 14, "#7a5b00", "middle", "700")
+text(155, 690, "Unplug the 5 V adapter", 12, "#4a5563", "middle")
+text(155, 708, "before plugging in USB:", 12, "#4a5563", "middle")
+text(155, 726, "both feed the Uno's 5 V.", 12, "#4a5563", "middle")
+text(155, 748, "Run on the adapter only.", 12, "#4a5563", "middle", "600")
 
 # legend
-lg = [(RED, "+ power"), (BLK, "ground"), (ORG, "servo signal"), (GRN, "button"), (YEL, "LED"), (PUR, "IR (optional)"), (CYN, "FSR (optional)")]
+lg = [(RED, "+ power"), (BLK, "ground"), (ORG, "servo signal"), (GRN, "button"), (YEL, "LED")]
 for i, (c, s) in enumerate(lg):
     x = 960 + (i % 4) * 130
     y = 30 + (i // 4) * 24
