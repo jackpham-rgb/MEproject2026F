@@ -30,6 +30,8 @@ A 3.85 → B 3.30 → D 3.00 → C 2.75.
 | `docs/04_wiring.md`, `docs/wiring/` | **Wiring diagram** (Fritzing-style PNG/SVG), wire list, why a 5 V wall adapter and not a battery |
 | `docs/05_bom.md`, `docs/bom.csv` | **Bill of materials**: every part with why we need it and the alternative we rejected |
 | `docs/decision_matrix_and_bom.xlsx` | **Excel**: binary decision matrices (concepts, power source) + BOM, totals as formulas. CSVs: `docs/decision_matrix_*.csv` |
+| `docs/Engineering_Report_ConceptA.docx` | **Part C engineering report** (summary, design, analysis, electrical, code, BOM, RVTM, test plan, drawings); build with `node tools/make_report.js` |
+| `docs/drawings/` | **Part C 2D drawings**: assembly + one dimensioned sheet per designed part (`all_drawings.pdf`); build with `python3 cad/drawings.py` |
 | `docs/06_rvtm.md` | Requirements traceability matrix (Part C 4a) |
 | `docs/07_pdr_outline.md` | Slide-by-slide PDR plan with GIFs and timing |
 | `docs/draft/` | Early concept notes (PDR stage). **A draft only**: the docs above supersede it |
@@ -71,10 +73,11 @@ Done (laptop only):
 - [x] Detail CAD with PETG tolerances and kit screws; no collisions over the full firmware sequence
 - [x] Arduino code, verified on an emulated Uno; Tinkercad and Wokwi wiring
 - [x] Wiring diagram, BOM with reasons, binary decision matrices (Excel), RVTM, PDR plan
+- [x] Part C: 2D drawings (13 sheets) and the engineering report (results section waits for the build)
 
 Still to do:
 - [ ] Hand sketches of the 4 concepts; PDR deck from `docs/07_pdr_outline.md`
 - [ ] Print the tolerance coupon, then the parts; order the purchased parts (`docs/05_bom.md`)
 - [ ] Measure the real servos / bearing and update `P` in `cad/model.py`
 - [ ] Calibrate the servo angles on the real robot (constants at the top of the code)
-- [ ] Part C: 2D drawings per part and assembly
+- [ ] Part C: add test results and photos to the report after the build
