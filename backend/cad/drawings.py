@@ -50,7 +50,7 @@ os.makedirs(OUT, exist_ok=True)
 SHEET_W, SHEET_H = 279.4, 215.9          # US letter landscape, mm
 DATE = "2026-11-02"
 
-# part numbers / names / quantities, same as the BOM (tools/make_tables.py)
+# part numbers / names / quantities, same as the BOM (backend/tools/make_tables.py)
 PN = {"base": ("CA-101", "Base", 1), "electronics_tray": ("CA-102", "Electronics tray", 1),
       "turret_plate": ("CA-201", "Turret plate", 1), "spine": ("CA-202", "Spine", 1), "top_cap": ("CA-203", "Top cap", 1),
       "carriage_arm": ("CA-301", "Carriage + arm", 1), "lift_link": ("CA-302", "Lift link", 1),

@@ -1,6 +1,6 @@
 // Engineering report (Part C) -> docs/Engineering_Report_ConceptA.docx
 //
-//   node tools/make_report.js
+//   node backend/tools/make_report.js
 //
 // Tables come straight from the repo (docs/06_rvtm.md, docs/bom.csv, EE/out/ee_report.txt numbers
 // quoted below are the values those scripts printed), so re-run this after re-running the checks.
@@ -12,7 +12,7 @@ const {
   BorderStyle,
 } = require("docx");
 
-const ROOT = path.join(__dirname, "..");
+const ROOT = path.join(__dirname, "..", "..");
 const P = (...p) => path.join(ROOT, ...p);
 const FONT = "Arial";
 const CONTENT_W = 9360; // 6.5 in in DXA
@@ -209,7 +209,7 @@ C.push(para([r("The firmware is one Arduino sketch ("), mono("firmware/concept_a
 C.push(table([["Step", "D9 turntable", "D10 lift", "D6 wrist", "D5 gripper", "Time"], ["HOME", "135° / 1936 µs", "30° / 853", "0° / 500", "20° / 750", "—"], ["GRIP", "135°", "30°", "0°", "95° / 1523", "0.8 s"], ["LIFT", "135°", "75° / 1317", "0°", "95°", "1.0 s"], ["FLIP", "135°", "75°", "180° / 2500", "95°", "1.5 s"], ["TURN", "45° / 1008", "75°", "180°", "95°", "1.5 s"], ["LOWER", "45°", "30° / 853", "180°", "95°", "1.0 s"], ["RELEASE", "45°", "30°", "180°", "70° / 1265", "0.6 s"]], [1300, 1760, 1560, 1560, 1700, 1480]));
 C.push(caption("Table: servo angle / pulse width at the end of each step (pulse = map(angle, 0, 180, min, max) µs)."));
 image("EE/out/signals_sequence.png", 6.3, "Figure 5. Button, servo pulse widths, LED and supply current in firmware order, replayed from the code.").forEach(x => C.push(x));
-C.push(para("Verification: the sketch compiles to 6.4 KB (19.6 % flash, 24.5 % RAM) and runs the full GRIP → RELEASE → DONE sequence on an emulated ATmega328P (tools/emulate_concept_a.sh); the Wokwi and Tinkercad circuits run the same sketch."));
+C.push(para("Verification: the sketch compiles to 6.4 KB (19.6 % flash, 24.5 % RAM) and runs the full GRIP → RELEASE → DONE sequence on an emulated ATmega328P (backend/tools/emulate_concept_a.sh); the Wokwi and Tinkercad circuits run the same sketch."));
 
 // 8 BOM
 C.push(h1("8. Bill of materials"));

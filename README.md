@@ -22,30 +22,16 @@ A 3.85 → B 3.30 → D 3.00 → C 2.75.
 
 ## Repo map
 
-| Path | What |
+| Folder | What's in it |
 |---|---|
-| `docs/01_concepts_and_decision_matrix.md` | 4 concepts, team decision matrix with the calculation |
-| `docs/02_design_analysis.md` | Lift clearance, motion profile, grip force, servo sizing, lift jam check, error budget, power |
-| `docs/03_detail_design.md` | **Detail design**: what the motion check found and fixed, tolerances, fasteners, parts |
-| `docs/04_wiring.md`, `docs/wiring/` | **Wiring diagram** (Fritzing-style PNG/SVG), wire list, why a 5 V wall adapter and not a battery |
-| `docs/05_bom.md`, `docs/bom.csv` | **Bill of materials**: every part with why we need it and the alternative we rejected |
-| `docs/decision_matrix_and_bom.xlsx` | **Excel**: binary decision matrices (concepts, power source) + BOM, totals as formulas. CSVs: `docs/decision_matrix_*.csv` |
-| `docs/Engineering_Report_ConceptA.docx` | **Part C engineering report** (summary, design, analysis, electrical, code, BOM, RVTM, test plan, drawings); build with `node tools/make_report.js` |
-| `docs/drawings/` | **Part C 2D drawings**: assembly + one dimensioned sheet per designed part (`all_drawings.pdf`); build with `python3 backend/cad/drawings.py` |
-| `docs/08_build_guide.md` | **Build guide**: shopping list, print order and settings, assembly steps, wiring, calibration |
-| `cad/print/` | **Print-ready STLs** (each turned to its best side), orientation preview |
-| `firmware/servo_setup/` | Servo setup sketch: fit horns at HOME, jog servos from the Serial Monitor to find the calibration angles |
-| `docs/06_rvtm.md` | Requirements traceability matrix (Part C 4a) |
-| `docs/07_pdr_outline.md` | Slide-by-slide PDR plan with GIFs and timing |
-| `docs/draft/` | Early concept notes (PDR stage). **A draft only**: the docs above supersede it |
-| `cad/` | **Detail CAD**: `model.py` (all parts + kinematics), `check.py` (collision / mass / load check over the firmware sequence), `export.py` (STEP for SolidWorks/Fusion, STL), `fusion_animate/` (Fusion 360 motion script), `out/` (STEP, STL, check report) |
-| `EE/` | **Electronics calculations**: servo PWM signals in firmware order, current budget, rail voltage, **LTspice circuit** (`EE/ltspice/`), run with `python3 EE/ee_calcs.py` |
-| `firmware/concept_a/concept_a.ino` | **The Arduino code** (4 servos, eased moves, one START button) |
-| `wokwi/concept_a/`, `docs/tinkercad_concept_a.md` | Breadboard simulation: Wokwi diagram, Tinkercad step by step |
-| `sim/concept_a.py` | Design calcs (reads the angles and times from the firmware) → `sim/out/` |
-| `viewer/concept_a_detail.html` | Detail CAD animated through the firmware sequence, with the check results |
-| `viewer/concepts.html`, `viewer/gifs/` | All 4 concepts animated; GIFs for docs and slides |
-| `tools/` | Page/diagram/BOM generators and the AVR emulator script |
+| **`cad/`** | CAD files only. `step/concept_a_assembly.step` (**open in SolidWorks / Fusion**) + `step/parts/`; `print/stl/` (print-ready STLs); `check/` (collision and mass report). See `cad/README.md` |
+| **`docs/`** | Everything to read or hand in: concepts and decision matrix (01), analysis (02), detail design (03), wiring (04), BOM (05), RVTM (06), PDR plan (07), **build guide (08)**, **Part C report** (`Engineering_Report_ConceptA.docx`), **2D drawings** (`drawings/all_drawings.pdf`), Excel matrices + BOM, wiring diagram |
+| **`EE/`** | Electronics results: servo PWM signals in firmware order, current budget, buck-vs-no-buck comparison, **LTspice circuit** (`EE/ltspice/`) |
+| **`firmware/`** | Arduino code: `concept_a/` (the robot), `servo_setup/` (fit horns at HOME, find calibration angles) |
+| **`sim/`** | Design-calc results (lift clearance, grip, servo loads) |
+| **`viewer/`** | Open in a browser: the detail CAD animated through the firmware sequence, all 4 concepts, GIFs |
+| **`wokwi/`** | Wokwi breadboard simulation (Tinkercad steps: `docs/tinkercad_concept_a.md`) |
+| **`backend/`** | All the code that generates the files above: `cad/` (CAD model, checks, exports, drawings, print prep), `ee/`, `sim/`, `tools/` (BOM, wiring diagram, viewers, report, emulator). See `backend/README.md` |
 
 Older concept-stage files (the Concept D design, the block-level CAD) were removed from the
 branch; they are still in the git history.
@@ -55,15 +41,12 @@ branch; they are still in the git history.
 **Laptop setup, step by step (Windows/macOS): [docs/00_local_setup.md](docs/00_local_setup.md).**
 
 ```bash
-pip install -r sim/requirements.txt cadquery
-python3 sim/concept_a.py                 # design calcs -> sim/out/
-python3 backend/cad/check.py                     # motion + collision check (~5 min) -> cad/check/check_report.txt
-python3 backend/cad/export.py                    # STEP / STL -> cad/step/
-python3 tools/make_tables.py             # BOM + decision matrices (md, csv, xlsx; needs openpyxl)
-python3 tools/make_wiring_diagram.py     # docs/wiring/wiring_diagram.svg
-python3 EE/ee_calcs.py                   # servo signals, current, rail voltage, LTspice files (ngspice optional)
-tools/emulate_concept_a.sh               # emulated Uno run (apt install gcc-avr avr-libc simavr)
+pip install -r backend/requirements.txt cadquery
+python3 backend/cad/check.py      # motion + collision check (~5 min) -> cad/check/
+python3 backend/cad/export.py     # STEP -> cad/step/
 ```
+
+Every generator and the order to run them: [backend/README.md](backend/README.md).
 
 Arduino IDE: open `firmware/concept_a/concept_a.ino`, board = Uno, then press the button.
 The Serial Monitor at 9600 baud shows each step.

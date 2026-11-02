@@ -50,7 +50,7 @@ One horizontal revolute axis runs along the **45° bisector** through the robot 
 **can mid-height (2.41 in + 0.04 in)**. A gripper on a 3.54 in arm grips the can. Then **one 180°
 rotation about that axis moves the can from START to TARGET and inverts it at the same time**.
 A 180° turn about a horizontal line is a mirror across that line in plan view, plus z → 2h − z.
-So the 90° relocation and the flip are the same motion. See `sim/out/flip_path_3d.png`.
+So the 90° relocation and the flip are the same motion. See `sim/flip_path_3d.png`.
 
 Properties, all checked in `sim/flip_geometry.py`:
 

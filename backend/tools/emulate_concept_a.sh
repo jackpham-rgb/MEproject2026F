@@ -3,10 +3,10 @@
 # The test build presses START after 1 s (AUTO_START) and prints the 4 servo angles every tick.
 #
 #   sudo apt install gcc-avr avr-libc simavr      # once (Linux / WSL)
-#   tools/emulate_concept_a.sh [wall_seconds]     # default 330 (simavr is ~30x slower than real time)
+#   backend/tools/emulate_concept_a.sh [wall_seconds]     # default 330 (simavr is ~30x slower than real time)
 set -euo pipefail
-ROOT=$(cd "$(dirname "$0")/.." && pwd)
-C=$ROOT/tools/.cache
+ROOT=$(cd "$(dirname "$0")/../.." && pwd)
+C=$ROOT/backend/.cache
 WALL=${1:-330}
 mkdir -p "$C"
 [ -d "$C/ArduinoCore-avr" ] || git clone -q --depth 1 https://github.com/arduino/ArduinoCore-avr.git "$C/ArduinoCore-avr"

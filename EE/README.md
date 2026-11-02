@@ -3,7 +3,7 @@
 Everything electrical lives here. One script makes all of it from the real firmware:
 
 ```bash
-python3 EE/ee_calcs.py      # numpy + matplotlib; runs the circuit too if ngspice is installed
+python3 backend/ee/ee_calcs.py      # numpy + matplotlib; runs the circuit too if ngspice is installed
 ```
 
 | File | What |

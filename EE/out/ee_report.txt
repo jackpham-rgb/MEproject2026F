@@ -1,4 +1,4 @@
-CONCEPT A ELECTRONICS (EE/ee_calcs.py)
+CONCEPT A ELECTRONICS (backend/ee/ee_calcs.py)
 
 1. SERVO SIGNAL (PWM) BASICS
    Servo library on a Uno: Timer1, prescaler 8 -> 0.5 us resolution; one 20 ms frame (50 Hz) for all servos.

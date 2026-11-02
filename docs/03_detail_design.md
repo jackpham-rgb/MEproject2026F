@@ -7,7 +7,7 @@ the robot's kinematics. The collision check, the STEP/STL exports, the Fusion 36
 ```bash
 python3.13 backend/cad/check.py    # motion + collision + mass + loads -> out/check_report.txt
 python3.13 backend/cad/export.py   # STEP assembly, per-part STEP/STL, viewer + Fusion data
-python3 tools/build_detail_viewer.py        # rebuild the 3D page
+python3 backend/tools/build_detail_viewer.py        # rebuild the 3D page
 ```
 (`pip install cadquery`; CadQuery needs Python ≥ 3.10.)
 

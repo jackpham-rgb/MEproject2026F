@@ -1,7 +1,7 @@
 # Design Analysis: Concept A (Claw + Wrist Flip + Turntable)
 
-Numbers come from `sim/concept_a.py`, which reads the servo angles and move times straight out of
-`firmware/concept_a/concept_a.ino`. Output: `sim/out/concept_a.txt`, `concept_a_clearance.png`,
+Numbers come from `backend/sim/concept_a.py`, which reads the servo angles and move times straight out of
+`firmware/concept_a/concept_a.ino`. Output: `sim/concept_a.txt`, `concept_a_clearance.png`,
 `concept_a_sequence.png`. Values marked **EST** get replaced with CAD mass properties and
 bench measurements.
 
@@ -109,7 +109,7 @@ both ends.
 - **Homing only after the can is removed:** after release, the open arms are still on both sides
   of the can. Turning back would knock it over.
 - **Tested:** it compiles for the Uno at 6.3 KB (19 % flash). On an emulated ATmega328P it runs
-  the full sequence and the logged angles ease in and out (`tools/emulate_concept_a.sh`).
+  the full sequence and the logged angles ease in and out (`backend/tools/emulate_concept_a.sh`).
 
 ## 9. Known weaknesses and next steps
 

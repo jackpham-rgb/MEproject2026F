@@ -1,6 +1,6 @@
 # PDR Slide Plan: Concept A (10–15 min, due Oct 29)
 
-✋ = needs your sketches or SolidWorks renders. GIFs are in `viewer/gifs/`, plots in `sim/out/`.
+✋ = needs your sketches or SolidWorks renders. GIFs are in `viewer/gifs/`, plots in `sim/`.
 
 | # | Slide | Content | Visual | Time |
 |---|---|---|---|---|
@@ -15,7 +15,7 @@
 | 9 | **Concept A compared** | Decision matrix + how it's calculated (A 3.85, B 3.30, D 3.00, C 2.75); honest downside: 4 servos = more failure points | Matrix table | 1:30 |
 | 10 | Selected design: CAD | Base, 6807 bearing turret, column on LM6UU, arm, wrist, 2-arm gripper | `viewer/gifs/conceptA_detail_cad.gif` + renders of `cad/step/concept_a_assembly.step` | 1:30 |
 | 11 | Motion sequence | Grip → lift → flip → turn → lower → release, 6.4 s, eased moves | `concept_a_sequence.png` | 1:00 |
-| 12 | Engineering checks | Grip 0.39 N minimum; servo loads with big margins; lift jam check (printed 1.10 → LM6UU 0.04) | Numbers from `sim/out/concept_a.txt` | 1:30 |
+| 12 | Engineering checks | Grip 0.39 N minimum; servo loads with big margins; lift jam check (printed 1.10 → LM6UU 0.04) | Numbers from `sim/concept_a.txt` | 1:30 |
 | 13 | Electronics and code | Pin map, separate 5 A servo supply, one-file sketch, Tinkercad / Wokwi sims | Wiring table + Tinkercad screenshot ✋ | 1:00 |
 | 14 | BOM, schedule, risks | ≈ $50–65; risks: wrist 180° range, lift binding, calibration, can can't be left mid-return | BOM | 1:00 |
 | | | | **Total** | **≈ 13:15** |

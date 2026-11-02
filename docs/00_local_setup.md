@@ -22,7 +22,7 @@ No git? On GitHub, switch to the branch, then **Code → Download ZIP**.
 | Detail CAD, animated | Double-click `viewer/concept_a_detail.html` |
 | All four concepts, animated | Double-click `viewer/concepts.html`. It needs internet, because three.js loads from a CDN |
 | GIFs for docs and slides | `viewer/gifs/` |
-| Plots | `sim/out/concept_a_*.png` |
+| Plots | `sim/concept_a_*.png` |
 | Design docs | `docs/*.md` (GitHub renders them) |
 | Breadboard simulation | Tinkercad: `docs/tinkercad_concept_a.md`. Wokwi: `wokwi/concept_a/README.md` |
 
@@ -48,8 +48,8 @@ Install Python 3.10+ from python.org. On Windows, tick "Add to PATH" and use `py
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r sim/requirements.txt
-python3 sim/concept_a.py           # lift clearance, grip, servo loads, jam check -> sim/out/concept_a*
+pip install -r backend/requirements.txt
+python3 backend/sim/concept_a.py           # lift clearance, grip, servo loads, jam check -> sim/concept_a*
 ```
 
 The script reads the angles and times from `concept_a.ino`. Rerun it after you change the code
@@ -74,7 +74,7 @@ check at every move. SolidWorks opens the same STEP; the mates are in `cad/READM
 
 ```bash
 sudo apt install gcc-avr avr-libc simavr
-tools/emulate_concept_a.sh         # compiles the sketch and runs it on an emulated Uno, ~5 min
+backend/tools/emulate_concept_a.sh         # compiles the sketch and runs it on an emulated Uno, ~5 min
 ```
 
 Skip this on macOS. Tinkercad or Wokwi test the same code in the browser.

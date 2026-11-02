@@ -1,13 +1,13 @@
 """Draw the Concept A wiring diagram (breadboard style, like Fritzing) -> docs/wiring/wiring_diagram.svg
 
-    python3 tools/make_wiring_diagram.py
+    python3 backend/tools/make_wiring_diagram.py
 
 Pins match firmware/concept_a/concept_a.ino. Wire colours follow hobby convention:
 red = + power, black = ground, orange = servo signal, other colours = logic signals.
 """
 import os
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT = os.path.join(ROOT, "docs", "wiring")
 os.makedirs(OUT, exist_ok=True)
 

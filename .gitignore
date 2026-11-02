@@ -1,3 +1,3 @@
-tools/.cache/
+backend/.cache/
 __pycache__/
 *.pyc

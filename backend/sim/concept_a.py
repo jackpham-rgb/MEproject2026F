@@ -1,9 +1,9 @@
 """Concept A (claw + wrist flip + turntable + lift) design calculations.
 
 Reads the servo angles and move times straight from firmware/concept_a/concept_a.ino,
-so the numbers here always match the code. Writes sim/out/concept_a.txt and plots.
+so the numbers here always match the code. Writes sim/concept_a.txt and plots.
 
-    python3 sim/concept_a.py
+    python3 backend/sim/concept_a.py
 
 Values tagged EST are estimates to replace with CAD mass properties / bench tests.
 """
@@ -16,8 +16,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "out")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+OUT = os.path.join(ROOT, "sim")
 os.makedirs(OUT, exist_ok=True)
 IN, G = 0.0254, 9.81
 
@@ -49,7 +49,7 @@ SERVOS = {  # stall torque kg*cm at 5 V (datasheet, typical)
 
 
 def read_firmware():
-    src = open(os.path.join(HERE, "..", "firmware", "concept_a", "concept_a.ino")).read()
+    src = open(os.path.join(ROOT, "firmware", "concept_a", "concept_a.ino")).read()
     ints = {k: int(v) for k, v in re.findall(r"const int (\w+)\s*=\s*(-?\d+);", src)}
     times = {k: int(v) for k, v in re.findall(r"(T_\w+) = (\d+)", src)}
     return ints, times
