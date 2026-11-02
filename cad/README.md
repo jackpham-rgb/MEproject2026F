@@ -9,6 +9,7 @@ Only CAD files live here. The code that makes them is in `backend/cad/`.
 | `step/fusion_sequence.json` | Joint values of the firmware sequence, read by the Fusion 360 animation script | — |
 | `print/stl/*.stl` | **Print-ready parts**, each turned to its best side and placed on the bed | any slicer (Cura, PrusaSlicer, Bambu Studio) |
 | `print/print_orientations.png`, `print/print_table.csv` | How each part sits on the bed, supports, time, mass | — |
+| `claw/` | **Claw only** (`claw.step` + motion file) for a close-up Fusion animation of the gripper: see `claw/README.md` | Fusion (script `backend/cad/fusion_claw/`) |
 | `check/check_report.txt` | Motion check: collisions in 289 poses, landing, tip-over, servo loads | text |
 | `check/mass_table.csv` | Mass and centre of gravity of every part | Excel |
 

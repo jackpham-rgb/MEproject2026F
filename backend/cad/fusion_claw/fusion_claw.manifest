@@ -1,0 +1,8 @@
+{
+  "autodeskProduct": "Fusion360",
+  "type": "script",
+  "author": "ME 2331 Project 2",
+  "description": {"": "Concept A: close-up animation of the claw (gripper) only"},
+  "supportedOS": "windows|mac",
+  "editEnabled": true
+}
