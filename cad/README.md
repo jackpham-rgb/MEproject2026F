@@ -1,5 +1,30 @@
 # Concept CAD (STEP / STL)
 
+## Concept A: detail (printable) model, the current design
+
+Everything is in `concept_a_detail/` and described in `docs/07_detail_design.md`.
+
+- **`out/concept_a_detail_assembly.step`:** for SolidWorks and Fusion. It has one component per
+  moving group (`grp_fixed`, `grp_turret`, `grp_crank`, `grp_lift`, `grp_wrist`,
+  `grp_finger_L`, `grp_finger_R`, `grp_can`).
+- **`out/parts/*.stl`:** printable parts, in assembly position. Print orientations come with
+  the print files.
+- **`fusion_animate/`:** a Fusion 360 script that imports the STEP, plays the firmware
+  sequence, and runs interference at every move.
+- **SolidWorks joints**, if you mate by hand:
+
+  | Groups | Mate | Range |
+  |---|---|---|
+  | turret ↔ fixed | Concentric on the Z axis | 0 → −90° |
+  | crank ↔ turret | Concentric on the X line y = −6, z = 148 | −22.5 → +22.5° |
+  | lift ↔ turret | Slide along Z | 0 → 15.3 mm |
+  | wrist ↔ lift | Concentric on the Y line x = 0, z = 59.7 | 0 → 180° |
+  | finger_R / finger_L ↔ wrist | Concentric on the Z lines x = ±8.1, y = 85 | 0 → 75° |
+
+The block-level concept model below (`build_cad_concept_a.py`) is the PDR layout. The detail
+model supersedes it.
+
+
 ## Concept A (selected)
 
 Regenerate: `python3 cad/build_cad_concept_a.py` (needs `pip install cadquery`). Units are

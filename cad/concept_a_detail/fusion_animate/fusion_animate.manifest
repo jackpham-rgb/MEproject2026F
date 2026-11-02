@@ -1,0 +1,8 @@
+{
+  "autodeskProduct": "Fusion360",
+  "type": "script",
+  "author": "ME 2331 Project 2",
+  "description": {"": "Concept A: import the assembly, play the firmware sequence, check interference"},
+  "supportedOS": "windows|mac",
+  "editEnabled": true
+}

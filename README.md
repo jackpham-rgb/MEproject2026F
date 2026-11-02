@@ -36,6 +36,7 @@ A 3.85 → B 3.30 → D 3.00 → C 2.75.
 | `firmware/concept_a/concept_a.ino` | **The Arduino code** (4 servos, eased moves, optional IR / FSR) |
 | `docs/tinkercad_concept_a.md`, `wokwi/concept_a/` | Breadboard simulation: Tinkercad step by step, Wokwi diagram |
 | `sim/concept_a.py` | Design calcs (reads the angles and times from the firmware) → `sim/out/concept_a*` |
+| `cad/concept_a_detail/` | **Detail (printable) CAD**: `model.py` (all parts + kinematics), `check.py` (firmware sequence collision / mass / load check), `export.py` (STEP for SolidWorks/Fusion, STL), `fusion_animate/` (Fusion 360 motion script). Write-up: `docs/07_detail_design.md`; 3D page: `viewer/concept_a_detail.html` |
 | `cad/build_cad_concept_a.py` → `cad/out/concept_a/` | Concept STEP assembly (fixed / turret / lift / wrist groups) + per-part STEP/STL |
 | `tools/emulate_concept_a.sh` | Compiles the sketch with avr-gcc and runs it on an emulated Uno |
 | `viewer/concepts.html`, `viewer/gifs/` | All 4 concepts animated, and looping GIFs for docs and slides |

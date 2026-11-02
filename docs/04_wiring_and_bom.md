@@ -1,5 +1,7 @@
 # Wiring and Bill of Materials: Concept A
 
+> **Updated by the detail design (`07_detail_design.md`):** the lazy-susan is replaced by a 6807 bearing in a 28 mm tower, the base is cut away in the arm's sweep sector, the release opens only 25°, and all screws come from the #67675 kit (#6-32 / #8-32, no nuts). Where this file disagrees, `07` and `cad/concept_a_detail/model.py` win.
+
 ## Power
 
 ```
@@ -41,10 +43,10 @@ For the Part C report, draw the final wiring diagram in Fritzing.
 | 3 | MG90S servo | 1 | Buy | $4 | Lift |
 | 4 | Micro servo with a full 180° (or a 270° micro servo) | 1 | Buy | $5–8 | Wrist: check the range |
 | 5 | SG90 or MG90S servo | 1 | Kit / buy | $0–4 | Gripper |
-| 6 | Lazy-susan bearing, 3–4 in | 1 | Buy / hardware store | $4 | Turntable |
+| 6 | 6807-2RS ball bearing, 35 × 47 × 7 mm | 1 | Buy | $5 | Turntable (replaces the lazy-susan) |
 | 7 | 6 mm steel rod, ~3 in | 2 | Buy | $3 | Lift guide |
 | 8 | LM6UU linear bearing | 2 | Buy | $3 | Carriage (a printed slide jams) |
-| 9 | 5–6 V buck converter, ≥5 A | 1 | Buy | $6 | Servo power |
+| 9 | 5 A buck converter (XL4015), set to 6.0 V | 1 | Buy | $6 | Servo power |
 | 10 | Wall adapter 7–12 V, ≥3 A | 1 | Buy / lab | $10 | |
 | 11 | 1000 µF capacitor (≥10 V) | 1 | Kit / buy | $1 | Across servo power |
 | 12 | Push button + LED + 220 Ω | 1 each | Kit | — | Start / status |
@@ -53,5 +55,5 @@ For the Part C report, draw the final wiring diagram in Fritzing.
 | 15 | TPU filament or silicone sheet | small | Buy | $2 | Gripper arm pads |
 | 16 | Steel washers / bolts + rubber feet | some | Hardware store | $3 | Base weight and grip on the table |
 | 17 | Printed parts (PLA): base box, turntable plate, column, carriage, arm, wrist hub, palm, 2 arms | 9 | Designed | filament | Part numbers come with the Part C drawings |
-| 18 | M3 screws, nuts, wires, headers | — | Kit / buy | $5 | |
+| 18 | Machine screws: HF kit #67675 (#6-32 × ½″ ×8, #8-32 × ½″ ×4) + servo-bag screws; wires, headers | — | Have / kit | — | No nuts needed (screws thread into printed pilots) |
 | | **Total to buy beyond the kit** | | | **≈ $50–65** | ≈ $40–55 without the optional parts |

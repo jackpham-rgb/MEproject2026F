@@ -29,6 +29,8 @@ const int WRIST_UP    = 0;     // can upright
 const int WRIST_FLIP  = 180;   // can upside down (real angle, see WRIST_RANGE)
 const int GRIP_OPEN   = 20;
 const int GRIP_CLOSED = 95;    // just past where the pads touch the can
+const int GRIP_RELEASE = 70;   // at the target the gripper is upside down: open only ~25 deg so the
+                               // arms clear the can but don't swing down into the base (CAD check)
 const int WRIST_RANGE = 180;   // set to 270 if the wrist is a 270-degree servo
 
 // ---------- Move times (ms) ----------
@@ -57,16 +59,19 @@ Step RUN[] = {
   {"FLIP",    {TURN_START,  LIFT_UP,   WRIST_FLIP, GRIP_CLOSED}, T_FLIP},
   {"TURN",    {TURN_TARGET, LIFT_UP,   WRIST_FLIP, GRIP_CLOSED}, T_TURN},
   {"LOWER",   {TURN_TARGET, LIFT_DOWN, WRIST_FLIP, GRIP_CLOSED}, T_LIFT},
-  {"RELEASE", {TURN_TARGET, LIFT_DOWN, WRIST_FLIP, GRIP_OPEN},   T_RELEASE},
+  {"RELEASE", {TURN_TARGET, LIFT_DOWN, WRIST_FLIP, GRIP_RELEASE}, T_RELEASE},
 };
 const int RUN_STEPS = sizeof(RUN) / sizeof(RUN[0]);
 
-// Going home (only after the can is removed): lift, straighten the wrist, turn back, lower.
+// Going home (only after the can is removed): lift, close the arms (open arms would hit the
+// table while un-flipping), straighten the wrist, turn back, lower, open. Order checked in CAD.
 Step HOMING[] = {
-  {"H-LIFT",  {TURN_TARGET, LIFT_UP,   WRIST_FLIP, GRIP_OPEN}, T_LIFT},
-  {"H-WRIST", {TURN_TARGET, LIFT_UP,   WRIST_UP,   GRIP_OPEN}, T_FLIP},
-  {"H-TURN",  {TURN_START,  LIFT_UP,   WRIST_UP,   GRIP_OPEN}, T_TURN},
-  {"H-LOWER", {TURN_START,  LIFT_DOWN, WRIST_UP,   GRIP_OPEN}, T_LIFT},
+  {"H-LIFT",  {TURN_TARGET, LIFT_UP,   WRIST_FLIP, GRIP_RELEASE}, T_LIFT},
+  {"H-CLOSE", {TURN_TARGET, LIFT_UP,   WRIST_FLIP, GRIP_CLOSED},  T_GRIP},
+  {"H-WRIST", {TURN_TARGET, LIFT_UP,   WRIST_UP,   GRIP_CLOSED},  T_FLIP},
+  {"H-TURN",  {TURN_START,  LIFT_UP,   WRIST_UP,   GRIP_CLOSED},  T_TURN},
+  {"H-LOWER", {TURN_START,  LIFT_DOWN, WRIST_UP,   GRIP_CLOSED},  T_LIFT},
+  {"H-OPEN",  {TURN_START,  LIFT_DOWN, WRIST_UP,   GRIP_OPEN},    T_GRIP},
 };
 const int HOME_STEPS = sizeof(HOMING) / sizeof(HOMING[0]);
 
@@ -152,7 +157,7 @@ void loop() {
       break;
 
     case FAULT:
-      if (pressed) { Serial.println(F("Reset: opening and going home.")); startSteps(HOMING, HOME_STEPS, RETURNING); }
+      if (pressed) { Serial.println(F("Reset: remove the can, going home.")); startSteps(HOMING, HOME_STEPS, RETURNING); }
       break;
 
     case RUNNING:

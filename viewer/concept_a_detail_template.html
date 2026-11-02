@@ -1,0 +1,297 @@
+<title>Concept A Detail Check</title>
+<meta name="description" content="Printable-level CAD of the Concept A can flipper running the firmware sequence, with collision, tolerance, fastener and mass checks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#eef1f4; --panel:#ffffff; --ink:#1a1e24; --muted:#5b6572; --line:#d5dbe2;
+  --accent:#2f6fdb; --ok:#1f8a5b; --bad:#c8413a; --warn:#b7791f; --grid:#e3e8ee;
+  --scene-bg:#e7ecf1; --scene-grid:#c3ccd6; --table:#f6f8fa; --code:#f3f5f8;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#111418; --panel:#191d23; --ink:#e6eaef; --muted:#9aa4b1; --line:#2b313a;
+  --accent:#6b9cf0; --ok:#43b883; --bad:#e8645c; --warn:#e0a84f; --grid:#232932;
+  --scene-bg:#161a20; --scene-grid:#2e3641; --table:#1c2128; --code:#1d2229; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --ground:#111418; --panel:#191d23; --ink:#e6eaef; --muted:#9aa4b1; --line:#2b313a;
+  --accent:#6b9cf0; --ok:#43b883; --bad:#e8645c; --warn:#e0a84f; --grid:#232932;
+  --scene-bg:#161a20; --scene-grid:#2e3641; --table:#1c2128; --code:#1d2229; color-scheme:dark;}
+body{background:var(--ground);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:16px;padding-block:20px 56px;display:grid;gap:24px}
+h1{font-size:26px;line-height:1.2;margin:0;font-weight:600;text-wrap:balance}
+h2{font-size:18px;margin:0 0 10px;font-weight:600}
+.sub{color:var(--muted);margin:4px 0 0;max-width:75ch}
+.bench{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:16px;align-items:start}
+@media (max-width:880px){.bench{grid-template-columns:1fr}}
+.viewport{position:relative;background:var(--scene-bg);border:1px solid var(--line);border-radius:8px;overflow:hidden;aspect-ratio:16/11;max-width:100%}
+.viewport canvas{display:block;width:100%;height:100%}
+.views{position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap}
+.banner{position:absolute;left:10px;right:10px;bottom:10px;display:flex;justify-content:space-between;align-items:end;gap:8px;pointer-events:none}
+.phase{font:500 14px "IBM Plex Sans",sans-serif;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
+.note{font:500 13px "IBM Plex Sans",sans-serif;background:var(--warn);color:#fff;border-radius:6px;padding:4px 10px}
+button,select{font:inherit;font-size:13px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.transport{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.transport input[type=range]{flex:1 1 200px;accent-color:var(--accent)}
+.transport label{font-size:13px;display:flex;gap:6px;align-items:center}
+.side{display:grid;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px}
+.lbl{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.val{font:500 17px "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-top:8px}
+.kv div{display:grid;gap:1px}
+.checks{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px;font-size:14px}
+.checks li{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:baseline}
+.pill{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.05em;border-radius:99px;padding:1px 8px;color:#fff;background:var(--ok)}
+.pill.warn{background:var(--warn)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.num{font-family:"IBM Plex Mono",monospace;text-align:right;font-variant-numeric:tabular-nums}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto;font:12.5px/1.45 "IBM Plex Mono",monospace;margin:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+code{font-family:"IBM Plex Mono",monospace;font-size:.92em}
+details summary{cursor:pointer;color:var(--accent)}
+.fail{padding:20px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Concept A Detail Check</h1>
+    <p class="sub">Printable-level CAD of the claw + wrist flip + turntable robot. The motion is the Arduino sequence (same angles and order as <code>concept_a.ino</code>) driving the real part geometry. Every pose was collision-checked with solid booleans. Purchased parts use datasheet envelopes: measure yours before printing.</p>
+  </header>
+
+  <section class="bench">
+    <div>
+      <div class="viewport" id="vp">
+        <div class="views" role="group" aria-label="Camera">
+          <button data-view="iso" aria-pressed="true">3/4</button>
+          <button data-view="front">Front</button>
+          <button data-view="top">Top</button>
+          <button data-view="gripper">Gripper</button>
+        </div>
+        <div class="banner"><span class="phase" id="phase">HOME</span><span class="note" id="removed" hidden>Operator lifts the can off, then presses START to home</span></div>
+      </div>
+      <div class="transport">
+        <button id="play">Pause</button>
+        <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Time">
+        <select id="speed" aria-label="Playback speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+        <label><input type="checkbox" id="xray"> see-through base</label>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <span class="lbl">Servo commands (deg)</span>
+        <div class="kv">
+          <div><span class="lbl">Turntable D9</span><span class="val" id="c-turn">–</span></div>
+          <div><span class="lbl">Lift D10</span><span class="val" id="c-lift">–</span></div>
+          <div><span class="lbl">Wrist D6</span><span class="val" id="c-wrist">–</span></div>
+          <div><span class="lbl">Gripper D5</span><span class="val" id="c-grip">–</span></div>
+        </div>
+        <div class="kv" style="margin-top:12px">
+          <div><span class="lbl">Turret angle</span><span class="val" id="j-psi">–</span></div>
+          <div><span class="lbl">Lift height</span><span class="val" id="j-h">–</span></div>
+          <div><span class="lbl">Wrist roll</span><span class="val" id="j-phi">–</span></div>
+          <div><span class="lbl">Arms open</span><span class="val" id="j-alpha">–</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="lbl">Checks</span>
+        <ul class="checks" id="checks"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <h2>3D-print tolerances (PETG, 0.4 mm nozzle)</h2>
+      <div class="scroll"><table>
+        <thead><tr><th>Fit</th><th>Hole (mm)</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td>#6-32 clearance</td><td class="num">3.9</td><td>screw passes through (spine foot, top cap, tray tabs, link, gear bore)</td></tr>
+          <tr><td>#6-32 pilot</td><td class="num">2.9</td><td>screw cuts its own thread (no nuts in the kit)</td></tr>
+          <tr><td>#8-32 pilot</td><td class="num">3.5</td><td>MG996R flange into the base</td></tr>
+          <tr><td>Servo-bag screw pilot</td><td class="num">1.7</td><td>servo tabs, horns</td></tr>
+          <tr><td>6 mm rod press</td><td class="num">6.00</td><td>rods in blind holes (prints ~0.1 under)</td></tr>
+          <tr><td>LM6UU press</td><td class="num">12.15</td><td>4 linear bearings in the carriage</td></tr>
+          <tr><td>6807 housing / hub</td><td class="num">47.10 / 34.95</td><td>bearing outer race in the base tower; printed hub in the bore</td></tr>
+          <tr><td>Moving gaps</td><td class="num">≥ 0.5</td><td>finger arms between the gripper plates</td></tr>
+          <tr><td>Gear backlash</td><td class="num">+0.2</td><td>added to the 16 mm gear centre distance</td></tr>
+        </tbody>
+      </table></div>
+      <p class="sub" style="margin-top:8px">Print <code>tolerance_coupon.stl</code> first (6 test holes) and adjust <code>TOL</code> in <code>model.py</code> if a fit is off.</p>
+    </div>
+    <div class="card">
+      <h2>Fasteners: your kit, no nuts needed</h2>
+      <div class="scroll"><table>
+        <thead><tr><th>Screw</th><th class="num">Qty</th><th>Where</th></tr></thead>
+        <tbody>
+          <tr><td>#6-32 × ½″ (kit, 12)</td><td class="num">8</td><td>tray → base 2, spine → turret 2, top cap → spine 2, link pivot 1, right gear axle 1</td></tr>
+          <tr><td>#8-32 × ½″ (kit, 10)</td><td class="num">4</td><td>MG996R flange → base</td></tr>
+          <tr><td>Servo-bag screws</td><td class="num">~14</td><td>servo tabs (2 each × 3), horns: turret 4, wrist 4, crank → link 1</td></tr>
+          <tr><td>Press-fit, no screws</td><td class="num">—</td><td>2 rods, 4 LM6UU, 6807 bearing + hub</td></tr>
+          <tr><td>Glue</td><td class="num">—</td><td>TPU pad liners, can bumper, Uno / buck on pegs (hot glue)</td></tr>
+        </tbody>
+      </table></div>
+      <p class="sub" style="margin-top:8px">Unused from the kit: #8-32 × ¾″, #10-24, ¼-20. The Uno's 3.2 mm holes are too small for #6, so it sits on printed pegs.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Check report</h2>
+    <pre>__REPORT__</pre>
+  </section>
+
+  <section class="card">
+    <details>
+      <summary>Mass of every part</summary>
+      <div class="scroll" style="margin-top:10px"><table>
+        <thead><tr><th>Part</th><th>Group</th><th>Material</th><th class="num">g</th></tr></thead>
+        <tbody>__MASS_ROWS__</tbody>
+      </table></div>
+    </details>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.128.0/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>const DATA = __MESH__;</script>
+<script>
+(function(){
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+
+/* ---------- checks list from the report ---------- */
+const REPORT = document.querySelector("pre").textContent;
+const items = [];
+REPORT.split("\n").forEach(l => {
+  const m = l.match(/^\s+(PASS|FAIL)\s+(.*)$/); if (m) items.push([m[1], m[2]]);
+  const c = l.match(/^\s+can after LOWER: (.*) -> (PASS|FAIL)/); if (c) items.push([c[2], "Can ends at the target: " + c[1]]);
+  const t = l.match(/^\s+tip-over: (.*) -> (PASS|FAIL)/); if (t) items.push([t[2], "Tip-over: " + t[1]]);
+  const j = l.match(/jam ratio .* -> (PASS|FAIL); (.*)$/); if (j) items.push([j[1], "Lift slides freely (LM6UU); " + j[2]]);
+});
+$("checks").innerHTML = items.map(([s, txt]) => `<li><span class="pill ${s === "PASS" ? "" : "warn"}">${s}</span><span>${txt.replace(/</g, "&lt;")}</span></li>`).join("");
+
+const vp = $("vp");
+if (!window.THREE) { vp.insertAdjacentHTML("beforeend", '<p class="fail">The 3D library did not load. Check the network and reload.</p>'); return; }
+
+/* ---------- scene ---------- */
+const renderer = new THREE.WebGLRenderer({antialias: true});
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+vp.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1.45, 1, 5000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; scene.add(root);      // model is z-up, mm
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8090a0, 0.8));
+const sun = new THREE.DirectionalLight(0xffffff, 0.65); sun.position.set(300, 500, 250); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-300, 200, -300); scene.add(fill);
+const tableMat = new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 1});
+const table = new THREE.Mesh(new THREE.PlaneGeometry(520, 520), tableMat); table.position.set(20, -20, -0.2); root.add(table);
+let grid = null;
+function paint(){
+  scene.background = new THREE.Color(css("--scene-bg")); tableMat.color.set(css("--table"));
+  if (grid) root.remove(grid);
+  grid = new THREE.GridHelper(508, 20, css("--scene-grid"), css("--scene-grid")); grid.rotation.x = Math.PI / 2; grid.position.set(20, -20, 0); root.add(grid);
+}
+paint();
+function ring(x, y, color){ const m = new THREE.Mesh(new THREE.RingGeometry(31, 35, 48), new THREE.MeshBasicMaterial({color, side: THREE.DoubleSide})); m.position.set(x, y, 0.3); root.add(m); }
+ring(0, 127, 0x1f8a5b); ring(127, 0, 0xc8413a);
+
+const groups = {}; const mats = [];
+for (const [g, parts] of Object.entries(DATA.groups)) {
+  const grp = new THREE.Group(); grp.matrixAutoUpdate = false; root.add(grp); groups[g] = grp;
+  for (const p of parts) {
+    let geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(p.v, 3));
+    geo.setIndex(p.f);
+    geo = geo.toNonIndexed(); geo.computeVertexNormals();
+    const mat = new THREE.MeshStandardMaterial({color: p.color, roughness: 0.6, metalness: p.color === "#b8bcc2" ? 0.5 : 0.05});
+    mat.userData.part = p.name; mats.push(mat);
+    grp.add(new THREE.Mesh(geo, mat));
+  }
+}
+$("xray").addEventListener("change", e => {
+  mats.forEach(m => { if (["base", "electronics_tray"].includes(m.userData.part)) { m.transparent = e.target.checked; m.opacity = e.target.checked ? 0.25 : 1; m.depthWrite = !e.target.checked; } });
+});
+
+/* ---------- kinematics (same as model.py) ---------- */
+const P = DATA.params, D2R = Math.PI / 180;
+const LST = [-3.0, -6.0, 148.0];
+function rotAbout(p, axis, deg){
+  return new THREE.Matrix4().makeTranslation(p[0], p[1], p[2])
+    .multiply(new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(...axis).normalize(), deg * D2R))
+    .multiply(new THREE.Matrix4().makeTranslation(-p[0], -p[1], -p[2]));
+}
+function mats4(s){
+  const T = {};
+  T.fixed = new THREE.Matrix4();
+  T.turret = rotAbout([0, 0, 0], [0, 0, 1], s.psi);
+  T.crank = T.turret.clone().multiply(rotAbout([0, LST[1], LST[2]], [1, 0, 0], s.theta - P.lift_theta0));
+  T.lift = T.turret.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0, s.h));
+  T.wrist = T.lift.clone().multiply(rotAbout([0, 0, P.grip_z], [0, 1, 0], s.phi));
+  T.finger_R = T.wrist.clone().multiply(rotAbout([P.pivot_x, P.pivot_y, 0], [0, 0, 1], -s.alpha));
+  T.finger_L = T.wrist.clone().multiply(rotAbout([-P.pivot_x, P.pivot_y, 0], [0, 0, 1], s.alpha));
+  return T;
+}
+const SEQ = DATA.sequence;
+const DUR = {HOME: 0.6, GRIP: 0.8, LIFT: 1.0, FLIP: 1.5, TURN: 1.5, LOWER: 1.0, RELEASE: 0.6, "H-LIFT": 1.0, "H-CLOSE": 0.8, "H-WRIST": 1.5, "H-TURN": 1.5, "H-LOWER": 1.0, "H-OPEN": 0.8};
+const PAUSE_AFTER = {RELEASE: 1.6, "H-OPEN": 1.0};
+// time stamp for each sample + the can matrix (rides with the wrist while gripped)
+const counts = {}; SEQ.forEach(s => counts[s.label] = (counts[s.label] || 0) + 1);
+const times = []; const canM = []; let t = 0, gripW = null, Tc = new THREE.Matrix4();
+SEQ.forEach((s, i) => {
+  if (i > 0 && SEQ[i - 1].label !== s.label && PAUSE_AFTER[SEQ[i - 1].label]) t += PAUSE_AFTER[SEQ[i - 1].label];
+  t += (DUR[s.label] || 1) / counts[s.label]; times.push(t);
+  const T = mats4(s);
+  if (s.attached && !gripW) gripW = T.wrist.clone();
+  if (s.attached) Tc = T.wrist.clone().multiply(gripW.clone().invert());
+  canM.push(Tc.clone());
+});
+const tEnd = times[times.length - 1] + 1.0;
+
+function apply(time){
+  let i = 0; while (i < times.length - 1 && times[i + 1] <= time) i++;
+  const s = SEQ[i], T = mats4(s);
+  for (const [g, grp] of Object.entries(groups)) { grp.matrix.copy(g === "can" ? canM[i] : T[g]); }
+  groups.can.visible = !s.label.startsWith("H-");
+  $("removed").hidden = !(s.label.startsWith("H-") || (s.label === "RELEASE" && i === SEQ.length - 1));
+  $("phase").textContent = s.label;
+  $("c-turn").textContent = s.turn.toFixed(0); $("c-lift").textContent = s.lift.toFixed(0);
+  $("c-wrist").textContent = s.wrist.toFixed(0); $("c-grip").textContent = s.grip.toFixed(0);
+  $("j-psi").textContent = s.psi.toFixed(1) + "°"; $("j-h").textContent = s.h.toFixed(1) + " mm";
+  $("j-phi").textContent = s.phi.toFixed(0) + "°"; $("j-alpha").textContent = s.alpha.toFixed(0) + "°";
+  scrub.value = Math.round(time / tEnd * 1000); tNow = time;
+}
+
+/* ---------- camera + playback ---------- */
+const V = (x, y, z) => new THREE.Vector3(x, z, -y);
+const VIEWS = {iso: [V(420, 380, 330), V(30, 30, 70)], front: [V(60, 520, 120), V(30, 40, 70)],
+               top: [V(30, 29, 720), V(30, 30, 0)], gripper: [V(170, 210, 160), V(0, 95, 70)]};
+function setView(k){ camera.position.copy(VIEWS[k][0]); controls.target.copy(VIEWS[k][1]); controls.update();
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === k)); }
+document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+setView("iso");
+const scrub = $("scrub"), playBtn = $("play");
+let tNow = 0, playing = !matchMedia("(prefers-reduced-motion: reduce)").matches, last = null;
+playBtn.textContent = playing ? "Pause" : "Play";
+playBtn.addEventListener("click", () => { playing = !playing; playBtn.textContent = playing ? "Pause" : "Play"; });
+scrub.addEventListener("input", () => { playing = false; playBtn.textContent = "Play"; apply(scrub.value / 1000 * tEnd); });
+const repaint = () => paint();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", repaint);
+new MutationObserver(repaint).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
+function resize(){ const w = vp.clientWidth, h = vp.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(vp);
+function loop(now){
+  if (last !== null && playing) { let nt = tNow + (now - last) / 1000 * parseFloat($("speed").value); if (nt > tEnd) nt = 0; apply(nt); }
+  last = now; controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop);
+}
+resize(); apply(playing ? 0 : times[Math.floor(times.length * 0.3)]);
+requestAnimationFrame(loop);
+})();
+</script>

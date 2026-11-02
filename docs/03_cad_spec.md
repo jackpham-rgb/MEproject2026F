@@ -1,5 +1,7 @@
 # Preliminary CAD Brief: Concept A (SolidWorks / Fusion 360)
 
+> **Updated by the detail design (`07_detail_design.md`):** the lazy-susan is replaced by a 6807 bearing in a 28 mm tower, the base is cut away in the arm's sweep sector, the release opens only 25°, and all screws come from the #67675 kit (#6-32 / #8-32, no nuts). Where this file disagrees, `07` and `cad/concept_a_detail/model.py` win.
+
 The concept solids are already generated: `cad/out/concept_a/concept_a_assembly.step` (mm), with
 one STEP/STL per part (`python3 cad/build_cad_concept_a.py`). Use it as the layout skeleton,
 then detail each part.
