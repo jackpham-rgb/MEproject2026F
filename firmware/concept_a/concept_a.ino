@@ -7,7 +7,7 @@
 // Wiring (see docs/tinkercad_concept_a.md):
 //   D9  turntable servo      D10 lift servo       D6 wrist servo     D5 gripper servo
 //   D4  start button to GND  D13 LED (+220 ohm)
-// Real robot: one 5 V 4 A wall adapter feeds the servo rail and the Uno 5V pin (docs/04_wiring.md).
+// Real robot: 12 V adapter -> Uno VIN, and -> XL4015 buck at 5.8 V -> servo rail (docs/04_wiring.md, EE/).
 //
 // Button: press to run. After DONE, take the can away, then press again to go home.
 // (Going home with the can still there would knock it over: the open arms are on both sides.)
@@ -30,6 +30,7 @@ const int GRIP_RELEASE = 70;   // at the target the gripper is upside down: open
                                // arms clear the can but don't swing down into the base (CAD check)
 
 // ---------- Move times (ms) ----------
+const unsigned long ATTACH_GAP_MS = 300;
 const unsigned long T_GRIP = 800, T_LIFT = 1000, T_FLIP = 1500, T_TURN = 1500, T_RELEASE = 600;
 
 // ---------- Pins ----------
@@ -112,9 +113,11 @@ void setup() {
   pinMode(PIN_LED, OUTPUT);
   now = makePose(TURN_START, LIFT_DOWN, WRIST_UP, GRIP_OPEN);
   writePose(now);                          // set the angle before attach so nothing jumps
-  turnServo.attach(PIN_TURN);
-  liftServo.attach(PIN_LIFT);
-  wristServo.attach(PIN_WRIST, WRIST_MIN_US, WRIST_MAX_US);
+  // Attach one servo at a time: if the robot was left away from home, only one servo jumps
+  // (and pulls stall current) at once, not all 4 (4.8 A). See EE/README.md.
+  turnServo.attach(PIN_TURN);                                  delay(ATTACH_GAP_MS);
+  liftServo.attach(PIN_LIFT);                                  delay(ATTACH_GAP_MS);
+  wristServo.attach(PIN_WRIST, WRIST_MIN_US, WRIST_MAX_US);    delay(ATTACH_GAP_MS);
   gripServo.attach(PIN_GRIP);
   writePose(now);
   Serial.println(F("Concept A ready. Press the button to start."));

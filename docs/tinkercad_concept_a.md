@@ -49,8 +49,8 @@ corners so the press actually connects them.
 
 - Tinkercad only has a small micro servo, so all 4 look the same. That's fine for testing the
   code and wiring. The real turntable uses a stronger MG996R.
-- Tinkercad powers the servos from the Uno's 5V pin. The real robot does the opposite: one
-  **5 V, 4 A wall adapter** feeds the servo rail, and the rail feeds the Uno's 5V pin. The Uno's
-  own 5 V regulator could never supply 4 servos. To show it in Tinkercad, add a **Power Supply**
-  part set to 5 V on the + / – rails.
+- Tinkercad powers the servos from the Uno's 5V pin. The real robot can't: a **12 V adapter**
+  feeds the Uno's VIN and an **XL4015 buck set to 5.8 V** feeds the servos, with all grounds
+  joined. To show it in Tinkercad, add a **Power Supply** part set to 5.8 V on the + / – rails
+  and remove the Uno 5V wire.
 - The simulation shows the servo angles, not the can. For the motion, use the GIFs.

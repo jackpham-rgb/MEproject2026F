@@ -77,32 +77,35 @@ CONCEPT_ROWS = [
 
 # ------------------------------------------------------------------ power
 POWERS = ["9 V battery (PP3) + buck", "4×AA NiMH (servos) + 9 V (Uno)", "2S LiPo 7.4 V + buck",
-          "12 V wall adapter + XL4015 buck (old)", "5 V 4 A wall adapter, direct (selected)"]
+          "12 V wall adapter + XL4015 buck 5.8 V (selected)", "5 V 4 A wall adapter, direct"]
+# Rows 1, 5, 6 and 7 come from the ngspice runs in EE/ee_calcs.py (EE/out/ee_report.txt, section 6).
 POWER_ROWS = [
-    ("Delivers a servo stall (MG996R 2.5 A) without sagging", [
-        (0, "A PP3 gives ~0.5–1 A; under 2.5 A it sags and the Uno resets"),
+    ("Covers a 2.5 A MG996R stall without current-limiting", [
+        (0, "A PP3 gives ~0.5–1 A; under 2.5 A it collapses"),
         (1, "NiMH AA cells handle 2–3 A"), (1, "LiPo handles > 10 A"),
-        (1, "Buck rated 5 A"), (1, "4 A ≥ 2.5 A stall + ~0.3 A idle servos and Uno")]),
+        (1, "ngspice: 12 V side 1.79 A of 2 A; buck 3.1 A of 5 A"), (1, "ngspice: 3.16 A of 4 A")]),
     ("No batteries to charge, replace or monitor", [
         (0, "~500 mAh, voltage drops as it drains"), (0, "Two packs to keep charged"), (0, "Needs balance charging"),
         (1, "Wall power"), (1, "Wall power")]),
     ("One power source for the whole robot", [
         (1, "One battery"), (0, "Two packs (servos and Uno)"), (1, "One pack"), (1, "One plug"), (1, "One plug")]),
-    ("No adjustment before first use", [
-        (0, "Buck output must be set with a meter"), (1, "4.8 V fixed"), (0, "Buck must be set"),
-        (0, "Buck must be set to 6.0 V before connecting servos"), (1, "Fixed, regulated 5 V")]),
-    ("No extra power board on the robot", [
-        (0, "Buck converter"), (1, "None"), (0, "Buck converter"), (0, "Buck converter"), (1, "None")]),
-    ("Servo voltage inside the 4.8–6 V rating without a regulator", [
-        (0, "9 V would burn the servos"), (1, "4.8 V"), (0, "7.4–8.4 V"), (0, "12 V"), (1, "5.0 V")]),
-    ("Uno powered through a protected input (barrel / VIN / USB)", [
-        (1, "VIN"), (1, "9 V into the barrel jack"), (1, "VIN"), (1, "VIN"),
-        (0, "Feeds the 5V pin: don't plug in USB while the adapter is in")]),
+    ("No extra power board to set up", [
+        (0, "Buck must be set with a meter"), (1, "4.8 V pack, nothing to set"), (0, "Buck must be set"),
+        (0, "Buck set to 5.8 V once with a meter"), (1, "Fixed 5 V")]),
+    ("Servos stay ≥ 4.8 V (rated) in a stall", [
+        (0, "Battery sags below the buck's input need"), (0, "4.8 V nominal pack sags under 2.5 A"), (1, "Buck holds its output"),
+        (1, "ngspice: min 5.50 V"), (0, "ngspice: min 4.25 V (cord + adapter drop)")]),
+    ("Uno stays ≥ 4.5 V (16 MHz minimum) in a stall", [
+        (0, "Same sagging battery feeds VIN"), (1, "Uno on its own 9 V"), (1, "7.4 V on VIN → 5 V"),
+        (1, "ngspice: 5.00 V, Uno on its own regulator"), (0, "ngspice: min 4.43 V, shares the servo rail")]),
+    ("USB can stay plugged in for calibration (Serial Monitor)", [
+        (1, "Uno on VIN: switches USB power off"), (1, "Uno on VIN"), (1, "Uno on VIN"),
+        (1, "Uno on VIN above 6.6 V: switches USB power off"), (0, "Adapter on the 5V pin: two 5 V sources fight")]),
     ("No special charger, no fire-risk cell", [
         (1, "Alkaline, disposable"), (0, "Needs a NiMH charger"), (0, "LiPo charger + fire-safe bag"), (1, "None"), (1, "None")]),
     ("Power parts cost ≤ $12", [
         (1, "~$3 battery + $5 buck"), (0, "~$12 cells + $2 holder + $15 charger"), (0, "~$15 pack + $20 charger + $5 buck"),
-        (0, "~$9 adapter + $5 buck = $14"), (1, "~$9 adapter")]),
+        (0, "~$8 adapter + $5 buck = $13"), (1, "~$9 adapter")]),
 ]
 
 # ------------------------------------------------------------------ BOM
@@ -111,7 +114,7 @@ DESIGNED = [
     ("CA-101", "Base", "base", "PETG", 1, "Bearing tower, MG996R pocket, ballast pockets; sweep sector cut away",
      "Holds the turntable and gives the robot its footprint (CG stays ≥ 39 mm inside it in every pose)",
      "Flat plywood/acrylic plate → the tower, servo pocket and sweep cut-out would be several glued pieces"),
-    ("CA-102", "Electronics tray", "electronics_tray", "PETG", 1, "Uno, 5 V rail, button / LED / DC-jack panel",
+    ("CA-102", "Electronics tray", "electronics_tray", "PETG", 1, "Uno, buck, servo rail, button / LED / DC-jack panel",
      "Keeps the electronics and wires out of the arm's 175° sweep",
      "Loose on the table → wires can snag the turning arm and the button moves around"),
     ("CA-201", "Turret plate", "turret_plate", "PETG", 1, "D plate + hub pressed into the 6807 bore, rod bosses",
@@ -163,26 +166,29 @@ PURCHASED = [
      "Jam ratio 0.018, the lift can't stick", "Printed slide → jam ratio 0.55, it can bind"),
     ("Steel rod 6 mm (h6), 300 mm long", "Cut to 2 × 112 mm", 1, "Amazon", 5, "Lift guide rods",
      "Straight, hard track for the LM6UU", "Printed rails → too rough and soft for the bearings"),
-    ("Wall adapter 5 V, 4 A", "Regulated, 5.5 × 2.1 mm plug", 1, "Amazon", 9, "All power",
-     "Scores 8/9 in the power matrix: covers a 2.5 A stall, one plug, no regulator, no charging",
-     "9 V battery → can't supply 2.5 A and would need a regulator (4/9); 12 V + buck → extra board to set (5/9)"),
+    ("Wall adapter 12 V, 2 A", "Regulated, 5.5 × 2.1 mm plug", 1, "Amazon", 8, "Uno VIN + buck input",
+     "Power matrix 7/9: wall power, one plug, and the Uno keeps its own regulator (5.00 V even in a servo stall)",
+     "5 V 4 A adapter direct → simpler (6/9) but Uno dips to 4.43 V in a stall and USB can't stay plugged in; 9 V battery → can't supply 2.5 A (4/9)"),
+    ("Buck converter XL4015", "5 A, set to 5.8 V", 1, "Amazon", 5, "Servo rail",
+     "Holds the servos at 5.8 V (≥ 5.5 V in a stall, ngspice) and keeps their current off the Uno's supply",
+     "No buck (5 V adapter direct) → servos sag to 4.25 V and the Uno to 4.43 V in a stall"),
     ("DC panel jack", "5.5 × 2.1 mm, panel mount", 1, "Amazon", 1, "Power input",
      "Adapter plugs into the robot; no loose wires to pull out", "Screw terminal → wires pull out when bumped"),
-    ("Electrolytic capacitor", "1000 µF, ≥ 10 V", 1, "Kit (have)", 0, "5 V rail",
-     "Covers the voltage dip when a servo starts, so the Uno (on the same rail) doesn't reset", "None → resets are likely"),
+    ("Electrolytic capacitor", "1000 µF, ≥ 10 V", 1, "Kit (have)", 0, "Servo rail",
+     "Covers fast current steps at the servo rail (1 A for 100 µs → 0.10 V droop)", "None → larger dips each time a servo starts"),
     ("Push button", "12 mm momentary", 1, "Kit (have)", 0, "START (D4)",
      "Spec: one start, then no human input. A button is one wire, one pin, nothing to pair or lose",
      "IR remote → receiver + library + batteries, stray IR can trigger it; timer → can't choose when it starts"),
     ("LED + 220 Ω resistor", "5 mm", 1, "Kit (have)", 0, "Status (D13)",
      "Blinking = moving, on = done: tells you when to lift the can off before homing",
      "Serial Monitor only → needs a laptop at the demo"),
-    ("Mini breadboard", "170 tie points", 1, "Kit (have)", 0, "5 V / GND rails",
-     "Splits the adapter's 5 V to 4 servos and the Uno", "Soldered perfboard → harder to change while calibrating"),
+    ("Mini breadboard", "170 tie points", 1, "Kit (have)", 0, "Servo rail",
+     "Splits the buck's 5.8 V to the 3 micro servos (each < 1 A, inside a contact's rating)", "Soldered perfboard → harder to change while calibrating"),
     ("Jumper wires", "M-M / M-F", 20, "Kit (have)", 0, "Signals, ground",
      "Connects the servo signals, button and LED", "Soldered wires → harder to fix"),
-    ("Servo extension lead", "300 mm", 3, "Amazon", 1, "Lift, wrist, gripper",
-     "These servos ride on the column; stock leads (~250 mm) can't reach the tray with a loop for the 90° turn",
-     "None → leads pull tight at the end of the turn"),
+    ("Servo extension lead", "300 mm", 4, "Amazon", 1, "Lift, wrist, gripper; 1 cut for the MG996R",
+     "Column servos need 300 mm with a loop for the 90° turn; one is cut so the MG996R's + / − go to the buck terminals",
+     "None → leads pull tight at the end of the turn; MG996R stall current would run through breadboard contacts (~1 A)"),
     ("Machine screw #6-32 × ½″", "Pan Phillips, HF kit #67675", 8, "Have", 0, "Tray 2, spine 2, top cap 2, link 1, gear axle 1",
      "Threads into printed pilots, no nuts needed", "Glue → can't take apart to fix or adjust"),
     ("Machine screw #8-32 × ½″", "Pan Phillips, HF kit #67675", 4, "Have", 0, "MG996R flange",
@@ -355,9 +361,10 @@ matrix_sheet(wb, "Concepts", "Concept decision matrix (binary)",
              "which matches the team's weighted matrix (A 3.85, B 3.30, D 3.00, C 2.75).",
              CONCEPTS, CONCEPT_ROWS, tiebreak_row=1, winner=0)
 matrix_sheet(wb, "Power source", "Power source decision matrix (binary)",
-             "Servo stall currents: MG996R 2.5 A, MG90S 0.7 A, SG90 0.65 A. Moves run one at a time, so the "
-             "normal draw is < 1.5 A; the supply must still cover one 2.5 A stall without the Uno resetting.",
-             POWERS, POWER_ROWS, winner=4)
+             "Stall currents: MG996R 2.5 A, MG90S 0.7 A, SG90 0.65 A. Normal run peak 0.65 A. Rows 1 and 5-7 are "
+             "ngspice results (EE/ee_calcs.py): the 12 V + buck design keeps the Uno at 5.00 V and the servos at >= 5.5 V "
+             "in a stall; the 5 V direct design is simpler but dips below both limits.",
+             POWERS, POWER_ROWS, winner=3)
 
 ws = wb.create_sheet("BOM")
 ws["A1"] = "Bill of materials: Concept A"

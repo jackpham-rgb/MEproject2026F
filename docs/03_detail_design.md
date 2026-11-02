@@ -29,7 +29,7 @@ missed. Each fix below closes a problem the check found.
 | Pads touched the can 6–26 mm above its middle (the voted design grips the middle) | Pads made 40 mm tall (z 46–86 mm), so they cover the middle of the can |
 | The can is a standard Coke can (66.2 × 122.2 mm, tapered top and bottom), not a generic 2.4 × 4.7 in cylinder | Grip axis raised to 61.1 mm (mid-height); finger pivots moved to y = 83 mm and the plates trimmed; carriage and lift servo up 2 mm; can bumper narrowed so it stays ≥ 0.5 mm from the closed fingers |
 | One MG996R mounting block rose into the turret hub | Block shortened to stop 1 mm under the hub |
-| Power: a 12 V adapter + XL4015 buck needed setting with a meter and added a board | One **5 V 4 A wall adapter** feeds the servos and the Uno directly; the buck and its tray standoffs are gone (power matrix in `decision_matrix_and_bom.xlsx`, rail check in `EE/README.md`) |
+| Power: is the buck needed? A 5 V adapter wired straight to the servos and the Uno was simulated against 12 V + buck | **Buck kept** (set to 5.8 V): with a servo stalled, the 5 V direct design drops the Uno to 4.43 V and the servos to 4.25 V; with the buck they hold 5.00 V and 5.50 V (`EE/README.md`). The MG996R's power goes straight to the buck terminals |
 
 ## Final check (`out/check_report.txt`)
 
@@ -40,10 +40,10 @@ missed. Each fix below closes a problem the check found.
 | Can at the end | **PASS**: centre (127.0, 0.0) mm, inverted, 0.0° tilt, set down at z = 0 |
 | Pads | Touching the can at the end of GRIP (the servo then squeezes past contact); 3.6 mm clear after release |
 | Tightest running gaps | 0.5 mm finger ↔ gripper plates (designed); 0.5 mm can ↔ bumper and bumper ↔ closed fingers (designed). LM6UU on rods is a sliding fit |
-| Tip-over | **PASS**: the robot CG stays ≥ 36 mm inside the base + tray footprint in every pose |
+| Tip-over | **PASS**: the robot CG stays ≥ 39 mm inside the base + tray footprint in every pose |
 | Lift slides freely | **PASS**: jam ratio 0.018 with LM6UU; a printed slide would be 0.55 |
 | Servo margins (CAD masses) | Lift 5×, wrist 30×, turntable ≫ (weight on the bearing) |
-| Mass | ≈ 545 g robot (≈ 300 g PETG printed, 245 g purchased) |
+| Mass | ≈ 571 g robot (≈ 301 g PETG printed, 270 g purchased) |
 
 ## 3D-print tolerances (PETG, 0.4 mm nozzle)
 

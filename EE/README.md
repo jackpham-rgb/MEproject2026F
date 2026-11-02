@@ -11,10 +11,12 @@ python3 EE/ee_calcs.py      # numpy + matplotlib; runs the circuit too if ngspic
 | `out/signals_sequence.png` | Button, the 4 servo signals and the LED, in firmware order, plus the current model |
 | `out/pwm_frames.png` | Inside one 20 ms frame: the 4 pulses back to back, at HOME, mid-FLIP and DONE |
 | `out/pulse_table.csv` | Every 20 ms frame of the run: angle, pulse start and pulse width for each servo |
-| `out/spice_rail.png` | ngspice: rail and Uno voltage, normal run and an MG996R stall |
+| `out/spice_rail.png` | ngspice: servo rail and Uno voltage, normal run and an MG996R stall |
+| `out/power_compare.png` | **Buck or no buck**: both power designs in 4 cases, with every limit |
 | `out/ee_report.txt` | All numbers below, as computed |
 | `ltspice/concept_a_run.cir`, `concept_a_stall.cir` | **LTspice netlists**: File → Open (file type *Netlists*), then Run |
 | `ltspice/concept_a.asc` | The same circuit as an LTspice schematic (`.step param STALL list 0 1`) |
+| `ltspice/power_A_*.cir`, `power_B_*.cir` | The power comparison: A = 5 V direct, B = 12 V + buck; cases normal / stall / powerup / powerup_all |
 | `ltspice/pwl/*.txt` | Signal and load waveforms the circuit plays (PWL files) |
 
 The script re-runs the firmware loop exactly: same constants and step tables read from
@@ -39,7 +41,9 @@ A hobby servo reads one pulse every 20 ms (50 Hz). The pulse width sets the angl
 (prescaler 8, 0.5 µs ticks). In each 20 ms frame it sends the pulses **one after another, in
 attach order: D9 turntable → D10 lift → D6 wrist → D5 gripper**, then waits out the frame.
 The longest possible chain is 2400 + 2400 + 2500 + 2400 µs = 9.7 ms, so all four always fit
-in the 20 ms frame (`out/pwm_frames.png`).
+in the 20 ms frame (`out/pwm_frames.png`). At power-up, `setup()` attaches the servos 0.3 s apart
+(D9 at 0 s, D10 at 0.3 s, D6 at 0.6 s, D5 at 0.9 s), so each servo's pulses start on its own
+(section 6 explains why).
 
 ![PWM frames](out/pwm_frames.png)
 
@@ -93,7 +97,7 @@ Plus the Uno board ≈ 45 mA and the LED 13.6 mA.
 | RELEASE | 0.24 A |
 | Homing steps | ≤ 0.34 A |
 
-**Peak 0.65 A vs a 4 A adapter: 6× margin.** The biggest steady load is not a moving servo but
+**Peak 0.65 A vs the 5 A buck: 7.7× margin** (12 V side ≈ 0.35 A + 0.06 A for the Uno). The biggest steady load is not a moving servo but
 the gripper holding the can:
 
 - Squeeze 0.8 N per arm × 44 mm lever (finger pivot y = 83 mm to can centre y = 127 mm) × 2
@@ -104,42 +108,38 @@ the gripper holding the can:
   Squeezing harder would leave the SG90 near stall and warm.
 
 Worst cases outside the normal run:
-- **One MG996R stall** (arm blocked): +2.5 A → about 3.2 A total, inside 4 A. Simulated below.
-- **All 4 servos jumping at power-up:** up to 4.6 A, more than the adapter's 4 A. The code
-  writes the home pose before `attach()`, so nothing jumps if the robot is powered up at home.
-  If it was moved by hand, set it back to home before plugging in.
+- **One MG996R stall** (arm blocked): +2.5 A → about 3.1 A at the buck, inside 5 A. Simulated below.
+- **Power-up away from home:** each servo jumps to its home angle at stall current. All four at
+  once would pull 4.7 A. That is over a 12 V 2 A adapter's limit (≈ 2.75 A drawn), so the firmware
+  attaches them 0.3 s apart: the worst moment is then one MG996R jump.
 
-## 3. Supply path and rail voltage
+## 3. Supply path and rail voltage (selected design: 12 V adapter + buck)
 
-| Element (EST) | Resistance |
+| Element (EST) | Value |
 |---|---:|
-| 5 V 4 A adapter (≈ 5 % load regulation) | 0.06 Ω |
-| 1.5 m cord, 2 × 20 AWG (33 mΩ/m each way) | 0.10 Ω (+ 1.5 µH) |
-| DC jack contact | 0.01 Ω |
-| Jumpers + breadboard contacts to the rail | 0.05 Ω |
-| Servo leads (MG996R 0.08 Ω; others with 300 mm extensions 0.13 Ω) | per servo |
-| **Total, adapter to rail** | **0.22 Ω** |
+| 12 V 2 A adapter (load regulation) | 0.15 Ω |
+| 1.5 m cord, 2 × 20 AWG | 0.10 Ω + 1.5 µH |
+| DC jack | 0.01 Ω |
+| XL4015 module: input capacitor / output resistance / efficiency | 220 µF / 0.03 Ω / 90 % |
+| Buck output → breadboard servo rail (jumpers + contacts) | 0.05 Ω |
+| Servo leads (MG996R 0.08 Ω, on the buck terminals; others 0.13 Ω with 300 mm extensions) | per servo |
+| Uno: VIN → M7 diode (≈ 1.0 V) → NCP1117 5 V regulator (dropout ≈ 1.1 V) | — |
 
-Hand calc: normal peak 0.65 A × 0.22 Ω = **0.14 V drop → rail ≈ 4.86 V**.
-MG996R stall: 3.15 A × 0.22 Ω = **0.69 V drop → rail ≈ 4.31 V**.
+Hand calc: servo rail drop at the normal peak 0.65 A × 0.08 Ω = **0.05 V → ≈ 5.75 V**. 12 V side:
+5.8 V × 0.65 A / (0.9 × 12 V) = **0.35 A**, plus 0.06 A for the Uno. The Uno's regulator burns
+(11 V − 5 V) × 0.06 A = **0.35 W**, fine for its SOT-223 package (~1 W).
 
-ngspice, same circuit with the real waveforms (`out/spice_rail.png`):
+ngspice, the full circuit with the real signal and current waveforms (`out/spice_rail.png`):
 
-| Case | Min rail | Min Uno 5V pin | Min at MG996R | Min at gripper |
+| Case | Servo rail | Uno 5V | MG996R min | Gripper min |
 |---|---:|---:|---:|---:|
-| Normal run | 4.86 V | 4.86 V | 4.85 V | 4.82 V |
-| MG996R stalled 0.5 s in TURN | 4.31 V | 4.31 V | 4.10 V | 4.27 V |
+| Normal run | 5.76–5.79 V | 5.00 V | 5.77 V | 5.72 V |
+| MG996R stalled 0.5 s in TURN | 5.68–5.79 V | 5.00 V | 5.50 V | 5.64 V |
 
 ![Rail voltage](out/spice_rail.png)
 
-- **Normal run: PASS.** The Uno stays above 4.5 V, the ATmega328P's minimum for 16 MHz.
-- **Stall:** the Uno dips to 4.31 V. That's below its 16 MHz spec but far above the 2.7 V
-  brown-out reset, so it keeps running. To raise it: a shorter or thicker adapter cord, or wire
-  the MG996R's power straight to the jack so its current skips the breadboard.
-
-**The 1000 µF capacitor** covers fast steps the adapter can't follow. A 1 A step for 100 µs
-(EST adapter response) droops it by 1 A × 100 µs / 1000 µF = 0.10 V. It matters because the Uno
-shares the rail. Rated ≥ 10 V, − leg to GND.
+**The 1000 µF capacitor** on the servo rail covers fast current steps. A 1 A step for 100 µs
+droops it by 1 A × 100 µs / 1000 µF = 0.10 V. Rated ≥ 10 V, − leg to GND.
 
 ## 4. Small parts
 
@@ -152,24 +152,65 @@ shares the rail. Rated ≥ 10 V, − leg to GND.
 
 ## 5. Rules that come out of these numbers
 
-1. **Unplug the 5 V adapter before plugging in USB** to upload. Both feed the Uno's 5 V net.
-2. Power up with the robot at home (no 4.6 A jump).
-3. Calibrate `GRIP_CLOSED` for a light squeeze (0.5–1 N per arm); the gripper's holding current
-   is the largest steady load.
-4. Keep the adapter cord short and thick (≤ 1.5 m, 20 AWG or better).
+1. Set the buck to **5.8 V with a meter before connecting any servo** (MG90S / SG90 max 6.0 V).
+2. The **MG996R's + / − go straight to the buck OUT terminals**, not the breadboard (a stall is
+   2.5 A; breadboard contacts are good for about 1 A).
+3. Calibrate `GRIP_CLOSED` for a light squeeze (0.5–1 N per arm). Holding the can is the biggest
+   steady load.
+4. Keep the firmware's staggered `attach()` (0.3 s apart).
+5. USB can stay plugged in with the adapter: the Uno switches USB power off above 6.6 V on VIN.
+
+## 6. Buck or no buck: both power designs simulated
+
+- **A:** a 5 V 4 A adapter wired straight to the servo rail and the Uno's 5V pin. No buck.
+- **B (selected):** a 12 V 2 A adapter to the Uno's VIN, plus an XL4015 at 5.8 V for the servos.
+
+Both use the same servo currents, wiring resistances and firmware, and in both the MG996R's power
+goes straight to the supply terminals. Four cases: a normal run; the MG996R stalled for 0.5 s in
+TURN (arm blocked); power-up away from home with this firmware (servos attached 0.3 s apart); and
+power-up away from home with all four attached at once (the old firmware).
+
+| Check (limit) | A normal | A stall | A power-up | **B normal** | **B stall** | **B power-up** |
+|---|---|---|---|---|---|---|
+| Uno 5 V (≥ 4.5 V for 16 MHz) | 4.86 ✔ | **4.43 ✘** | 4.52 ✔ | 5.00 ✔ | 5.00 ✔ | 5.00 ✔ |
+| Servo supply (≥ 4.8 V rated) | 4.82 ✔ | **4.25 ✘** | **4.34 ✘** | 5.72 ✔ | 5.50 ✔ | 5.52 ✔ |
+| Servo supply (≤ 6.0 V) | 4.95 ✔ | ✔ | ✔ | 5.79 ✔ | ✔ | ✔ |
+| Adapter current (A: 4 A, B: 2 A) | 0.66 ✔ | 3.16 ✔ | 2.72 ✔ | 0.38 ✔ | 1.79 ✔ | 1.54 ✔ |
+| Buck current (≤ 5 A) | — | — | — | 0.60 ✔ | 3.10 ✔ | 2.66 ✔ |
+| Breadboard rail current (≤ ~1 A) | 0.59 ✔ | 0.94 ✔ | 0.91 ✔ | 0.53 ✔ | 0.54 ✔ | 0.85 ✔ |
+| USB plugged in while powered | ✘ two 5 V sources | | | ✔ Uno switches USB off | | |
+
+With the old all-at-once power-up, both adapters were overloaded: A drew 4.77 A of its 4 A and B
+drew 2.75 A of its 2 A. Staggering the attach fixed both. That is why the firmware does it.
+
+![Buck or no buck](out/power_compare.png)
+
+**Conclusion: keep the buck.** Both designs pass the normal run, so the robot would work either
+way. The difference shows in the fault cases:
+- Without the buck, the Uno shares the servo rail. A blocked arm drops it to 4.43 V, below its
+  16 MHz minimum (it won't reset, since brown-out is 2.7 V), and the servos sag to 4.25 V,
+  below their rating.
+- With the buck, the Uno sits on its own regulator and holds 5.00 V in every case, and the servos
+  never drop below 5.5 V.
+- The buck also lets USB stay plugged in, so the Serial Monitor can stay open while you calibrate
+  the servo angles. With A you'd have to unplug the adapter every time.
+
+The cost is $5 and setting the buck once with a meter. Power decision matrix: B 7/9, A 6/9
+(`docs/decision_matrix_and_bom.xlsx`).
 
 ## How the LTspice circuit is built
 
 | Block | In the netlist |
 |---|---|
-| Adapter, cord, jack | `VADP` 5 V → `RADP` → `RCORD` + `LCORD` → `RJACK` |
-| Breadboard rail | `RRAIL` → node `rail`; `CRAIL` 1000 µF + `RESR` 0.08 Ω |
-| 4 servos | lead resistor + current source playing `pwl/i_*.txt` (the EST current model) |
+| Adapter, cord, jack | `VADP` 12 V → `RADP` → `RCORD` + `LCORD` → `RJACK` → node `vin` (+ `CIN` 220 µF) |
+| XL4015 buck (averaged) | `BBUCK` 5.8 V → `VSENSE` → `RBOUT` 0.03 Ω → node `bk`; `BBIN` draws Pout / (0.9 × Vin) from `vin` |
+| Breadboard rail | `VRAIL` (current sense) → `RRAIL` → node `rail`; `CRAIL` 1000 µF + `RESR` 0.08 Ω |
+| 4 servos | lead resistor + current source playing `pwl/i_*.txt` (EST current model); the MG996R hangs on `bk`, the others on `rail` |
 | Stall test | `ISTALL` 2.5 A for 0.5 s in the middle of TURN (`STALL` = 1) |
-| Uno | `RUNO` jumper → node `uno5v`, 45 mA load |
+| Uno | `RVIN` → node `vinu` (45 mA load); `BREG` makes `uno5v` = min(5 V, VIN − 2.1 V) |
 | Servo signals | `VSIG_D9 / D10 / D6 / D5` play `pwl/sig_D*.txt` (the exact pulse trains) through 25 Ω pins into ~10 kΩ servo inputs |
 | LED | `VLED_D13` → 25 Ω → 220 Ω → LED model (Vf ≈ 2.0 V at 13.6 mA) |
 | Button | 35 kΩ pull-up to `uno5v`, switch `SBTN` to GND, pressed at 1.0 s and 9.4 s |
 
-Plot in LTspice: `V(rail)`, `V(uno5v)`, `V(d9)` `V(d10)` `V(d6)` `V(d5)` (zoom into any 20 ms to see
+Plot in LTspice: `V(rail)`, `V(uno5v)`, `V(vin)`, `V(d9)` `V(d10)` `V(d6)` `V(d5)` (zoom into any 20 ms to see
 the four pulses in order), `V(d13)`, `V(d4)`.

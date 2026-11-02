@@ -8,47 +8,54 @@
 circuit live, use **Wokwi** (`wokwi/concept_a/`) or **Tinkercad Circuits**
 (`docs/tinkercad_concept_a.md`). Both run the real sketch.
 
-There are no optional parts: 4 servos, 1 START button, 1 status LED, 1 power adapter.
+There are no optional parts: 4 servos, 1 START button, 1 status LED, 1 power adapter, 1 buck converter.
 
-## Power: one 5 V, 4 A wall adapter, no regulator
+## Power: 12 V wall adapter, buck converter for the servos
 
 ```
-5 V 4 A regulated wall adapter ──> DC panel jack
- └── +5 V / GND rails on the mini breadboard
-      ├── all 4 servo red (+) and brown (GND) wires
-      ├── 1000 µF capacitor across the rails (− leg to GND)
-      └── Uno 5V pin and GND
+12 V 2 A wall adapter ──> DC panel jack
+ ├── Uno VIN  (the Uno's own regulator makes its 5 V)
+ └── XL4015 buck, set to 5.8 V with a meter before any servo is connected
+      ├── OUT terminals ──> MG996R + / −  (straight to the terminals: its 2.5 A stall skips the breadboard)
+      └── breadboard servo rail ──> lift, wrist, gripper servos + 1000 µF capacitor
+All grounds are joined: jack −, buck −, rail GND, Uno GND.
 ```
 
-**Why this and not a battery?** Full scoring: `docs/decision_matrix_and_bom.xlsx`, sheet
-*Power source* (also `docs/decision_matrix_power.csv`).
+**Do we need the buck? Yes.** Both designs were simulated in ngspice with the real servo
+currents, in a normal run, with the MG996R stalled (arm blocked), and at power-up away from
+home (`EE/README.md`, section 6):
 
-| Option | Score (of 9) | Deciding fact |
-|---|:-:|---|
-| **5 V 4 A wall adapter, direct (selected)** | **8** | Covers a 2.5 A MG996R stall; one plug; servos are rated 4.8–6 V, so no regulator; nothing to charge or set |
-| 12 V wall adapter + XL4015 buck (old design) | 5 | Works, but adds a board whose output must be set with a meter before the servos go on |
-| 4×AA NiMH (servos) + 9 V (Uno) | 5 | Two packs to keep charged; needs a charger |
-| 9 V battery (PP3) + buck | 4 | A PP3 gives only ~0.5–1 A. A 2.5 A servo stall sags it and resets the Uno. 9 V would also burn the servos without a regulator |
-| 2S LiPo 7.4 V + buck | 3 | Needs a balance charger and fire-safe handling, plus the buck |
+| | **12 V + buck (selected)** | 5 V 4 A adapter, no buck |
+|---|---|---|
+| Normal run | Uno 5.00 V, servos ≥ 5.72 V | Uno 4.86 V, servos ≥ 4.82 V |
+| MG996R stalled 0.5 s | **Uno 5.00 V**, servos ≥ 5.50 V | Uno **4.43 V** (below its 4.5 V / 16 MHz minimum), servos 4.25 V |
+| Power-up away from home | Uno 5.00 V, servos ≥ 5.52 V | servos 4.34 V |
+| USB plugged in while powered | Fine: the Uno switches USB power off above 6.6 V on VIN | Not allowed: two 5 V sources fight, so no Serial Monitor while calibrating |
+| Parts | adapter $8 + buck $5, set once with a meter | adapter $9 |
 
-So wall power is the simpler, easier-to-maintain choice, and a 5 V adapter removes the buck as well.
+Both pass the normal run. The buck wins on every fault case and lets the Serial Monitor stay open
+while you calibrate the angles. That is worth $5 and one adjustment. Power decision matrix:
+12 V + buck **7/9**, 5 V direct 6/9, LiPo + buck 5/9, 9 V battery 4/9, AA NiMH pack 4/9
+(`docs/decision_matrix_and_bom.xlsx`, sheet *Power source*).
 
-**The one rule that comes with it:** the adapter feeds the Uno through its 5V pin, which has no
-reverse protection. **Unplug the adapter before plugging in USB** to upload, and run on the
-adapter only. (With both connected, two 5 V sources fight through the Uno.)
+Why 5.8 V and not 6.0 V: the MG90S and SG90 are rated to 6.0 V, and 5.8 V leaves room for the
+buck's adjustment screw to drift.
 
-The electrical calculations behind this (servo PWM signals in firmware order, current per
-step, rail voltage in ngspice, LED and button values, the LTspice circuit) are in
-**[`EE/README.md`](../EE/README.md)**. Short version: peak 0.65 A in a normal run (6× margin on
-4 A), and the Uno's 5V pin stays ≥ 4.86 V.
+**A 9 V battery won't do.** A PP3 gives about 0.5–1 A; one servo stall needs 2.5 A, so it would sag
+and reset the Uno.
+
+The firmware attaches the servos 0.3 s apart. If the robot is powered up away from home, only one
+servo jumps at a time. All four at once would pull 4.8 A, over the 12 V adapter's limit.
 
 ## Wire list (matches `firmware/concept_a/concept_a.ino`)
 
 | From | To | Wire | Notes |
 |---|---|---|---|
-| Jack + | +5 V rail and Uno **5V** | red | |
-| Jack − | GND rail and Uno **GND** | black | common ground (servo signals need it) |
-| Turntable servo MG996R | signal → **D9**, + → rail, GND → rail | orange / red / brown | |
+| Jack + | XL4015 IN+ and Uno **VIN** | red | 12 V |
+| Jack − | XL4015 IN− and Uno **GND** | black | |
+| XL4015 OUT+ / OUT− | servo rail + / GND, and the MG996R's red / brown | red / black | 5.8 V. MG996R power on the terminals, not the breadboard |
+| GND rail | Uno GND | black | common ground (servo signals need it) |
+| Turntable servo MG996R | signal → **D9** (+ / − at the buck terminals) | orange | One extension lead is cut to split its power from its signal |
 | Lift servo MG90S | signal → **D10** | orange | 300 mm extension lead |
 | Wrist servo MG90S | signal → **D6** | orange | 300 mm lead. Code widens its pulse range to 500–2500 µs to reach 180° |
 | Gripper servo SG90 | signal → **D5** | orange | 300 mm lead |

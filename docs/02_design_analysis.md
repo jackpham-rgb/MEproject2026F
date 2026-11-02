@@ -92,7 +92,8 @@ both ends.
   reaction from the turntable doesn't slide the base.
 - **Electronics:** all electrical calculations (servo PWM signals in firmware order, current
   budget, rail voltage, LED / button values, LTspice circuit) are in **`EE/README.md`**. In short:
-  one 5 V, 4 A wall adapter; peak normal draw ≈ 0.65 A; the Uno's 5V pin stays ≥ 4.86 V (ngspice).
+  a 12 V wall adapter feeds the Uno's VIN and an XL4015 buck at 5.8 V for the servos; peak normal
+  draw ≈ 0.65 A; the Uno holds 5.00 V even with a servo stalled (ngspice).
   The power-source comparison is in `docs/04_wiring.md` and `docs/decision_matrix_and_bom.xlsx`.
 
 ## 8. Firmware (`firmware/concept_a/concept_a.ino`)

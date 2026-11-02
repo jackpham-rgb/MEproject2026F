@@ -9,7 +9,7 @@ Each row says **why we need it** and **what else we considered**, so the list an
 | Part no. | Part | Material | Qty | Mass (g) | What it does | Why we need it | Alternative → why not |
 |---|---|---|---:|---:|---|---|---|
 | CA-101 | Base | PETG | 1 | 109.2 | Bearing tower, MG996R pocket, ballast pockets; sweep sector cut away | Holds the turntable and gives the robot its footprint (CG stays ≥ 39 mm inside it in every pose) | Flat plywood/acrylic plate → the tower, servo pocket and sweep cut-out would be several glued pieces |
-| CA-102 | Electronics tray | PETG | 1 | 56.5 | Uno, 5 V rail, button / LED / DC-jack panel | Keeps the electronics and wires out of the arm's 175° sweep | Loose on the table → wires can snag the turning arm and the button moves around |
+| CA-102 | Electronics tray | PETG | 1 | 57.0 | Uno, buck, servo rail, button / LED / DC-jack panel | Keeps the electronics and wires out of the arm's 175° sweep | Loose on the table → wires can snag the turning arm and the button moves around |
 | CA-201 | Turret plate | PETG | 1 | 24.4 | D plate + hub pressed into the 6807 bore, rod bosses | Puts the column's weight and tipping load on the bearing, so the servo only turns it | Column screwed to the servo horn → the servo spline carries all the bending load |
 | CA-202 | Spine | PETG | 1 | 22.4 | Column back + lift-servo bracket | Ties the rods to the turret and holds the lift servo | Aluminium extrusion → extra cost and brackets for no gain at this load |
 | CA-203 | Top cap | PETG | 1 | 10.5 | Captures the rod tops | Keeps the 2 rods parallel so the 4 LM6UU slide without binding | Rods held only at the bottom → they splay and the carriage jams |
@@ -21,7 +21,7 @@ Each row says **why we need it** and **what else we considered**, so the list an
 | CA-404 | Can bumper | Silicone sheet | 1 | 0.2 | Cut from the pad sheet, glued to the gripper frame | Sets how deep the can sits in the gripper, so every grip and landing is the same | No stop → grip depth varies with how the can is placed |
 | CA-900 | Tolerance coupon | PETG | 1 | 8.2 | 6 test holes | Checks screw, rod and bearing fits on our printer before ~300 g of parts | Print the parts first → one wrong fit wastes hours of printing |
 
-Printed robot parts: **≈ 300 g PETG** (+ ~15 % for supports/purge). STL files: `cad/out/parts/`. Part numbers match the Part C drawings.
+Printed robot parts: **≈ 301 g PETG** (+ ~15 % for supports/purge). STL files: `cad/out/parts/`. Part numbers match the Part C drawings.
 
 ## Purchased parts
 
@@ -34,19 +34,20 @@ Printed robot parts: **≈ 300 g PETG** (+ ~15 % for supports/purge). STL files:
 | CA-P05 | Ball bearing 6807-2RS | 35 × 47 × 7 mm | 1 | Amazon / VXB | 5 | Turntable | Carries the arm's weight and tipping moment so the servo only turns it | 4 in lazy-susan → too tall, it collided with the wrist in the CAD check; servo alone → side load on the spline |
 | CA-P06 | Linear bearing LM6UU | 6 mm ID × 12 mm OD × 19 mm | 4 | Amazon | 1 | Lift carriage | Jam ratio 0.018, the lift can't stick | Printed slide → jam ratio 0.55, it can bind |
 | CA-P07 | Steel rod 6 mm (h6), 300 mm long | Cut to 2 × 112 mm | 1 | Amazon | 5 | Lift guide rods | Straight, hard track for the LM6UU | Printed rails → too rough and soft for the bearings |
-| CA-P08 | Wall adapter 5 V, 4 A | Regulated, 5.5 × 2.1 mm plug | 1 | Amazon | 9 | All power | Scores 8/9 in the power matrix: covers a 2.5 A stall, one plug, no regulator, no charging | 9 V battery → can't supply 2.5 A and would need a regulator (4/9); 12 V + buck → extra board to set (5/9) |
-| CA-P09 | DC panel jack | 5.5 × 2.1 mm, panel mount | 1 | Amazon | 1 | Power input | Adapter plugs into the robot; no loose wires to pull out | Screw terminal → wires pull out when bumped |
-| CA-P10 | Electrolytic capacitor | 1000 µF, ≥ 10 V | 1 | Kit (have) | — | 5 V rail | Covers the voltage dip when a servo starts, so the Uno (on the same rail) doesn't reset | None → resets are likely |
-| CA-P11 | Push button | 12 mm momentary | 1 | Kit (have) | — | START (D4) | Spec: one start, then no human input. A button is one wire, one pin, nothing to pair or lose | IR remote → receiver + library + batteries, stray IR can trigger it; timer → can't choose when it starts |
-| CA-P12 | LED + 220 Ω resistor | 5 mm | 1 | Kit (have) | — | Status (D13) | Blinking = moving, on = done: tells you when to lift the can off before homing | Serial Monitor only → needs a laptop at the demo |
-| CA-P13 | Mini breadboard | 170 tie points | 1 | Kit (have) | — | 5 V / GND rails | Splits the adapter's 5 V to 4 servos and the Uno | Soldered perfboard → harder to change while calibrating |
-| CA-P14 | Jumper wires | M-M / M-F | 20 | Kit (have) | — | Signals, ground | Connects the servo signals, button and LED | Soldered wires → harder to fix |
-| CA-P15 | Servo extension lead | 300 mm | 3 | Amazon | 1 | Lift, wrist, gripper | These servos ride on the column; stock leads (~250 mm) can't reach the tray with a loop for the 90° turn | None → leads pull tight at the end of the turn |
-| CA-P16 | Machine screw #6-32 × ½″ | Pan Phillips, HF kit #67675 | 8 | Have | — | Tray 2, spine 2, top cap 2, link 1, gear axle 1 | Threads into printed pilots, no nuts needed | Glue → can't take apart to fix or adjust |
-| CA-P17 | Machine screw #8-32 × ½″ | Pan Phillips, HF kit #67675 | 4 | Have | — | MG996R flange | The MG996R's 4.6 mm flange holes fit #8 | #6 → loose in the flange |
-| CA-P18 | Servo-bag screws | Come with the servos | 14 | With servos | — | Servo tabs, horns, crank | Sized for the servo tabs and horns | Kit screws → too big for the micro-servo tabs |
-| CA-P19 | Silicone rubber sheet | 3/32 in (2.4 mm), ~6 × 6 in | 1 | Amazon | 6 | Finger pads + can bumper | Grippy pads (μ ≈ 0.6) keep the squeeze needed low (0.4 N), so the can isn't dented | Bare PETG pads → slippery, needs a harder squeeze; TPU → a second filament for 1 g of parts |
-| CA-P20 | Steel washers + rubber feet | ~100 g of washers, 4 feet | 1 | Hardware store | 3 | Base | Weight and friction so the turning reaction doesn't slide the base | Clamp to the table → the demo table may not allow it |
-| CA-P21 | PETG filament | 1.75 mm, ~0.35 kg | 1 | Have | — | Printed parts | Tougher than PLA and creeps less under the press fits (bearing, LM6UU, rods) | PLA → press fits loosen over time |
+| CA-P08 | Wall adapter 12 V, 2 A | Regulated, 5.5 × 2.1 mm plug | 1 | Amazon | 8 | Uno VIN + buck input | Power matrix 7/9: wall power, one plug, and the Uno keeps its own regulator (5.00 V even in a servo stall) | 5 V 4 A adapter direct → simpler (6/9) but Uno dips to 4.43 V in a stall and USB can't stay plugged in; 9 V battery → can't supply 2.5 A (4/9) |
+| CA-P09 | Buck converter XL4015 | 5 A, set to 5.8 V | 1 | Amazon | 5 | Servo rail | Holds the servos at 5.8 V (≥ 5.5 V in a stall, ngspice) and keeps their current off the Uno's supply | No buck (5 V adapter direct) → servos sag to 4.25 V and the Uno to 4.43 V in a stall |
+| CA-P10 | DC panel jack | 5.5 × 2.1 mm, panel mount | 1 | Amazon | 1 | Power input | Adapter plugs into the robot; no loose wires to pull out | Screw terminal → wires pull out when bumped |
+| CA-P11 | Electrolytic capacitor | 1000 µF, ≥ 10 V | 1 | Kit (have) | — | Servo rail | Covers fast current steps at the servo rail (1 A for 100 µs → 0.10 V droop) | None → larger dips each time a servo starts |
+| CA-P12 | Push button | 12 mm momentary | 1 | Kit (have) | — | START (D4) | Spec: one start, then no human input. A button is one wire, one pin, nothing to pair or lose | IR remote → receiver + library + batteries, stray IR can trigger it; timer → can't choose when it starts |
+| CA-P13 | LED + 220 Ω resistor | 5 mm | 1 | Kit (have) | — | Status (D13) | Blinking = moving, on = done: tells you when to lift the can off before homing | Serial Monitor only → needs a laptop at the demo |
+| CA-P14 | Mini breadboard | 170 tie points | 1 | Kit (have) | — | Servo rail | Splits the buck's 5.8 V to the 3 micro servos (each < 1 A, inside a contact's rating) | Soldered perfboard → harder to change while calibrating |
+| CA-P15 | Jumper wires | M-M / M-F | 20 | Kit (have) | — | Signals, ground | Connects the servo signals, button and LED | Soldered wires → harder to fix |
+| CA-P16 | Servo extension lead | 300 mm | 4 | Amazon | 1 | Lift, wrist, gripper; 1 cut for the MG996R | Column servos need 300 mm with a loop for the 90° turn; one is cut so the MG996R's + / − go to the buck terminals | None → leads pull tight at the end of the turn; MG996R stall current would run through breadboard contacts (~1 A) |
+| CA-P17 | Machine screw #6-32 × ½″ | Pan Phillips, HF kit #67675 | 8 | Have | — | Tray 2, spine 2, top cap 2, link 1, gear axle 1 | Threads into printed pilots, no nuts needed | Glue → can't take apart to fix or adjust |
+| CA-P18 | Machine screw #8-32 × ½″ | Pan Phillips, HF kit #67675 | 4 | Have | — | MG996R flange | The MG996R's 4.6 mm flange holes fit #8 | #6 → loose in the flange |
+| CA-P19 | Servo-bag screws | Come with the servos | 14 | With servos | — | Servo tabs, horns, crank | Sized for the servo tabs and horns | Kit screws → too big for the micro-servo tabs |
+| CA-P20 | Silicone rubber sheet | 3/32 in (2.4 mm), ~6 × 6 in | 1 | Amazon | 6 | Finger pads + can bumper | Grippy pads (μ ≈ 0.6) keep the squeeze needed low (0.4 N), so the can isn't dented | Bare PETG pads → slippery, needs a harder squeeze; TPU → a second filament for 1 g of parts |
+| CA-P21 | Steel washers + rubber feet | ~100 g of washers, 4 feet | 1 | Hardware store | 3 | Base | Weight and friction so the turning reaction doesn't slide the base | Clamp to the table → the demo table may not allow it |
+| CA-P22 | PETG filament | 1.75 mm, ~0.35 kg | 1 | Have | — | Printed parts | Tougher than PLA and creeps less under the press fits (bearing, LM6UU, rods) | PLA → press fits loosen over time |
 
-**Spend beyond what we already have: ≈ $53.**
+**Spend beyond what we already have: ≈ $58.**

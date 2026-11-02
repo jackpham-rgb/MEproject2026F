@@ -4,7 +4,7 @@ Units: millimetres. World frame at the HOME pose: origin = turntable axis on the
 (the robot's location, Figure 2 vertex), +Y -> START can (0, 127), +X -> TARGET can (127, 0), +Z up.
 
 Groups (one rigid body each, so they map 1:1 to Fusion/SolidWorks components and joints):
-  fixed    base (with bearing tower), 6807 bearing, electronics tray, MG996R, Arduino, breadboard
+  fixed    base (with bearing tower), 6807 bearing, electronics tray, MG996R, Arduino, buck, breadboard
   turret   turret plate + hub, horn, rods, spine, top cap, lift servo + bracket
   crank    lift crank (rotates about the lift-servo shaft, an X-axis line)
   lift     carriage, 4x LM6UU, beam, wrist bracket, wrist servo, link
@@ -70,7 +70,7 @@ TOL = dict(
     rod_press=6.0,     # 6 mm rod: nominal hole prints ~0.1 mm under -> light press fit
     lm_press=12.15,    # LM6UU 12 mm OD: +0.15 -> snug press fit
     run_bore=3.9,      # gear on a #6 screw axle: running clearance
-    peg=2.8,           # printed peg for 3.2 mm board holes (Uno)
+    peg=2.8,           # printed peg for 3.2 mm board holes (Uno); the buck uses 2.6 mm pegs for its 3.0 mm holes
     bear_shaft=34.95,  # printed hub into the 35 mm bearing bore (prints ~+0.05)
     bear_housing=47.1, # bearing outer race into the printed tower
     gap_moving=0.5,    # minimum gap between parts that move relative to each other
@@ -256,8 +256,13 @@ def build_parts():
     for hx, hy in uno_holes:                                                             # standoff + 3 mm peg (no #4 screws in the kit)
         x, y = uno_o[0] + hx, uno_o[1] + hy
         tray = tray.union(cyl(x, y, 3.0, p["tray_t"], p["tray_t"] + 6)).union(cyl(x, y, TOL["peg"] / 2, p["tray_t"] + 6, p["tray_t"] + 9))
+    # buck converter standoffs (XL4015 5 A module, 54 x 23, holes ~48 x 17  VERIFY)
+    bk_o = (8.0, ty0 + 10.0)
+    for hx, hy in ((3, 3), (51, 3), (3, 20), (51, 20)):
+        x, y = bk_o[0] + hx, bk_o[1] + hy
+        tray = tray.union(cyl(x, y, 3.0, p["tray_t"], p["tray_t"] + 5)).union(cyl(x, y, 1.3, p["tray_t"] + 5, p["tray_t"] + 8))
     add("electronics_tray", "fixed", tray, "PETG", note="2x #6-32x1/2 up through the tabs into the base. "
-        "The Uno sits on printed pegs (dab of hot glue); mini breadboard is self-adhesive.")
+        "The Uno and the buck sit on printed pegs (dab of hot glue); mini breadboard is self-adhesive.")
 
     # ---------------- fixed: purchased ----------------
     bear = cyl(0, 0, p["bear_od"] / 2, H - p["bear_w"], H).cut(cyl(0, 0, p["bear_id"] / 2, H - p["bear_w"] - 1, H + 1))
@@ -267,8 +272,10 @@ def build_parts():
     uno = box(uno_o[0], uno_o[0] + 68.6, uno_o[1], uno_o[1] + 53.3, p["tray_t"] + 6, p["tray_t"] + 7.6)
     uno = uno.union(box(uno_o[0] - 6, uno_o[0] + 10, uno_o[1] + 32, uno_o[1] + 44, p["tray_t"] + 7.6, p["tray_t"] + 18.6))
     add("arduino_uno", "fixed", uno, "buy", mass=25.0)
+    add("buck_XL4015", "fixed", box(bk_o[0], bk_o[0] + 54, bk_o[1], bk_o[1] + 23, p["tray_t"] + 5, p["tray_t"] + 19),
+        "buy", mass=25.0, note="XL4015 5 A buck set to 5.8 V for the servos; MG996R power on its OUT terminals  VERIFY footprint")
     add("mini_breadboard", "fixed", box(8, 55, ty0 + 45, ty0 + 80, p["tray_t"], p["tray_t"] + 8.5), "buy", mass=10.0,
-        note="5 V rail from the wall adapter + 1000 uF capacitor")
+        note="5.8 V servo rail from the buck + 1000 uF capacitor")
 
     # ---------------- turret ----------------
     tz0, tz1 = p["turret_z0"], p["turret_z1"]

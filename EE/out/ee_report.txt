@@ -38,7 +38,7 @@ CONCEPT A ELECTRONICS (EE/ee_calcs.py)
    H-TURN    peak 0.34 A   turn 0.13  lift 0.13  wrist 0.02  grip 0.01
    H-LOWER   peak 0.24 A   turn 0.01  lift 0.15  wrist 0.02  grip 0.01
    H-OPEN    peak 0.26 A   turn 0.01  lift 0.13  wrist 0.02  grip 0.05
-   Peak of the whole run: 0.65 A. Adapter rating 4 A -> 6.2x margin.
+   Peak of the whole run: 0.65 A. XL4015 rating 5 A -> 7.7x margin; 12 V 2 A adapter -> see section 6.
    Gripper hold: 0.8 N per arm x 44 mm lever x 2 arms = 0.72 kg*cm = 45% of the SG90 stall torque -> ~0.29 A while it holds the can.
    The SG90 can make at most 1.78 N per arm here; squeeze 0.5-1 N (0.39 N minimum, SF 3).
    Worst cases outside the normal run: one MG996R stall 2.5 A; all 4 servos jumping at power-up 4.6 A (> 4 A:
@@ -48,14 +48,65 @@ CONCEPT A ELECTRONICS (EE/ee_calcs.py)
    Status LED: (5.0 - 2.0 V) / 220 ohm = 13.6 mA  (Uno pin limit 20 mA recommended, 40 mA absolute)
    START button: INPUT_PULLUP 20-50 kOhm -> 0.1-0.25 mA when pressed; debounced 40 ms in code
    Servo signal inputs draw < 1 mA each from D9/D10/D6/D5
-   Supply path: adapter 0.06 + cord 0.1 + jack 0.01 + rail 0.05 ohm (EST)
-   Hand calc, rail drop at the run peak: 0.65 A x 0.22 ohm = 0.14 V
-   Hand calc, rail drop in an MG996R stall: 3.15 A x 0.22 ohm = 0.69 V
+   Servo path (design B): buck 5.8 V, 0.03 ohm out + rail 0.05 ohm; Uno on its own VIN regulator (EST)
+   Hand calc, rail drop at the run peak: 0.65 A x 0.08 ohm = 0.05 V
+   Hand calc, rail drop in an MG996R stall: 3.15 A x 0.08 ohm = 0.25 V
+   12 V side at the run peak: 5.8 V x 0.65 A / (0.9 x 12 V) = 0.35 A, plus the Uno 0.059 A
    1000 uF capacitor: a 1 A step for 100 us (adapter response, EST) droops it 1 A x 100 us / 1000 uF = 0.10 V
 
-5. NGSPICE RESULTS (same netlist as EE/ltspice/concept_a_run.cir / _stall.cir)
-   normal run : min rail 4.86 V, min Uno 5V 4.86 V, min at MG996R 4.85 V, min at gripper 4.82 V
-   MG996R stall: min rail 4.31 V, min Uno 5V 4.31 V, min at MG996R 4.10 V, min at gripper 4.27 V
-   Normal run: Uno stays above 4.5 V -> PASS.
-   Stall: Uno dips to 4.31 V. Below its 4.5 V / 16 MHz spec but far above the 2.7 V brown-out,
-   so it keeps running (no reset). Shorter / thicker cord or the MG996R wired straight to the jack lowers the dip.
+5. NGSPICE RESULTS, DESIGN B WITH THE REAL SIGNALS (EE/ltspice/concept_a_run.cir / _stall.cir)
+   normal run : servo rail 5.76-5.79 V, Uno 5V min 5.00 V, MG996R min 5.77 V, gripper min 5.72 V
+   MG996R stall: servo rail 5.68-5.79 V, Uno 5V min 5.00 V, MG996R min 5.50 V, gripper min 5.64 V
+
+6. BUCK OR NO BUCK: both power designs, 3 cases (ngspice; EE/ltspice/power_*.cir)
+   A = 5 V 4 A adapter direct (rail + Uno 5V pin).  B = 12 V 2 A adapter -> XL4015 at 5.8 V (servos), Uno on VIN.
+   des  case        check                          value            limit                      result
+   A    normal      Uno 5 V (min)                  4.86 V           ≥ 4.5 V (16 MHz)           PASS 
+   A    normal      Servo supply (min)             4.82 V           ≥ 4.8 V rated              PASS 
+   A    normal      Servo supply (max)             4.96 V           ≤ 6.0 V (MG90S, SG90)      PASS 
+   A    normal      5 V adapter current (max)      0.66 A           ≤ 4.0 A rating             PASS 
+   A    normal      Breadboard rail current (max)  0.59 A           ≤ ~1 A per contact         PASS 
+   A    stall       Uno 5 V (min)                  4.43 V           ≥ 4.5 V (16 MHz)           WARN warn: runs, no reset (> 2.7 V BOD)
+   A    stall       Servo supply (min)             4.25 V           ≥ 4.8 V rated              WARN warn: servos slower/weaker for that moment
+   A    stall       Servo supply (max)             4.96 V           ≤ 6.0 V (MG90S, SG90)      PASS 
+   A    stall       5 V adapter current (max)      3.16 A           ≤ 4.0 A rating             PASS 
+   A    stall       Breadboard rail current (max)  0.94 A           ≤ ~1 A per contact         PASS 
+   A    powerup     Uno 5 V (min)                  4.52 V           ≥ 4.5 V (16 MHz)           PASS 
+   A    powerup     Servo supply (min)             4.34 V           ≥ 4.8 V rated              WARN warn: servos slower/weaker for that moment
+   A    powerup     Servo supply (max)             4.96 V           ≤ 6.0 V (MG90S, SG90)      PASS 
+   A    powerup     5 V adapter current (max)      2.72 A           ≤ 4.0 A rating             PASS 
+   A    powerup     Breadboard rail current (max)  0.91 A           ≤ ~1 A per contact         PASS 
+   A    powerup_all Uno 5 V (min)                  4.07 V           ≥ 4.5 V (16 MHz)           WARN warn: runs, no reset (> 2.7 V BOD)
+   A    powerup_all Servo supply (min)             3.97 V           ≥ 4.8 V rated              WARN warn: servos slower/weaker for that moment
+   A    powerup_all Servo supply (max)             4.96 V           ≤ 6.0 V (MG90S, SG90)      PASS 
+   A    powerup_all 5 V adapter current (max)      4.77 A           ≤ 4.0 A rating             FAIL adapter current-limits: rail collapses, Uno resets
+   A    powerup_all Breadboard rail current (max)  2.29 A           ≤ ~1 A per contact         WARN warn: more than one contact's rating
+   B    normal      Uno 5 V (min)                  5.00 V           ≥ 4.5 V (16 MHz)           PASS 
+   B    normal      Servo supply (min)             5.72 V           ≥ 4.8 V rated              PASS 
+   B    normal      Servo supply (max)             5.79 V           ≤ 6.0 V (MG90S, SG90)      PASS 
+   B    normal      12 V adapter current (max)     0.38 A           ≤ 2.0 A rating             PASS 
+   B    normal      XL4015 output current (max)    0.60 A           ≤ 5 A                      PASS 
+   B    normal      Breadboard rail current (max)  0.53 A           ≤ ~1 A per contact         PASS 
+   B    stall       Uno 5 V (min)                  5.00 V           ≥ 4.5 V (16 MHz)           PASS 
+   B    stall       Servo supply (min)             5.50 V           ≥ 4.8 V rated              PASS 
+   B    stall       Servo supply (max)             5.79 V           ≤ 6.0 V (MG90S, SG90)      PASS 
+   B    stall       12 V adapter current (max)     1.79 A           ≤ 2.0 A rating             PASS 
+   B    stall       XL4015 output current (max)    3.10 A           ≤ 5 A                      PASS 
+   B    stall       Breadboard rail current (max)  0.54 A           ≤ ~1 A per contact         PASS 
+   B    powerup     Uno 5 V (min)                  5.00 V           ≥ 4.5 V (16 MHz)           PASS 
+   B    powerup     Servo supply (min)             5.52 V           ≥ 4.8 V rated              PASS 
+   B    powerup     Servo supply (max)             5.79 V           ≤ 6.0 V (MG90S, SG90)      PASS 
+   B    powerup     12 V adapter current (max)     1.54 A           ≤ 2.0 A rating             PASS 
+   B    powerup     XL4015 output current (max)    2.66 A           ≤ 5 A                      PASS 
+   B    powerup     Breadboard rail current (max)  0.85 A           ≤ ~1 A per contact         PASS 
+   B    powerup_all Uno 5 V (min)                  5.00 V           ≥ 4.5 V (16 MHz)           PASS 
+   B    powerup_all Servo supply (min)             5.44 V           ≥ 4.8 V rated              PASS 
+   B    powerup_all Servo supply (max)             5.79 V           ≤ 6.0 V (MG90S, SG90)      PASS 
+   B    powerup_all 12 V adapter current (max)     2.75 A           ≤ 2.0 A rating             FAIL adapter current-limits: rail collapses; Uno stays up only if VIN holds
+   B    powerup_all XL4015 output current (max)    4.71 A           ≤ 5 A                      PASS 
+   B    powerup_all Breadboard rail current (max)  2.20 A           ≤ ~1 A per contact         WARN warn: more than one contact's rating
+   B    all         Uno regulator heat             0.35 W           ≤ ~1 W (SOT-223)           PASS 
+   A    all         USB plugged in while powered   two 5 V sources  not allowed                FAIL rule: unplug the adapter before USB (no Serial Monitor while running)
+   B    all         USB plugged in while powered   VIN > 6.6 V      Uno switches USB power off PASS 
+   A: peak input power, normal run = 3.3 W (adapter 20 W)
+   B: peak input power, normal run = 4.6 W (adapter 24 W)
