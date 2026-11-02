@@ -6,8 +6,9 @@ How to run (Fusion 360 -> UTILITIES -> ADD-INS -> Scripts and Add-Ins):
      "fusion_animate", and press Run.
   2. When asked, choose cad/step/concept_a_assembly.step. fusion_sequence.json must be in
      the same cad/step/ folder (it is, after running backend/cad/export.py).
-  3. Watch the robot move. A summary appears at the end; the full log is written to
-     cad/step/fusion_interference_log.txt.
+  3. Choose Yes for the guided tour (a box explains each motor before its move, slow playback)
+     or No for the full run with Fusion's interference check (log: cad/step/fusion_interference_log.txt).
+  4. At the end it asks "Play again?" (no re-import needed).
 
 The script opens a NEW design (Direct modeling, so occurrences can be moved freely) and leaves
 your other documents alone. Kinematics are identical to model.py / check.py.
@@ -95,6 +96,51 @@ def to_fusion(m):
     return mx
 
 
+# Guided tour: what each motor does, shown before its move (keys = step labels from fusion_sequence.json)
+TOUR = {
+    "GRIP": ("MOTOR 4 of 4: GRIPPER  (SG90 servo, pin D5)   20° -> 95°",
+             "The SG90 turns the LEFT finger directly: the finger's gear sits on the servo's spline.\n"
+             "The left finger's 16-tooth gear meshes with the RIGHT finger's gear, so the right finger turns the\n"
+             "same amount the other way. Both arms close together and centre the can.\n\n"
+             "The can is pushed against the silicone bumper, so it sits at the same depth every time.\n"
+             "The silicone pads squeeze about 0.5–1 N per arm: enough to hold 15 g, far below the ~8 N that dents it."),
+    "LIFT": ("MOTOR 2 of 4: LIFT  (MG90S servo, pin D10)   30° -> 75°",
+             "The lift servo on the column turns a 20 mm crank. A link pushes the carriage straight up the two\n"
+             "6 mm steel rods, sliding on 4 LM6UU linear bearings: 45° of crank = 15.3 mm (0.6 in) of lift.\n\n"
+             "Why lift first: gripped at mid-height, the can's corner is 2.74 in from the grip point but only\n"
+             "2.41 in above the table. Flipping in place would dig 0.33 in into the table. Lifted 0.6 in, it clears by 0.27 in."),
+    "FLIP": ("MOTOR 3 of 4: WRIST  (MG90S servo, pin D6)   0° -> 180°",
+             "The wrist servo rolls the whole gripper half a turn about the arm's line. That line passes through\n"
+             "the can's centre, so the can turns upside down in place, without moving sideways.\n\n"
+             "The code widens this servo's pulse range (500–2500 µs) so an MG90S reaches the full 180°."),
+    "TURN": ("MOTOR 1 of 4: TURNTABLE  (MG996R servo, pin D9)   135° -> 45°",
+             "The big servo under the base turns the turret 90°. The turret rides on a 6807 ball bearing, which\n"
+             "carries the weight and the tipping load, so the servo only has to turn it.\n\n"
+             "The can travels on a 5 in (127 mm) circle from START to TARGET: the robot visibly turns 90°."),
+    "LOWER": ("MOTOR 2 again: LIFT  75° -> 30°",
+              "The carriage comes back down the same 15.3 mm. Because the can was flipped about its own centre,\n"
+              "lowering the same distance sets the upside-down can exactly on the table: placed, not dropped."),
+    "RELEASE": ("MOTOR 4 again: GRIPPER  95° -> 70°",
+                "The arms open only 25°. The gripper is upside down here, so opening fully would swing an arm into\n"
+                "the base. 25° is enough: the pads clear the can by about 2 mm. The can stands free, inverted, at TARGET.\n\n"
+                "On the real robot the LED now stays on. Homing starts only after you lift the can off and press START."),
+    "H-LIFT": ("HOMING 1: lift up (MG90S, D10)", "Raise the arm so the gripper can turn over without touching the table."),
+    "H-CLOSE": ("HOMING 2: close the arms (SG90, D5)", "Open arms would sweep through the table while un-flipping, so close them first."),
+    "H-WRIST": ("HOMING 3: wrist back to 0° (MG90S, D6)", "The gripper rolls back upright."),
+    "H-TURN": ("HOMING 4: turntable back to START (MG996R, D9)", "The turret turns back 90°."),
+    "H-LOWER": ("HOMING 5: lower (MG90S, D10)", "Back down to can height."),
+    "H-OPEN": ("HOMING 6: open the arms (SG90, D5)", "Ready for the next can."),
+}
+INTRO = ("HOW IT MOVES: 4 servos, one at a time\n\n"
+         "1  Turntable   MG996R  pin D9    turns the whole arm 90°\n"
+         "2  Lift        MG90S   pin D10   raises the arm 0.6 in (crank + link on 2 rods)\n"
+         "3  Wrist       MG90S   pin D6    rolls the gripper 180°\n"
+         "4  Gripper     SG90    pin D5    closes 2 geared arms on the can\n\n"
+         "Sequence: GRIP -> LIFT -> FLIP -> TURN -> LOWER -> RELEASE (6.4 s on the real robot).\n"
+         "Every move eases in and out (slow - fast - slow) so the light can isn't shaken loose.\n\n"
+         "Before each move a box explains which motor moves and why. Press OK to play it.")
+
+
 def run(context):
     app = adsk.core.Application.get()
     ui = app.userInterface
@@ -131,6 +177,28 @@ def run(context):
             ui.messageBox("Could not find groups: " + ", ".join(missing))
             return
 
+        Y = adsk.core.DialogResults.DialogYes
+        YN = adsk.core.MessageBoxButtonTypes.YesNoButtonType
+        guided = ui.messageBox("Guided tour?\n\nYes: explain each motor before its move, play slowly.\n"
+                               "No: play the full sequence and run Fusion's interference check.",
+                               "Concept A", YN) == Y
+        if guided:
+            ui.messageBox(INTRO, "Concept A: how it moves")
+        while True:
+            n_hits = play(app, ui, design, cfg, occ_of, leaf_group, folder, guided)
+            if not guided:
+                ui.messageBox(("PASS: no interference between moving groups at the end of any move.\n"
+                               if n_hits == 0 else f"{n_hits} interference(s) found.\n") +
+                              "Log: " + os.path.join(folder, "fusion_interference_log.txt"))
+            if ui.messageBox("Play again?", "Concept A", YN) != Y:
+                break
+    except Exception:
+        ui.messageBox("Failed:\n" + traceback.format_exc())
+
+
+def play(app, ui, design, cfg, occ_of, leaf_group, folder, guided):
+    """One pass through the sequence. Guided: explain each step first, slower, no interference check."""
+    if True:
         log = []
         grip_wrist = None
         T_can = ident()
@@ -138,6 +206,10 @@ def run(context):
         n_hits = 0
         samples = cfg["samples"]
         for k, s in enumerate(samples):
+            if guided and s["label"] != prev_label and s["label"] in TOUR:
+                title, text = TOUR[s["label"]]
+                ui.messageBox(text, title)
+            prev_label = s["label"]
             M = group_mats(s, cfg)
             if s["attached"] and grip_wrist is None:
                 grip_wrist = M["wrist"]
@@ -148,10 +220,10 @@ def run(context):
                 occ.transform = to_fusion(M[g])
             app.activeViewport.refresh()
             adsk.doEvents()
-            time.sleep(0.03)
+            time.sleep(0.09 if guided else 0.03)
 
             last_of_step = (k + 1 == len(samples)) or samples[k + 1]["label"] != s["label"]
-            if last_of_step:
+            if last_of_step and not guided:
                 ents = adsk.core.ObjectCollection.create()
                 for g, occ in occ_of.items():
                     if g == "can" and s["label"].startswith("H-"):
@@ -177,10 +249,7 @@ def run(context):
                 except Exception:
                     log.append(f"{s['label']}: interference API failed: {traceback.format_exc().splitlines()[-1]}")
                 log.append(f"end of {s['label']}: checked")
-        with open(os.path.join(folder, "fusion_interference_log.txt"), "w") as f:
-            f.write("\n".join(log) + "\n")
-        ui.messageBox(("PASS: no interference between moving groups at the end of any move.\n"
-                       if n_hits == 0 else f"{n_hits} interference(s) found.\n") +
-                      "Log: " + os.path.join(folder, "fusion_interference_log.txt"))
-    except Exception:
-        ui.messageBox("Failed:\n" + traceback.format_exc())
+        if not guided:
+            with open(os.path.join(folder, "fusion_interference_log.txt"), "w") as f:
+                f.write("\n".join(log) + "\n")
+        return n_hits

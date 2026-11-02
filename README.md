@@ -25,7 +25,7 @@ A 3.85 → B 3.30 → D 3.00 → C 2.75.
 | Folder | What's in it |
 |---|---|
 | **`cad/`** | CAD files only. `step/concept_a_assembly.step` (**open in SolidWorks / Fusion**) + `step/parts/`; `print/stl/` (print-ready STLs); `check/` (collision and mass report). See `cad/README.md` |
-| **`docs/`** | Everything to read or hand in: concepts and decision matrix (01), analysis (02), detail design (03), wiring (04), BOM (05), RVTM (06), PDR plan (07), **build guide (08)**, **Part C report** (`Engineering_Report_ConceptA.docx`), **2D drawings** (`drawings/all_drawings.pdf`), Excel matrices + BOM, wiring diagram |
+| **`docs/`** | Everything to read or hand in: concepts and decision matrix (01), analysis (02), detail design (03), wiring (04), BOM (05), RVTM (06), PDR plan (07), **build guide (08)**, **how the motors and claw work (09)**, **Part C report** (`Engineering_Report_ConceptA.docx`), **2D drawings** (`drawings/all_drawings.pdf`), Excel matrices + BOM, wiring diagram |
 | **`EE/`** | Electronics results: servo PWM signals in firmware order, current budget, buck-vs-no-buck comparison, **LTspice circuit** (`EE/ltspice/`) |
 | **`firmware/`** | Arduino code: `concept_a/` (the robot), `servo_setup/` (fit horns at HOME, find calibration angles) |
 | **`sim/`** | Design-calc results (lift clearance, grip, servo loads) |
