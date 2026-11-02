@@ -387,7 +387,7 @@ def build_parts():
         gr = gr.union(box(hx - 3, hx + 3, pvy - 3, pvy + 3, pt[1], tab_z)).cut(cyl(hx, pvy, 0.85, tab_z - 6, tab_z + 1))
     add("gripper_frame", "wrist", gr, "PETG", note="Flange + 2 plates + posts in one print. Wrist horn: 4 servo-bag "
         "screws. Right gear axle: #6-32x1/2 from the top. Left gear rides on the gripper-servo horn. Servo: 2 servo-bag screws.")
-    add("can_bumper", "wrist", box(-4.5, 4.5, py1, py1 + 2.4, pb[0], pt[1]), "silicone", note="can stop, cut from the 3/32 in silicone sheet: place the can against it")
+    add("can_bumper", "wrist", box(-4.5, 4.5, py1, py1 + 1.6, pb[0], pt[1]), "silicone", note="can stop, cut from the 1/16 in silicone sheet: place the can against it")
     gsrv = moved(micro_servo_local(), trsf_axes((-pvx, pvy, gs_face - 5.8), (-1, 0, 0), (0, 0, -1)))
     add("gripper_servo_SG90", "wrist", gsrv, "buy", mass=9.0)
     add("axle_R", "wrist", cyl(pvx, pvy, 1.75, pt[1] - 12.7, pt[1]), "buy", mass=1.6, note="#6-32x1/2 (kit), right-gear axle")
@@ -412,7 +412,7 @@ def build_parts():
     fR = arm.union(pad).union(gear_disc).cut(cyl(pvx, pvy, TOL["run_bore"] / 2, fz0 - 1, fz1 + 1))
     fL = arm.union(pad).union(gear_disc).mirror("YZ").cut(cyl(-pvx, pvy, 3.0, fz0 + 2, fz1 + 1))   # spline / horn socket
     add("finger_R", "finger_R", fR, "PETG", note="Gear (m1, 16T, pitch r 8 mm, +0.2 backlash) + arm + can pad. Print "
-        "flat. Runs on a #6-32 axle (3.9 mm bore). Line the pad with the 3/32 in silicone sheet.")
+        "flat. Runs on a #6-32 axle (3.9 mm bore). Line the pad with the 1/16 in (1.6 mm) silicone sheet: 32 x 40 mm.")
     add("finger_L", "finger_L", fL, "PETG", note="Mirror of finger_R; its gear has the servo-spline socket.")
 
     # ---------------- tolerance test coupon (print first; not part of the assembly) ----------------

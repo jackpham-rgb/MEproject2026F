@@ -18,7 +18,7 @@ Each row says **why we need it** and **what else we considered**, so the list an
 | CA-401 | Gripper frame | PETG | 1 | 11.8 | Flange + 2 plates + posts | Holds the gripper servo and both finger axles on the wrist horn | Servo bracket from a kit → doesn't hold geared fingers at the right centre distance (16.2 mm) |
 | CA-402 | Finger, right | PETG | 1 | 9.7 | Gear m1 16T + arm + curved pad | Geared to the left finger so one servo closes both arms equally and centres the can | One fixed + one moving arm → pushes the can off-centre |
 | CA-403 | Finger, left | PETG | 1 | 9.7 | Mirror; gear has the servo-spline socket | As CA-402 | As CA-402 |
-| CA-404 | Can bumper | Silicone sheet | 1 | 0.2 | Cut from the pad sheet, glued to the gripper frame | Sets how deep the can sits in the gripper, so every grip and landing is the same | No stop → grip depth varies with how the can is placed |
+| CA-404 | Can bumper | Silicone sheet | 1 | 0.1 | Cut from the pad sheet, glued to the gripper frame | Sets how deep the can sits in the gripper, so every grip and landing is the same | No stop → grip depth varies with how the can is placed |
 | CA-900 | Tolerance coupon | PETG | 1 | 8.2 | 6 test holes | Checks screw, rod and bearing fits on our printer before ~300 g of parts | Print the parts first → one wrong fit wastes hours of printing |
 
 Printed robot parts: **≈ 301 g PETG** (+ ~15 % for supports/purge). STL files: `cad/out/parts/`. Part numbers match the Part C drawings.
@@ -46,7 +46,7 @@ Printed robot parts: **≈ 301 g PETG** (+ ~15 % for supports/purge). STL files:
 | CA-P17 | Machine screw #6-32 × ½″ | Pan Phillips, HF kit #67675 | 8 | Have | — | Tray 2, spine 2, top cap 2, link 1, gear axle 1 | Threads into printed pilots, no nuts needed | Glue → can't take apart to fix or adjust |
 | CA-P18 | Machine screw #8-32 × ½″ | Pan Phillips, HF kit #67675 | 4 | Have | — | MG996R flange | The MG996R's 4.6 mm flange holes fit #8 | #6 → loose in the flange |
 | CA-P19 | Servo-bag screws | Come with the servos | 14 | With servos | — | Servo tabs, horns, crank | Sized for the servo tabs and horns | Kit screws → too big for the micro-servo tabs |
-| CA-P20 | Silicone rubber sheet | 3/32 in (2.4 mm), ~6 × 6 in | 1 | Amazon | 6 | Finger pads + can bumper | Grippy pads (μ ≈ 0.6) keep the squeeze needed low (0.4 N), so the can isn't dented | Bare PETG pads → slippery, needs a harder squeeze; TPU → a second filament for 1 g of parts |
+| CA-P20 | Silicone rubber sheet | 1/16 in (1.6 mm), ~6 × 6 in | 1 | Amazon | 6 | Finger pads + can bumper | Grippy pads (μ ≈ 0.6) keep the squeeze needed low (0.4 N), so the can isn't dented | Bare PETG pads → slippery, needs a harder squeeze; TPU → a second filament for 1 g of parts |
 | CA-P21 | Steel washers + rubber feet | ~100 g of washers, 4 feet | 1 | Hardware store | 3 | Base | Weight and friction so the turning reaction doesn't slide the base | Clamp to the table → the demo table may not allow it |
 | CA-P22 | PETG filament | 1.75 mm, ~0.35 kg | 1 | Have | — | Printed parts | Tougher than PLA and creeps less under the press fits (bearing, LM6UU, rods) | PLA → press fits loosen over time |
 

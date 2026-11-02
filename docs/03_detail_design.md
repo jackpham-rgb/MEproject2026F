@@ -22,7 +22,7 @@ missed. Each fix below closes a problem the check found.
 | The square base corner reached the can's path, so the inverted can and the flipped gripper hit the base during the 90° turn | The base is **cut away in the 175° sector the arm, the open arms and the can sweep** (−30° … 145°). Only the bearing tower stays there |
 | The MG996R body sat under the arm's path | The servo now points **away from the sweep** (225°) |
 | The open gripper arms hit the gripper-frame posts | Posts moved inside the arms' swing (x = ±15 mm) |
-| At the target the gripper is upside down, so opening fully (75°) swung an arm down into the base | **Release opens only 25°** (`GRIP_RELEASE = 70`). That's enough: the pads clear the can by 3.6 mm |
+| At the target the gripper is upside down, so opening fully (75°) swung an arm down into the base | **Release opens only 25°** (`GRIP_RELEASE = 70`). That's enough: the bare pads clear the can by 3.6 mm (2.0 mm with the 1.6 mm silicone liners) |
 | Turning back with the can at the target sweeps the gripper through it | Homing only after the can is lifted off (the button press), as before |
 | Un-flipping with the arms open sweeps them through the table | Homing order: **lift → close → un-flip → turn → lower → open** (firmware updated) |
 | The turret hub sat at 0.0 mm on the MG996R body (rubbing) | Hub raised 0.6 mm |

@@ -23,7 +23,7 @@ lift_link,lift,PETG,0.3,0.2,-7.0,12.5,138.1
 wrist_servo,lift,buy,6.9,13.0,0.0,42.1,55.9
 wrist_horn,wrist,buy,0.8,1.0,0.0,57.2,61.1
 gripper_frame,wrist,PETG,15.5,11.8,-0.2,72.5,72.8
-can_bumper,wrist,silicone,0.3,0.2,-0.0,92.2,75.2
+can_bumper,wrist,silicone,0.2,0.1,-0.0,91.8,75.2
 gripper_servo_SG90,wrist,buy,6.9,9.0,-13.3,83.0,93.1
 axle_R,wrist,buy,0.1,1.6,8.1,83.0,75.7
 finger_R,finger_R,PETG,12.8,9.7,32.7,120.8,68.1

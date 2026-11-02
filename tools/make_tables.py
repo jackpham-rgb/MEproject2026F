@@ -195,7 +195,7 @@ PURCHASED = [
      "The MG996R's 4.6 mm flange holes fit #8", "#6 → loose in the flange"),
     ("Servo-bag screws", "Come with the servos", 14, "With servos", 0, "Servo tabs, horns, crank",
      "Sized for the servo tabs and horns", "Kit screws → too big for the micro-servo tabs"),
-    ("Silicone rubber sheet", "3/32 in (2.4 mm), ~6 × 6 in", 1, "Amazon", 6, "Finger pads + can bumper",
+    ("Silicone rubber sheet", "1/16 in (1.6 mm), ~6 × 6 in", 1, "Amazon", 6, "Finger pads + can bumper",
      "Grippy pads (μ ≈ 0.6) keep the squeeze needed low (0.4 N), so the can isn't dented",
      "Bare PETG pads → slippery, needs a harder squeeze; TPU → a second filament for 1 g of parts"),
     ("Steel washers + rubber feet", "~100 g of washers, 4 feet", 1, "Hardware store", 3, "Base",

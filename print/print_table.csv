@@ -1,0 +1,12 @@
+part_no,part,file,qty,bed_face,size_mm,fits_bed,press_fits_vertical,contact_mm2,overhang_mm2,supports,mass_g,est_time_h
+CA-101,Base,print/stl/CA-101_base.stl,1,"+Z (upside down, top face down)",152 × 129 × 52,yes,1 of 1,11205,970,yes: supports on build plate,109.2,10.5
+CA-102,Electronics tray,print/stl/CA-102_electronics_tray.stl,1,"-Z (as modelled, bottom down)",152 × 104 × 28,yes,0 of 0,14588,44,none,57.0,5.5
+CA-201,Turret plate,print/stl/CA-201_turret_plate.stl,1,"-Z (as modelled, bottom down)",80 × 62 × 19,yes,2 of 2,387,3702,yes: supports on build plate,24.4,2.3
+CA-202,Spine,print/stl/CA-202_spine.stl,1,-Y face down,50 × 103 × 24,yes,0 of 0,4542,0,none,22.4,2.1
+CA-203,Top cap,print/stl/CA-203_top_cap.stl,1,"+Z (upside down, top face down)",54 × 44 × 6,yes,2 of 2,2352,0,none,10.5,1.0
+CA-301,Carriage + arm,print/stl/CA-301_carriage_arm.stl,1,-Y face down,52 × 100 × 44,yes,0 of 4,3224,438,yes: supports on build plate,46.0,4.4
+CA-302,Lift link,print/stl/CA-302_lift_link.stl,1,+X face down,16 × 7 × 3,yes,0 of 0,100,0,none,0.2,0.3
+CA-401,Gripper frame,print/stl/CA-401_gripper_frame.stl,1,-Y face down,62 × 39 × 33,yes,0 of 0,1091,58,none,11.8,1.1
+CA-402,"Finger, right",print/stl/CA-402_finger_R.stl,1,"-Z (as modelled, bottom down)",41 × 78 × 40,yes,1 of 1,251,453,yes: supports on build plate,9.7,0.9
+CA-403,"Finger, left",print/stl/CA-403_finger_L.stl,1,"-Z (as modelled, bottom down)",41 × 78 × 40,yes,1 of 1,251,465,yes: supports on build plate,9.7,0.9
+CA-900,Tolerance coupon,print/stl/CA-900_tolerance_coupon.stl,1,"-Z (as modelled, bottom down)",70 × 22 × 8,yes,2 of 2,1351,0,none,8.2,0.8

@@ -32,6 +32,9 @@ A 3.85 → B 3.30 → D 3.00 → C 2.75.
 | `docs/decision_matrix_and_bom.xlsx` | **Excel**: binary decision matrices (concepts, power source) + BOM, totals as formulas. CSVs: `docs/decision_matrix_*.csv` |
 | `docs/Engineering_Report_ConceptA.docx` | **Part C engineering report** (summary, design, analysis, electrical, code, BOM, RVTM, test plan, drawings); build with `node tools/make_report.js` |
 | `docs/drawings/` | **Part C 2D drawings**: assembly + one dimensioned sheet per designed part (`all_drawings.pdf`); build with `python3 cad/drawings.py` |
+| `docs/08_build_guide.md` | **Build guide**: shopping list, print order and settings, assembly steps, wiring, calibration |
+| `print/` | **Print-ready STLs** (each turned to its best side), orientation preview |
+| `firmware/servo_setup/` | Servo setup sketch: fit horns at HOME, jog servos from the Serial Monitor to find the calibration angles |
 | `docs/06_rvtm.md` | Requirements traceability matrix (Part C 4a) |
 | `docs/07_pdr_outline.md` | Slide-by-slide PDR plan with GIFs and timing |
 | `docs/draft/` | Early concept notes (PDR stage). **A draft only**: the docs above supersede it |
