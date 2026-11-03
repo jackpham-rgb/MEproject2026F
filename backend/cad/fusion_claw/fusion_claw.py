@@ -31,7 +31,7 @@ INTRO = ("THE CLAW: one SG90 servo (pin D5), two geared arms\n\n"
          "4. Silicone-lined pads squeeze about 0.5–1 N per arm: enough to hold the 15 g can,\n"
          "   far below the ~8 N that dents it.\n"
          "5. Release opens only 25°: on the robot the claw is upside down there, and opening fully\n"
-         "   would swing an arm into the base. 25° still clears the can by ~2 mm.\n\n"
+         "   would swing an arm into the base. 25° still swings the pads ~13 mm clear of the can.\n\n"
          "Servo angles: open 20°, closed 95°, release 70°.\n"
          "Tip: orbit to look down on the gears before pressing OK.")
 

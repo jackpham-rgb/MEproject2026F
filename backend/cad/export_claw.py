@@ -36,7 +36,7 @@ CAPTION = {
     "GRIP": f"GRIP: SG90 turns {FW['GRIP_OPEN']}° → {FW['GRIP_CLOSED']}°. It drives the LEFT arm; the gears turn the RIGHT arm the same amount the other way.",
     "HOLD": "Holding: pads squeeze ~0.5–1 N per arm (holds 15 g; dents at ~8 N).",
     "RELEASE": f"RELEASE: {FW['GRIP_CLOSED']}° → {FW['GRIP_RELEASE']}°, only 25° (upside down at the target, a full opening would hit the base).",
-    "HOLD2": "Pads now clear the can by ~2 mm.",
+    "HOLD2": "Pads now clear the can by ~13 mm (11.7 mm with the silicone liners).",
     "OPEN-FULL": f"Homing: back to fully open ({FW['GRIP_OPEN']}°).",
 }
 
@@ -74,7 +74,46 @@ def main():
                                 finger_L=mat(T["finger_L"]), finger_R=mat(T["finger_R"])))
         grip = to
     json.dump(dict(frame_dt=dt, pivot_x=M.P["pivot_x"], pivot_y=M.P["pivot_y"], captions=CAPTION, samples=samples), open(os.path.join(OUT, "claw_sequence.json"), "w"))
-    print(f"wrote cad/claw/claw.step and cad/claw/claw_sequence.json ({len(samples)} frames, {len(samples) * dt:.1f} s)")
+    render_preview(parts, samples)
+    print(f"wrote cad/claw/claw.step, claw_sequence.json ({len(samples)} frames, {len(samples) * dt:.1f} s), claw_open_close.png")
+
+
+def render_preview(parts, samples):
+    """Top view at open / closed / release, plus a close-up of the gear mesh."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from OCP.gp import gp_Trsf
+    import drawings as D
+
+    def trsf(m):
+        t = gp_Trsf()
+        t.SetValues(*[m[i][j] for i in range(3) for j in range(4)])
+        return t
+
+    pick = {"OPEN": None, "HOLD": None, "HOLD2": None}
+    for s_ in samples:
+        if s_["label"] in pick:
+            pick[s_["label"]] = s_
+    fig, axs = plt.subplots(1, 4, figsize=(19, 5.6), gridspec_kw={"width_ratios": [1, 1, 1, 0.8]})
+    for ax, (lab, title) in zip(axs, [("OPEN", f"OPEN ({FW['GRIP_OPEN']}°)"), ("HOLD", f"GRIP: closed on the can ({FW['GRIP_CLOSED']}°)"),
+                                      ("HOLD2", f"RELEASE ({FW['GRIP_RELEASE']}°)"), ("HOLD", "gear mesh, close-up (closed)")]):
+        s_ = pick[lab]
+        shapes = [parts[n]["shape"].val() for n in ("gripper_frame", "can_bumper", "test_can")]
+        shapes += [parts[f]["shape"].val().moved(cq.Location(trsf(s_[f]))) for f in ("finger_L", "finger_R")]
+        if "close-up" in title:
+            shapes = [parts[f]["shape"].val().moved(cq.Location(trsf(s_[f]))) for f in ("finger_L", "finger_R")]
+        vis, _ = D.project(cq.Compound.makeCompound(shapes).wrapped, (0, 0, 1), (1, 0, 0))
+        for p_ in vis:
+            ax.plot([x for x, _ in p_], [y for _, y in p_], "k", lw=0.5)
+        if "close-up" in title:
+            ax.set_xlim(-20, 20); ax.set_ylim(70, 96)
+        ax.set_aspect("equal"); ax.axis("off")
+        ax.set_title(f"{title}\narm angle α = {s_['alpha']:.0f}°", fontsize=10)
+    fig.suptitle("Claw from above: the SG90 turns the left arm; the 16-tooth gears turn the right arm the same amount the other way", fontsize=11)
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "claw_open_close.png"), dpi=110)
+    plt.close(fig)
 
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ ALLOWED = {
     frozenset(("wrist_servo", "wrist_horn")),
     frozenset(("wrist_servo", "gripper_frame")),        # spline tip touches the flange face
     frozenset(("gripper_servo_SG90", "finger_L")),
-    frozenset(("finger_L", "finger_R")),
+    # finger_L / finger_R: real involute gears now; they must NOT overlap (checked like any other pair)
     frozenset(("axle_R", "finger_R")),
 }
 VOL_TOL = 1.0      # mm^3: anything bigger is a real overlap
@@ -171,8 +171,11 @@ def main():
                         near[key] = (dd, label)
         step_end = k + 1 == len(seq) or seq[k + 1][0] != label
         if not can_removed and step_end and label in ("GRIP", "RELEASE"):
-            for fn in ("finger_L", "finger_R"):
-                pad_gap.setdefault(label, []).append(dist(shapes[fn][1], shapes["test_can"][1]))
+            for fn, sx in (("finger_L", -1), ("finger_R", 1)):
+                # pads only: leave out the gear (within 11 mm of the pivot), whose teeth sit behind the can
+                pad_only = by_name[fn]["shape"].val().cut(
+                    M.cyl(sx * M.P["pivot_x"], M.P["pivot_y"], 11.0, -1, 200).val()).moved(cq.Location(T[by_name[fn]["group"]]))
+                pad_gap.setdefault(label, []).append(dist(pad_only, shapes["test_can"][1]))
         # whole-robot CG (incl. can if present) vs the support footprint
         tm = tx = ty = 0.0
         for nm, (pp, shp) in shapes.items():

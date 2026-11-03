@@ -1,0 +1,91 @@
+ENGINEERING CHECKS: 43 checks, 43 PASS, 0 FAIL
+(backend/mech/mech_checks.py; CAD masses/inertias, firmware timing; EST = datasheet value)
+
+   area       check                                                      value                          limit                    result
+   Servos     SG90 (grip): torque demand / torque available              44.9%                          ≤ 50%                    PASS
+   Servos     SG90 (grip): peak speed / no-load speed                    29.3%                          ≤ 70%                    PASS
+   Servos     MG90S (lift): torque demand / torque available             19.7%                          ≤ 50%                    PASS
+   Servos     MG90S (lift): peak speed / no-load speed                   14.1%                          ≤ 70%                    PASS
+   Servos     MG90S (wrist): torque demand / torque available            31.9%                          ≤ 50%                    PASS
+   Servos     MG90S (wrist): peak speed / no-load speed                  37.5%                          ≤ 70%                    PASS
+   Servos     MG996R (turn): torque demand / torque available            0.7%                           ≤ 50%                    PASS
+   Servos     MG996R (turn): peak speed / no-load speed                  31.9%                          ≤ 70%                    PASS
+   Servos     SG90 holding torque at 0.8 N/arm squeeze                   45% of stall                   ≤ 60 %                   PASS
+   Lift       stroke (exact slider-crank)                                15.31 mm                       ≥ 15.2 mm (0.6 in)       PASS
+   Lift       link angle (transmission; toggle at 90°)                   12.3°                          ≤ 30°                    PASS
+   Lift       model vs exact lift height                                 0.20 mm                        ≤ 0.5 mm                 PASS
+   Lift       link clearance in its real tilted pose                     0.85 mm                        ≥ 0.5 mm                 PASS
+   Gears      contact ratio (smooth, continuous mesh)                    1.44                           ≥ 1.2                    PASS
+   Gears      profile shift vs undercut limit (17-z)/17                  x = 0.1 vs 0.059               x ≥ limit                PASS
+   Gears      centre distance matches shifted gears                      +0.008 mm                      |Δ| ≤ 0.05 mm            PASS
+   Gears      tip thickness (printable, not pointed)                     0.51 mm                        ≥ 0.4 mm (nozzle)        PASS
+   Gears      root clearance                                             0.25 mm                        ≥ 0.2 mm                 PASS
+   Gears      teeth never overlap over the full 75° travel (CAD)         0.0000 mm³                     0                        PASS
+   Gears      running clearance between flanks (CAD)                     0.098 mm                       0.05–0.3 mm              PASS
+   Strength   gear tooth bending at SG90 stall (Lewis)                   10.8 MPa                       ≤ 20.0 MPa               PASS
+   Can        design squeeze 0.8 N/arm vs needed (slip)                  5.4× the minimum               ≥ 2×                     PASS
+   Can        design squeeze vs dent force (~8 N/arm)                    10× below                      ≥ 3×                     PASS
+   Can        SG90 can't crush the can even at stall                     1.78 N/arm max                 < 8 N                    PASS
+   Can        set down, not dropped (bottom height after LOWER, CAD)     -0.00 mm, 0 mm/s               |z| ≤ 0.5 mm             PASS
+   Can        inverted can tips only past                                24.3°                          ≥ 3 × wrist tolerance (3°) PASS
+   Stability  tip-over (dynamic ZMP margin, all moves)                   36.8 mm                        ≥ 20 mm                  PASS
+   Stability  base sliding: inertial force / foot friction               1.10%                          ≤ 20 %                   PASS
+   Stability  turntable reaction torque / foot friction torque           2.36%                          ≤ 20 %                   PASS
+   Strength   finger arm bending at SG90 stall                           3.8 MPa                        ≤ 20 MPa                 PASS
+   Strength   finger arm deflection at SG90 stall                        0.71 mm                        ≤ 1.5 mm                 PASS
+   Strength   carriage arm (2× dynamic load)                             0.10 MPa, 1.9 µm               ≤ 20 MPa                 PASS
+   Strength   6 mm rods (bending, fixed-fixed)                           0.88 MPa, 0.77 µm              ≤ 200 MPa                PASS
+   Strength   LM6UU load vs static rating 206 N (EST)                    1.34 N                         ≤ 50 N                   PASS
+   Strength   turret plate at the hub (2× dynamic)                       0.41 MPa                       ≤ 20 MPa                 PASS
+   Strength   6807 bearing: load vs static rating (EST 3.5 kN)           5.4 N + 149 N·mm               ≤ 10 % of rating         PASS
+   Strength   lift link: buckling load / max link force                  1176×                          ≥ 10×                    PASS
+   Strength   SG90 spline socket shear at stall                          0.69 MPa                       ≤ 10 MPa                 PASS
+   Strength   #6/#8 screws in PETG: pull-out / worst load                615 N vs 19 N                  ≥ 10×                    PASS
+   Power      peak servo current vs XL4015 rating 5 A                    0.65 A                         ≤ 2.5 A (50 %)           PASS
+   Power      buck dissipation (no heatsink ≤ 1 W)                       0.42 W                         ≤ 1 W                    PASS
+   Power      SG90 holding heat (5 s per run)                            1.69 W for 5 s                 ≤ 2 W                    PASS
+   Power      Uno regulator (12 V in, 59 mA)                             0.35 W                         ≤ 1 W (SOT-223)          PASS
+
+DETAILS
+
+1. SERVO DUTY: inverse dynamics along the firmware's eased moves (ratings at 4.8 V: conservative)
+   GRIP     SG90   peak torque   70.40 N·mm (44.9% of stall), peak speed  175.8 °/s (29.3%), worst torque/available 44.9%   [J (both arms, 1:1 gears) = 469.53 kg·mm²]
+   LIFT     MG90S  peak torque   30.19 N·mm (17.1% of stall), peak speed   84.4 °/s (14.1%), worst torque/available 19.7%   [moving mass 149 g, CG 39 mm in front of the rods]
+   FLIP     MG90S  peak torque    5.73 N·mm ( 3.2% of stall), peak speed  225.0 °/s (37.5%), worst torque/available  5.2%   [J = 0.651 kg·cm², CG 10.2 mm off the roll axis]
+   TURN     MG996R peak torque    5.43 N·mm ( 0.6% of stall), peak speed  112.5 °/s (31.9%), worst torque/available  0.7%   [J = 8.29 kg·cm²]
+   LOWER    MG90S  peak torque   30.00 N·mm (17.0% of stall), peak speed   84.4 °/s (14.1%), worst torque/available 19.6%   [moving mass 149 g, CG -13 mm in front of the rods]
+   RELEASE  SG90   peak torque    1.99 N·mm ( 1.3% of stall), peak speed   78.1 °/s (13.0%), worst torque/available  1.4%   [J (both arms, 1:1 gears) = 2848.65 kg·mm²]
+   H-LIFT   MG90S  peak torque   26.82 N·mm (15.2% of stall), peak speed   84.4 °/s (14.1%), worst torque/available 17.5%   [moving mass 134 g, CG -13 mm in front of the rods]
+   H-CLOSE  SG90   peak torque    1.12 N·mm ( 0.7% of stall), peak speed   58.6 °/s ( 9.8%), worst torque/available  0.7%   [J (both arms, 1:1 gears) = 2848.65 kg·mm²]
+   H-WRIST  MG90S  peak torque   44.61 N·mm (25.3% of stall), peak speed  225.0 °/s (37.5%), worst torque/available 31.9%   [J = 4.453 kg·cm², CG 97.6 mm off the roll axis]
+   H-TURN   MG996R peak torque    4.41 N·mm ( 0.5% of stall), peak speed  112.5 °/s (31.9%), worst torque/available  0.6%   [J = 5.79 kg·cm²]
+   H-LOWER  MG90S  peak torque   26.71 N·mm (15.1% of stall), peak speed   84.4 °/s (14.1%), worst torque/available 17.4%   [moving mass 134 g, CG 31 mm in front of the rods]
+   H-OPEN   SG90   peak torque    0.55 N·mm ( 0.4% of stall), peak speed  175.8 °/s (29.3%), worst torque/available  0.4%   [J (both arms, 1:1 gears) = 469.53 kg·mm²]
+   gripper hold: 2 × 0.8 N × 44 mm = 70.4 N·mm = 45% of SG90 stall
+
+2. LIFT MECHANISM: crank + link (exact slider-crank)
+   link length 9.36 mm; stroke exact 15.31 mm (model 15.31); max difference mid-stroke 0.20 mm
+   link tilt from vertical: 2.9° … 12.3°  (force transmission cos = 0.977)
+   link in its real tilted pose: min clearance to spine / top cap / lift servo / rods = 0.85 mm
+
+3. CLAW GEARS: 16T, module 1, 20°, profile shift +0.1 each, 0.2 mm backlash
+   pitch r 8.0, base r 7.518, tip r 9.10, root r 6.85 mm; working pressure angle 21.79°
+   centre distance for zero backlash 16.192 mm vs pivots 16.200 mm; contact ratio 1.44; tip thickness 0.51 mm
+   CAD mesh over 0–75° (31 poses): max overlap 0.0000 mm³; flank gap 0.098–0.099 mm (constant = true involute)
+   Lewis: worst case full SG90 stall through the mesh, Ft = 19.6 N → σ = 10.8 MPa (face 6.0 mm, Y 0.302)
+
+4. THE CAN: friction needed through every acceleration, landing, standing inverted
+   max friction demand: squeeze ≥ 0.149 N per arm (μ = 0.5, includes gravity, lift, flip and turn accelerations)
+   inverted on its top rim (r 27.6 mm), CG 61.1 mm up: tips at 24.3°; wrist error budget ±3°
+
+5. ROBOT STABILITY: zero-moment point (dynamic tip-over), sliding, turning reaction
+   dynamic ZMP stays ≥ 36.8 mm inside the support footprint in every pose of the run and homing
+
+6. STRENGTH AND STIFFNESS (worst-case loads; PETG allowable 20 MPa = UTS 50 / 2.5)
+   finger arm: 1.78 N at 53 mm → σ 3.8 MPa, deflection 0.71 mm
+
+7. POWER AND HEAT
+   peak mechanical power: MG996R (turn) 0.007 W, MG90S (lift) 0.044 W, MG90S (wrist) 0.119 W, SG90 (grip) 0.011 W
+   peak electrical (servo rail, ngspice model): 0.65 A × 5.8 V = 3.77 W; buck loss (10 %) 0.42 W
+   mechanical energy per run (all servos, run + homing): 0.195 J
+

@@ -24,7 +24,7 @@ A 3.85 → B 3.30 → D 3.00 → C 2.75.
 
 | Folder | What's in it |
 |---|---|
-| **`cad/`** | CAD files only. `step/concept_a_assembly.step` (**open in SolidWorks / Fusion**) + `step/parts/`; `print/stl/` (print-ready STLs); `check/` (collision and mass report); `claw/` (claw-only STEP for a close-up Fusion animation). See `cad/README.md` |
+| **`cad/`** | CAD files only. `step/concept_a_assembly.step` (**open in SolidWorks / Fusion**) + `step/parts/`; `print/stl/` (print-ready STLs); `check/` (collision, mass and **43 engineering checks**: `mech_report.txt`); `claw/` (claw-only STEP for a close-up Fusion animation). See `cad/README.md` |
 | **`docs/`** | Everything to read or hand in: concepts and decision matrix (01), analysis (02), detail design (03), wiring (04), BOM (05), RVTM (06), PDR plan (07), **build guide (08)**, **how the motors and claw work (09)**, **Part C report** (`Engineering_Report_ConceptA.docx`), **2D drawings** (`drawings/all_drawings.pdf`), Excel matrices + BOM, wiring diagram |
 | **`EE/`** | Electronics results: servo PWM signals in firmware order, current budget, buck-vs-no-buck comparison, **LTspice circuit** (`EE/ltspice/`) |
 | **`firmware/`** | Arduino code: `concept_a/` (the robot), `servo_setup/` (fit horns at HOME, find calibration angles) |
@@ -57,6 +57,7 @@ Done (laptop only):
 - [x] 4 concepts, animated; team decision matrix → Concept A
 - [x] Design calcs: lift clearance, grip force, servo loads, lift jam check, error budget, power
 - [x] Detail CAD with PETG tolerances and kit screws; no collisions over the full firmware sequence
+- [x] Engineering checks: 43/43 pass (servo duty, lift mechanism, involute gears, can grip, dynamic stability, strength, power)
 - [x] Arduino code, verified on an emulated Uno; Tinkercad and Wokwi wiring
 - [x] Wiring diagram, BOM with reasons, binary decision matrices (Excel), RVTM, PDR plan
 - [x] Part C: 2D drawings (13 sheets) and the engineering report (results section waits for the build)

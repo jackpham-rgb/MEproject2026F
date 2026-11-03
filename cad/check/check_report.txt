@@ -6,26 +6,26 @@ COLLISION SWEEP: 289 poses x 30 parts, solid booleans, tolerance 1.0 mm^3
      0.01 mm  LM6UU_R2 x rod_R  (at H-TURN)
      0.01 mm  LM6UU_L2 x rod_L  (at TURN)
      0.01 mm  LM6UU_L1 x rod_L  (at TURN)
+     0.10 mm  finger_L x finger_R  (at HOME)
      0.50 mm  finger_L x gripper_frame  (at H-WRIST)
      0.50 mm  finger_R x gripper_frame  (at H-WRIST)
      0.54 mm  finger_R x test_can  (at RELEASE)
      0.54 mm  finger_L x test_can  (at RELEASE)
      0.60 mm  turntable_servo_MG996R x turret_plate  (at HOME)
-     0.61 mm  carriage_arm x rod_L  (at H-TURN)
   can after LOWER: centre (127.0, 0.0) mm (target (127.0, 0.0)), INVERTED, tilt 0.0 deg, bottom at z = -0.00 mm -> PASS
   gap measurement: every 4th pose (72); collision booleans: every pose
-  pads at GRIP end: 0.00 mm from the can (0 = touching; the servo then squeezes past contact); at RELEASE end: 3.6 mm clear
-  tip-over: robot CG stays 39 mm inside the support footprint (worst at TURN) -> PASS
+  pads at GRIP end: 0.00 mm from the can (0 = touching; the servo then squeezes past contact); at RELEASE end: 13.3 mm clear
+  tip-over: robot CG stays 37 mm inside the support footprint (worst at TURN) -> PASS
   PASS  table clearance (lowest moving parts): test_can -0.0 mm, gripper_servo_SG90 +17.0 mm, finger_R +29.3 mm, gripper_frame +35.4 mm, finger_L +36.2 mm
 
 MASS (printed: volume x 1.27 g/cc x 0.60 fill factor, EST; purchased: typical datasheet mass)
-  robot total 571 g (printed 301 g, purchased 270 g), can 15 g
-  PETG filament ~301 g (+ supports / purge ~15 %)
-  CG at home: (-2.8, -23.7, 57.0) mm
+  robot total 564 g (printed 294 g, purchased 270 g), can 15 g
+  PETG filament ~294 g (+ supports / purge ~15 %)
+  CG at home: (-2.4, -24.3, 57.3) mm
     turret     124.4 g
     crank        1.0 g
     lift        91.2 g
-    wrist       23.6 g
+    wrist       23.5 g
     finger_L     9.7 g
     finger_R     9.7 g
 
@@ -35,4 +35,4 @@ SERVO LOADS FROM CAD MASSES (stall ratings at 5 V: MG996R 9.4, MG90S 1.8, SG90 1
   wrist: 58 g rotating (incl. can), CG 10.3 mm off the roll axis -> 0.06 kg*cm vs micro servo 1.8 -> 30x margin
   turntable: J = 7.7 kg*cm^2, accel torque 0.032 kg*cm vs MG996R 9.4 (weight on the 6807 bearing)
 
-(run time 264 s)
+(run time 887 s)

@@ -17,6 +17,7 @@ pip install -r backend/requirements.txt cadquery      # CadQuery needs Python �
 | `cad/export_claw.py` | `cad/claw/` (claw-only STEP + arm motion file) | the model |
 | `cad/fusion_claw/` | Fusion 360 script: close-up claw animation from `cad/claw/claw.step` | — run inside Fusion |
 | `cad/fusion_animate/` | Fusion 360 script: plays the firmware sequence on `cad/step/concept_a_assembly.step` | — run inside Fusion |
+| `mech/mech_checks.py` | `cad/check/mech_report.txt` + `mech_servo_duty.png`: 43 engineering checks (servo torque/speed by inverse dynamics, lift slider-crank, gears, can friction, dynamic stability, strength, power) | the model or the firmware |
 | `ee/ee_calcs.py` | `EE/out/`, `EE/ltspice/` (signals, current, ngspice runs if installed) | the firmware or the power design |
 | `sim/concept_a.py` | `sim/` (lift clearance, grip, loads, plots) | the firmware angles or times |
 | `tools/make_tables.py` | `docs/05_bom.md`, `docs/bom.csv`, decision matrices (CSV + xlsx) | the check (masses) |

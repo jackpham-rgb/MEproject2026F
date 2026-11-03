@@ -122,7 +122,7 @@ TOUR = {
               "lowering the same distance sets the upside-down can exactly on the table: placed, not dropped."),
     "RELEASE": ("MOTOR 4 again: GRIPPER  95° -> 70°",
                 "The arms open only 25°. The gripper is upside down here, so opening fully would swing an arm into\n"
-                "the base. 25° is enough: the pads clear the can by about 2 mm. The can stands free, inverted, at TARGET.\n\n"
+                "the base. 25° is enough: the pads clear the can by about 13 mm. The can stands free, inverted, at TARGET.\n\n"
                 "On the real robot the LED now stays on. Homing starts only after you lift the can off and press START."),
     "H-LIFT": ("HOMING 1: lift up (MG90S, D10)", "Raise the arm so the gripper can turn over without touching the table."),
     "H-CLOSE": ("HOMING 2: close the arms (SG90, D5)", "Open arms would sweep through the table while un-flipping, so close them first."),

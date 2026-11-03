@@ -28,7 +28,7 @@ can isn't shaken loose.
    just past contact, a squeeze of about **0.5–1 N per arm**: 0.39 N is enough to hold the 15 g can
    with a 3× margin, and it dents at about 8 N. (The SG90 can make at most 1.8 N per arm here.)
 5. **Small release.** At the target the gripper is upside down, so the arms open only **25°**
-   (95° → 70°). Opening fully would swing an arm into the base; 25° clears the can by about 2 mm.
+   (95° → 70°). Opening fully would swing an arm into the base; 25° swings the pads about 13 mm clear of the can.
 
 ## The sequence
 

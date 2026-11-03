@@ -153,7 +153,7 @@ L += ["", f"Total ≈ {tot_g:.0f} g of PETG (+ ~15 % for supports and purge) and
       "| `WRIST_FLIP` | `w` until the gripper is exactly upside down (use a phone level app on the frame) | 180 |",
       "| `GRIP_CLOSED` | `g` until the pads touch the can, then +3 to +5° for a light squeeze (0.5–1 N per arm: "
       "the can shouldn't dent, and shouldn't slide when you tug it) | 95 |",
-      "| `GRIP_RELEASE` | upside down at the target: open until the pads just clear the can (≥ 2 mm) | 70 |", "",
+      "| `GRIP_RELEASE` | upside down at the target: open until the pads clear the can by a few mm (CAD: 13 mm at 70°); don't open further, the arm would reach the base | 70 |", "",
       "`p` prints all four angles. Copy them into the constants at the top of `firmware/concept_a/concept_a.ino`, "
       "upload it, then press START.", "",
       "## 7. Tests (fill in the report's section 10)", "",

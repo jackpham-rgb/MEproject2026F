@@ -112,7 +112,7 @@ C.push(para([r("The selected design (Concept A) is a small crane on a turntable.
 C.push(para("Before ordering hardware, the design was verified as far as possible on the laptop:"));
 [
   "Detail CAD of every printed and purchased part, with PETG print tolerances and screws from the team's Harbor Freight #67675 kit.",
-  "A collision check that runs the real firmware sequence through the CAD in 289 poses: no part touches another or the table, the can lands inverted at (127.0, 0.0) mm with 0.0° tilt, and the robot stays 39 mm inside its tip-over footprint.",
+  "A collision check that runs the real firmware sequence through the CAD in 289 poses: no part touches another or the table, the can lands inverted at (127.0, 0.0) mm with 0.0° tilt, and the robot stays 37 mm inside its tip-over footprint.",
   "Mechanical analysis: lift clearance, grip force, servo torques (5× and 30× margins), lift jam check.",
   "Electrical analysis: servo signals replayed from the firmware, a current budget, and an ngspice/LTspice circuit run comparing two power designs. The Uno holds 5.00 V even with a servo stalled.",
   "The firmware compiles for the Uno (19.6 % flash) and runs the full sequence on an emulated ATmega328P.",
@@ -139,7 +139,7 @@ C.push(h1("4. Design description"));
 image("docs/report_img/cad_home.png", 4.6, "Figure 1. Detail CAD at HOME: arm at the start can (red ring); target is the green ring.").forEach(x => C.push(x));
 C.push(table([
   ["Subsystem", "Design", "Why"],
-  ["Base (CA-101)", "Printed box with a bearing tower; the 175° sector the arm and can sweep is cut away", "Holds the turntable; footprint keeps the CG ≥ 39 mm inside in every pose"],
+  ["Base (CA-101)", "Printed box with a bearing tower; the 175° sector the arm and can sweep is cut away", "Holds the turntable; footprint keeps the CG ≥ 37 mm inside in every pose"],
   ["Turntable", "MG996R + 6807-2RS bearing (35 × 47 × 7 mm) carrying a D-shaped turret plate (CA-201)", "The bearing takes the weight and tipping load, so the servo only turns it"],
   ["Lift", "Carriage + arm (CA-301) on 4 LM6UU bearings on two 6 mm rods; MG90S crank + link (CA-302)", "15.3 mm (0.6 in) stroke; jam ratio 0.018 (a printed slide would be 0.55)"],
   ["Wrist", "MG90S rolls the gripper 180° about the radial line through the can's centre", "Flipping about the can's own centre means lowering 0.6 in sets it exactly on the table"],
@@ -153,7 +153,7 @@ C.push(para("Running the real part shapes through the firmware sequence found pr
 [
   "The original lazy-susan stack was as tall as the grip axis, so the wrist servo hit it: replaced by a 6807 bearing in a 28 mm tower and a D-shaped turret plate.",
   "The square base corner was in the can's path: the base is cut away in the swept sector.",
-  "At the target the gripper is upside down, so opening fully swung an arm into the base: release opens only 25°, which still clears the can by 3.6 mm.",
+  "At the target the gripper is upside down, so opening fully swung an arm into the base: release opens only 25°, which still swings the pads 13 mm clear of the can.",
   "Un-flipping with the arms open would sweep them through the table: homing closes the arms first, and runs only after the can is lifted off.",
 ].forEach(t => C.push(bullet(t)));
 C.push(h2("4.2 Print tolerances and fasteners"));
@@ -172,12 +172,12 @@ C.push(table([
   ["Turntable", "J = 7.7 kg·cm², weight on the bearing", "0.032 kg·cm vs MG996R 9.4"],
   ["Lift jam", "Drawer effect 2μe/L with bushings 43 mm apart", "0.018 with LM6UU (printed slide 0.55)"],
   ["Collisions", "Solid booleans, 289 poses, run + homing", "None; tightest moving gaps 0.5 mm (designed)"],
-  ["Tip-over", "CG vs convex hull of base + tray", "≥ 39 mm inside in every pose"],
+  ["Tip-over", "CG vs convex hull of base + tray; dynamic ZMP with all inertial forces", "≥ 37 mm static, ≥ 36.7 mm dynamic, inside in every pose"],
   ["Landing", "Can pose after LOWER", "(127.0, 0.0) mm, inverted, 0.0° tilt, z = 0.00"],
   ["Error budget", "Turntable error → landing offset 5 in × sin(e)", "1° → 0.09 in, 2° → 0.17 in"],
 ], [1700, 4360, 3300]));
 C.push(spacer());
-C.push(para("Mass: 571 g robot (301 g printed PETG, 270 g purchased) + 15 g can."));
+C.push(para("Mass: 564 g robot (294 g printed PETG, 270 g purchased) + 15 g can. The full engineering check (backend/mech/mech_checks.py → cad/check/mech_report.txt) runs 43 checks on servo torque and speed (inverse dynamics from CAD masses and inertias), the lift slider-crank, the gears (contact ratio, undercut, Lewis bending), can friction through every acceleration, dynamic stability, strength, stiffness and power: all 43 pass."));
 
 // 6 electrical
 C.push(h1("6. Electrical design"));

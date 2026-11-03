@@ -43,7 +43,11 @@ P = dict(
     lift_servo_tip=(-3.0, -6.0, 150.0),
     wrist_tip_y=58.5,
     plate_x=31.0, plate_y1=91.0, plate_bot=(68.5, 72.5), plate_top=(79.5, 82.0),
-    pivot_x=8.1, pivot_y=83.0, gear_r=8.0, finger_z=(73.0, 79.0), pad_z=(46.0, 86.0),        # 40 mm pads centred near can mid-height (59.7)
+    pivot_x=8.1, pivot_y=83.0, gear_r=8.0, finger_z=(73.0, 79.0),
+    gear_z=16, gear_m=1.0, gear_pa=20.0, gear_x=0.10, gear_thin=0.10,   # involute spur gears on the fingers:
+    # 16T module 1, 20 deg; profile shift +0.1 each (16T < 17T undercut limit; also fills the 16.2 mm
+    # centre distance: standard 16.0); each tooth thinned 0.1 mm at the pitch circle -> 0.2 mm backlash
+    pad_z=(46.0, 86.0),        # 40 mm pads centred near can mid-height (61.1)
     pad_t=5.5, pad_half_angle=28.0, grip_open_angle=75.0,
     print_density=1.27, print_fill=0.60,                             # PETG, ~3 walls + 30 % infill
 )
@@ -187,6 +191,50 @@ def mg996r_local():
 MICRO_HOLES_X = (-5.95 + 22.8 - 5.95) / 2   # body centre x in the micro-servo local frame (5.45)
 
 
+def involute_gear(cx, cy, z0, z1, tooth0_deg, p=None):
+    """Involute spur gear (profile-shifted, thinned for backlash) as a solid, centred at (cx, cy),
+    extruded z0..z1, with a tooth centred at tooth0_deg. Returns (solid, info dict)."""
+    p = p or P
+    z, m, pa, x, thin = p["gear_z"], p["gear_m"], math.radians(p["gear_pa"]), p["gear_x"], p["gear_thin"]
+    r = m * z / 2
+    rb = r * math.cos(pa)
+    ra = r + m * (1 + x)
+    rf = r - m * (1.25 - x)
+    inv = lambda a: math.tan(a) - a
+    s_p = m * (math.pi / 2 + 2 * x * math.tan(pa)) - thin                # tooth thickness at the pitch circle
+    psi_p = s_p / (2 * r)                                                 # half-thickness angle at the pitch circle
+
+    def half_angle(rho):                                                  # half-thickness angle at radius rho >= rb
+        return psi_p + inv(pa) - inv(math.acos(rb / rho))
+
+    n_inv = 10
+    radii = [max(rb, rf) + (ra - max(rb, rf)) * i / n_inv for i in range(n_inv + 1)]
+    pts = []
+    pitch = 2 * math.pi / z
+    for k in range(z):
+        c = math.radians(tooth0_deg) + k * pitch
+        # root arc from the previous gap middle to this tooth's flank start
+        flank_l = [(rho, c - half_angle(rho)) for rho in radii]          # leading flank, root -> tip
+        flank_r = [(rho, c + half_angle(rho)) for rho in reversed(radii)]  # trailing flank, tip -> root
+        gap_prev = c - pitch / 2
+        a_root_l = flank_l[0][1]
+        pts.append((rf, gap_prev))
+        pts.append((rf, a_root_l))                                       # radial line rf -> rb (below base circle)
+        pts += flank_l
+        tip_a0, tip_a1 = flank_l[-1][1], flank_r[0][1]
+        pts += [(ra, tip_a0 + (tip_a1 - tip_a0) * t / 3) for t in (1, 2)]   # tip land
+        pts += flank_r
+        pts.append((rf, flank_r[-1][1]))
+    xy = [(cx + rho * math.cos(a), cy + rho * math.sin(a)) for rho, a in pts]
+    clean = [xy[0]]
+    for q in xy[1:]:
+        if math.dist(q, clean[-1]) > 1e-4:
+            clean.append(q)
+    solid = cq.Workplane("XY").workplane(offset=z0).polyline(clean).close().extrude(z1 - z0)
+    info = dict(r=r, rb=rb, ra=ra, rf=rf, s_pitch=s_p, tip_thickness=2 * half_angle(ra) * ra)
+    return solid, info
+
+
 # --------------------------------------------------------------------------------------
 # Part definitions
 # --------------------------------------------------------------------------------------
@@ -219,6 +267,25 @@ def build_parts():
     cavity = box(-half + wall, half - wall, -half + wall, half - wall, 0, H - top).cut(
         sector(rt - wall, p["sweep_a0"] - 3, p["sweep_a1"] + 3, -1, H + 1))
     base = base.cut(cavity)
+    # trim the two sharp tips the sweep cut leaves on the square (no function; tip-over margin
+    # changes ~1 mm): chamfer each one and close the new face with a wall
+    outer = box(-half, half, -half, half, 0, H).cut(sector(rt, p["sweep_a0"], p["sweep_a1"], -1, H + 1))
+    for a_deg, sx, c in ((p["sweep_a1"], -1, 30.0), (p["sweep_a0"], 1, 15.0)):   # right tip limited by the ballast pocket
+        a = math.radians(a_deg)
+        tip = (sx * half, sx * half * math.tan(a))
+        d_slant = (-math.cos(a), -math.sin(a))                                     # along the cut edge, toward the tower
+        p1 = (tip[0], tip[1] - c)                                                  # along the square edge
+        p2 = (tip[0] + c * d_slant[0], tip[1] + c * d_slant[1])
+        ux, uy = p2[0] - p1[0], p2[1] - p1[1]
+        L = math.hypot(ux, uy); ux, uy = ux / L, uy / L
+        nx, ny = uy, -ux                                                           # normal; flip it to point at the tip
+        if (tip[0] - p1[0]) * nx + (tip[1] - p1[1]) * ny < 0:
+            nx, ny = -nx, -ny
+        e1 = (p1[0] - 6 * ux, p1[1] - 6 * uy); e2 = (p2[0] + 6 * ux, p2[1] + 6 * uy)
+        poly = lambda pts: cq.Workplane("XY").workplane(offset=-1).polyline(pts).close().extrude(H + 2)
+        slab = poly([e1, e2, (e2[0] - wall * nx, e2[1] - wall * ny), (e1[0] - wall * nx, e1[1] - wall * ny)])
+        base = base.union(slab.intersect(outer))
+        base = base.cut(poly([e1, e2, (e2[0] + 200 * nx, e2[1] + 200 * ny), (e1[0] + 200 * nx, e1[1] + 200 * ny)]))
     # bearing seat in the tower top: floor ring + pocket for the 6807 outer race
     base = base.union(cyl(0, 0, rt, H - top - 7, H - top).cut(cyl(0, 0, 18, H - top - 8, H)))
     base = base.cut(cyl(0, 0, TOL["bear_housing"] / 2, H - p["bear_w"], H + 1)).cut(cyl(0, 0, 18, H - top - 9, H + 1))
@@ -387,7 +454,7 @@ def build_parts():
         gr = gr.union(box(hx - 3, hx + 3, pvy - 3, pvy + 3, pt[1], tab_z)).cut(cyl(hx, pvy, 0.85, tab_z - 6, tab_z + 1))
     add("gripper_frame", "wrist", gr, "PETG", note="Flange + 2 plates + posts in one print. Wrist horn: 4 servo-bag "
         "screws. Right gear axle: #6-32x1/2 from the top. Left gear rides on the gripper-servo horn. Servo: 2 servo-bag screws.")
-    add("can_bumper", "wrist", box(-4.5, 4.5, py1, py1 + 1.6, pb[0], pt[1]), "silicone", note="can stop, cut from the 1/16 in silicone sheet: place the can against it")
+    add("can_bumper", "wrist", box(-2.5, 2.5, py1, py1 + 1.6, pb[0], pt[1]), "silicone", note="can stop, 5 mm wide (clears the gear tips by 0.67 mm), cut from the 1/16 in silicone sheet: place the can against it")
     gsrv = moved(micro_servo_local(), trsf_axes((-pvx, pvy, gs_face - 5.8), (-1, 0, 0), (0, 0, -1)))
     add("gripper_servo_SG90", "wrist", gsrv, "buy", mass=9.0)
     add("axle_R", "wrist", cyl(pvx, pvy, 1.75, pt[1] - 12.7, pt[1]), "buy", mass=1.6, note="#6-32x1/2 (kit), right-gear axle")
@@ -408,12 +475,16 @@ def build_parts():
     pad = ring.intersect(wedge)
     pad = pad.union(box(rc + 2, rc + 7, cy - 13, cy + 13, pz0, pz1))
     pad = pad.cut(cyl(0, cy, rc, pz0 - 1, pz1 + 1))
-    gear_disc = cyl(pvx, pvy, p["gear_r"], fz0, fz1)
-    fR = arm.union(pad).union(gear_disc).cut(cyl(pvx, pvy, TOL["run_bore"] / 2, fz0 - 1, fz1 + 1))
-    fL = arm.union(pad).union(gear_disc).mirror("YZ").cut(cyl(-pvx, pvy, 3.0, fz0 + 2, fz1 + 1))   # spline / horn socket
-    add("finger_R", "finger_R", fR, "PETG", note="Gear (m1, 16T, pitch r 8 mm, +0.2 backlash) + arm + can pad. Print "
+    # meshing involute gears: the right gear has a tooth on the line of centres (pointing at the
+    # left gear), the left gear has a gap there (tooth offset half a pitch)
+    pitch_deg = 360.0 / p["gear_z"]
+    gear_R, _ = involute_gear(pvx, pvy, fz0, fz1, 180.0)
+    gear_L, _ = involute_gear(-pvx, pvy, fz0, fz1, pitch_deg / 2)
+    fR = arm.union(pad).union(gear_R).cut(cyl(pvx, pvy, TOL["run_bore"] / 2, fz0 - 1, fz1 + 1))
+    fL = arm.union(pad).mirror("YZ").union(gear_L).cut(cyl(-pvx, pvy, 3.0, fz0 + 2, fz1 + 1))   # spline / horn socket
+    add("finger_R", "finger_R", fR, "PETG", note="Involute gear (16T, m1, 20 deg, +0.1 profile shift, 0.2 mm backlash) + arm + can pad. Print "
         "flat. Runs on a #6-32 axle (3.9 mm bore). Line the pad with the 1/16 in (1.6 mm) silicone sheet: 32 x 40 mm.")
-    add("finger_L", "finger_L", fL, "PETG", note="Mirror of finger_R; its gear has the servo-spline socket.")
+    add("finger_L", "finger_L", fL, "PETG", note="Mirror of finger_R (gear turned half a tooth so the two mesh); its gear has the servo-spline socket.")
 
     # ---------------- tolerance test coupon (print first; not part of the assembly) ----------------
     cp = box(0, 70, 0, 22, 0, 8)

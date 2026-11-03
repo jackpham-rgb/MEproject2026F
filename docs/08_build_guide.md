@@ -47,7 +47,7 @@ Files: `cad/print/stl/` (already turned to the best side and placed on the bed).
 | Order | Part no. | Part | Qty | Lay it on the bed with | Size on bed (mm) | Supports | PETG (g) | ≈ hours |
 |---:|---|---|---:|---|---|---|---:|---:|
 | 1 | CA-900 | Tolerance coupon | 1 | -Z (as modelled, bottom down) | 70 × 22 × 8 | none | 8.2 | 0.8 |
-| 2 | CA-101 | Base | 1 | +Z (upside down, top face down) | 152 × 129 × 52 | yes: supports on build plate | 109.2 | 10.5 |
+| 2 | CA-101 | Base | 1 | +Z (upside down, top face down) | 152 × 112 × 52 | yes: supports on build plate | 102.3 | 9.8 |
 | 3 | CA-102 | Electronics tray | 1 | -Z (as modelled, bottom down) | 152 × 104 × 28 | none | 57.0 | 5.5 |
 | 4 | CA-201 | Turret plate | 1 | -Z (as modelled, bottom down) | 80 × 62 × 19 | yes: supports on build plate | 24.4 | 2.3 |
 | 5 | CA-202 | Spine | 1 | -Y face down | 50 × 103 × 24 | none | 22.4 | 2.1 |
@@ -55,10 +55,10 @@ Files: `cad/print/stl/` (already turned to the best side and placed on the bed).
 | 7 | CA-301 | Carriage + arm | 1 | -Y face down | 52 × 100 × 44 | yes: supports on build plate | 46.0 | 4.4 |
 | 8 | CA-302 | Lift link | 1 | +X face down | 16 × 7 × 3 | none | 0.2 | 0.3 |
 | 9 | CA-401 | Gripper frame | 1 | -Y face down | 62 × 39 × 33 | none | 11.8 | 1.1 |
-| 10 | CA-402 | Finger, right | 1 | -Z (as modelled, bottom down) | 41 × 78 × 40 | yes: supports on build plate | 9.7 | 0.9 |
-| 11 | CA-403 | Finger, left | 1 | -Z (as modelled, bottom down) | 41 × 78 × 40 | yes: supports on build plate | 9.7 | 0.9 |
+| 10 | CA-402 | Finger, right | 1 | -Z (as modelled, bottom down) | 42 × 79 × 40 | yes: supports on build plate | 9.7 | 0.9 |
+| 11 | CA-403 | Finger, left | 1 | -Z (as modelled, bottom down) | 42 × 78 × 40 | yes: supports on build plate | 9.7 | 0.9 |
 
-Total ≈ 309 g of PETG (+ ~15 % for supports and purge) and ≈ 30 h of printing (EST).
+Total ≈ 302 g of PETG (+ ~15 % for supports and purge) and ≈ 29 h of printing (EST).
 
 **Print CA-900 first.** Check each hole with the real part:
 
@@ -152,7 +152,7 @@ Place a real empty can at the START mark (5.0 in from the turntable axis), again
 | `LIFT_UP` | `LIFT_DOWN` + 45 (0.6 in higher); check the flipped can clears the table | 75 |
 | `WRIST_FLIP` | `w` until the gripper is exactly upside down (use a phone level app on the frame) | 180 |
 | `GRIP_CLOSED` | `g` until the pads touch the can, then +3 to +5° for a light squeeze (0.5–1 N per arm: the can shouldn't dent, and shouldn't slide when you tug it) | 95 |
-| `GRIP_RELEASE` | upside down at the target: open until the pads just clear the can (≥ 2 mm) | 70 |
+| `GRIP_RELEASE` | upside down at the target: open until the pads clear the can by a few mm (CAD: 13 mm at 70°); don't open further, the arm would reach the base | 70 |
 
 `p` prints all four angles. Copy them into the constants at the top of `firmware/concept_a/concept_a.ino`, upload it, then press START.
 
