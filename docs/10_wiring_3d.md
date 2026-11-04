@@ -30,7 +30,7 @@ back of the spine, base floor and tray floor. **The three loops stay free.**
 
 ## Through each move
 
-One animation per move, parts see-through (`docs/wiring/motion/`, all six in `all_moves.mp4`,
+One animation per move, parts see-through (`docs/wiring/motion/`, all six in `all_moves.gif` / `all_moves.mp4`,
 interactive: `viewer/wiring_motion.html`). The tied runs move with their part; each free loop is
 drawn with its real cable length, hanging under gravity and resting on any part it meets. The bars
 show how much of each loop's slack the move uses (must stay ≤ 80 %). Check: `cad/wiring/wiring_motion_report.txt`.
