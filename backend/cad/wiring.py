@@ -325,13 +325,37 @@ class Scene:
         for p in parts:
             sh = p["shape"].val().moved(cq.Location(T[p["group"]]))
             self.items.append((p["name"], p["group"], sh.wrapped, sh.BoundingBox()))
+        self._faces = {}
 
-    def clearance(self, pt, r, skip=()):
+    def push(self, pt, r, margin=0.4):
+        """Move a loop sample out of any part it is in (or too close to), to the part surface + r + margin:
+        a cable resting on a surface instead of passing through it."""
+        p = np.array(pt, float)
+        for name, grp, sh, bb in self.items:
+            m = r + margin + 1.0
+            if p[0] < bb.xmin - m or p[0] > bb.xmax + m or p[1] < bb.ymin - m or p[1] > bb.ymax + m or p[2] < bb.zmin - m or p[2] > bb.zmax + m:
+                continue
+            if name not in self._faces:
+                self._faces[name] = cq.Compound.makeCompound(cq.Shape.cast(sh).Faces()).wrapped
+            v = BRepBuilderAPI_MakeVertex(gp_Pnt(*map(float, p))).Vertex()
+            d = BRepExtrema_DistShapeShape(v, self._faces[name])
+            if not d.IsDone() or d.NbSolution() == 0:
+                continue
+            q = d.PointOnShape2(1); q = np.array([q.X(), q.Y(), q.Z()])
+            dist = d.Value()
+            inside = BRepClass3d_SolidClassifier(sh, gp_Pnt(*map(float, p)), 1e-6).State() == TopAbs_IN
+            if inside and dist > 1e-6:
+                p = q + (q - p) / dist * (r + margin)
+            elif not inside and dist < r + margin and dist > 1e-6:
+                p = q + (p - q) / dist * (r + margin)
+        return p
+
+    def clearance(self, pt, r, skip=(), skip_group=None):
         """(min surface gap, part name) of a wire sample of radius r; <0 means it cuts into a part."""
         best, who = 1e9, None
         v = BRepBuilderAPI_MakeVertex(gp_Pnt(*map(float, pt))).Vertex()
         for name, grp, sh, bb in self.items:
-            if name in skip:
+            if name in skip or grp == skip_group:
                 continue
             m = r + 3.0
             if pt[0] < bb.xmin - m or pt[0] > bb.xmax + m or pt[1] < bb.ymin - m or pt[1] > bb.ymax + m or pt[2] < bb.zmin - m or pt[2] > bb.zmax + m:
@@ -518,7 +542,7 @@ def main():
             "lift_servo_MG90S": "#2a2a2a", "wrist_servo": "#2a2a2a", "gripper_servo_SG90": "#2a5fd0"}
     for p in parts:
         v, f = p["shape"].val().tessellate(0.15, 0.3)
-        mesh["parts"].append(dict(name=p["name"], color=elec.get(p["name"], col.get(p["group"], "#999999")),
+        mesh["parts"].append(dict(name=p["name"], group=p["group"], color=elec.get(p["name"], col.get(p["group"], "#999999")),
                                   solid=p["name"] in elec, v=[round(c, 2) for q in v for c in (q.x, q.y, q.z)],
                                   f=[i for t in f for i in t]))
     for w in W:

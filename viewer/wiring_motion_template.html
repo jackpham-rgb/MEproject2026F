@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept A Wiring Motion</title>
+<meta name="description" content="Each move of the Concept A run with see-through parts, showing the servo leads and their loops moving, slack used and clearance.">
+<style>
+:root{--ground:#eef1f4;--panel:#fff;--ink:#1a1e24;--muted:#5b6572;--line:#d5dbe2;--accent:#2f6fdb;--ok:#1f8a5b;--warn:#b7791f;--scene-bg:#e9edf2;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#111418;--panel:#191d23;--ink:#e6eaef;--muted:#9aa4b1;--line:#2b313a;--accent:#6b9cf0;--ok:#43b883;--warn:#e0a84f;--scene-bg:#161a20;color-scheme:dark}}
+:root[data-theme="dark"]{--ground:#111418;--panel:#191d23;--ink:#e6eaef;--muted:#9aa4b1;--line:#2b313a;--accent:#6b9cf0;--ok:#43b883;--warn:#e0a84f;--scene-bg:#161a20;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{overflow-x:hidden}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 16px 48px;display:grid;gap:14px}
+h1{font-size:24px;line-height:1.2;margin:0;font-weight:600}
+.sub{color:var(--muted);margin:4px 0 0;max-width:85ch}
+.vp{position:relative;background:var(--scene-bg);border:1px solid var(--line);border-radius:8px;overflow:hidden;aspect-ratio:16/9}
+.vp canvas{display:block;width:100%;height:100%}
+.hud{position:absolute;left:12px;top:10px;right:12px;display:flex;justify-content:space-between;gap:10px;align-items:start;pointer-events:none;flex-wrap:wrap}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13.5px}
+.act{font-weight:600;font-size:17px}
+.muted{color:var(--muted)}
+.bars{display:grid;gap:5px;min-width:250px}
+.bar{display:grid;grid-template-columns:105px 1fr 44px;gap:8px;align-items:center;font-size:12.5px}
+.track{display:block;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.fill{display:block;width:0;height:100%;border-radius:4px;background:var(--ok)}
+.fill.hi{background:var(--warn)}
+.num{font-variant-numeric:tabular-nums;text-align:right}
+.ctl{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;font-size:13px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;margin:0}
+body.capture .wrap{padding:0;max-width:none}
+body.capture header,body.capture .ctl,body.capture .card{display:none}
+body.capture .vp{border:0;border-radius:0;aspect-ratio:auto;height:100vh}
+@media (max-width:640px){.bars{min-width:0;width:100%}.hud{position:static;padding:8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Concept A: the wiring through each move</h1>
+  <p class="sub">One move at a time, printed parts see-through. The tied runs of each servo lead move with their part; the three free loops bend between their ties. The bars show how much of each loop's slack the move uses (it must stay under 80 %).</p>
+</header>
+<div class="vp" id="vp">
+  <div class="hud">
+    <div class="box"><div class="act" id="act">GRIP</div><div id="srv" class="muted"></div><div id="note"></div></div>
+    <div class="box bars" id="bars"></div>
+  </div>
+</div>
+<div class="ctl" id="ctl"></div>
+<div class="card"><pre>__REPORT__</pre></div>
+</div>
+<!-- three.js r128 is served from this repo (viewer/lib); CDN only as a fallback -->
+<script src="lib/three.min.js"></script>
+<script>window.THREE || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.128.0/three.min.js"><\/script>')</script>
+<script src="lib/OrbitControls.js"></script>
+<script>(window.THREE && THREE.OrbitControls) || document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>')</script>
+<script>const MESH = __MESH__; const MOT = __MOTION__;</script>
+<script>
+(function(){
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const vp = $("vp");
+if (!window.THREE) { vp.insertAdjacentHTML("beforeend", "<p style='padding:60px 20px'>The 3D library did not load. Reload the page.</p>"); return; }
+const renderer = new THREE.WebGLRenderer({antialias:true, preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+vp.prepend(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(css("--scene-bg"));
+const camera = new THREE.PerspectiveCamera(32, 16/9, 1, 5000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true;
+const root = new THREE.Group(); root.rotation.x = -Math.PI/2; scene.add(root);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8090a0, 0.85));
+const sun = new THREE.DirectionalLight(0xffffff, 0.6); sun.position.set(300,500,250); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(-300,200,-300); scene.add(fill);
+const grid = new THREE.GridHelper(500, 20, 0x9aa6b2, 0x9aa6b2); grid.rotation.x = Math.PI/2; grid.position.set(0,-50,0);
+grid.material.transparent = true; grid.material.opacity = 0.35; root.add(grid);
+
+const groups = {};
+["fixed","turret","crank","lift","wrist","finger_R","finger_L","can"].forEach(g => { const G = new THREE.Group(); G.matrixAutoUpdate = false; root.add(G); groups[g] = G; });
+function geo(p){ let g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(p.v, 3)); g.setIndex(p.f); g = g.toNonIndexed(); g.computeVertexNormals(); return g; }
+for (const p of MESH.parts) {
+  const mat = new THREE.MeshStandardMaterial({color:p.color, roughness:0.6, metalness:0.05});
+  const g = geo(p), parent = groups[p.name === "test_can" ? "can" : p.group] || groups.fixed;
+  if (!p.solid) { mat.transparent = true; mat.opacity = 0.2; mat.depthWrite = false; }
+  const m = new THREE.Mesh(g, mat); if (!p.solid) m.renderOrder = 2; parent.add(m);
+  if (!p.solid) parent.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 30), new THREE.LineBasicMaterial({color:0x56606c, transparent:true, opacity:0.35})));
+}
+const NMOV = MOT.wires.length;                                 // the first wires are the moving leads
+MESH.wires.slice(NMOV).forEach(w => root.add(new THREE.Mesh(geo(w), new THREE.MeshStandardMaterial({color:w.color, roughness:0.45}))));
+const movMats = MOT.wires.map(w => new THREE.MeshStandardMaterial({color:w.color, roughness:0.45}));
+const movMesh = MOT.wires.map((w, i) => { const m = new THREE.Mesh(new THREE.BufferGeometry(), movMats[i]); root.add(m); return m; });
+
+const byAct = MOT.actions.map(() => []); MOT.frames.forEach(f => byAct[f.a].push(f));
+const VIEWS = {   // per action: target (model xyz), distance, azimuth, elevation
+  GRIP:{t:[-5,80,85],d:300,az:-150,el:42}, LIFT:{t:[-10,0,95],d:340,az:-140,el:16}, FLIP:{t:[-5,35,60],d:300,az:-155,el:20},
+  TURN:{t:[-15,-35,62],d:400,az:-125,el:38}, LOWER:{t:[-10,0,95],d:340,az:-140,el:16}, RELEASE:{t:[60,-5,85],d:330,az:-150,el:30},
+};
+function view(name){
+  const V = VIEWS[name], a = V.az*Math.PI/180, e = V.el*Math.PI/180; root.updateMatrixWorld();
+  const t = new THREE.Vector3(...V.t), pos = t.clone().addScaledVector(new THREE.Vector3(Math.cos(e)*Math.cos(a), Math.cos(e)*Math.sin(a), Math.sin(e)), V.d);
+  camera.position.copy(pos.applyMatrix4(root.matrixWorld)); controls.target.copy(t.applyMatrix4(root.matrixWorld)); controls.update();
+}
+const LOOPS = ["Wrist loop (1)", "Lift loop (3)", "Turn loop (6)"];
+$("bars").innerHTML = LOOPS.map((n, i) => `<div class="bar"><span>${n}</span><span class="track"><span class="fill" id="f${i}"></span></span><span class="num" id="p${i}"></span></div>`).join("")
+  + `<div class="bar"><span>Closest part</span><span class="muted" style="font-size:12px">tied runs</span><span class="num" id="gap"></span></div>`;
+let lastGap = null;
+function show(ai, k){
+  const A = MOT.actions[ai], F = byAct[ai][Math.min(k, byAct[ai].length - 1)];
+  for (const [g, m] of Object.entries(F.T)) { const M = new THREE.Matrix4(); M.set(...m, 0,0,0,1); groups[g].matrix.copy(M); groups[g].matrixWorldNeedsUpdate = true; }
+  F.wires.forEach((arr, i) => {
+    const pts = []; for (let j = 0; j < arr.length; j += 3) pts.push(new THREE.Vector3(arr[j], arr[j+1], arr[j+2]));
+    movMesh[i].geometry.dispose();
+    movMesh[i].geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), pts.length * 2, MOT.wires[i].r, 8, false);
+  });
+  const start = ai === 0 ? MOT.start[A.joint] : byAct[ai][0].cmd;
+  $("act").textContent = `${ai + 1}/6  ${A.name}`;
+  $("srv").textContent = `${A.servo}: ${start.toFixed(0)}° → ${A.target}°   now ${F.cmd.toFixed(0)}°`;
+  $("note").textContent = A.note;
+  LOOPS.forEach((n, i) => { const f = F.slack[n] || 0; $("f"+i).style.width = Math.min(100, f*100) + "%"; $("f"+i).classList.toggle("hi", f > 0.8); $("p"+i).textContent = Math.round(f*100) + " %"; });
+  if (F.gap != null) lastGap = F.gap; $("gap").textContent = lastGap == null ? "" : lastGap.toFixed(1) + " mm";
+}
+function size(){ const r = vp.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); }
+new ResizeObserver(size).observe(vp); size();
+
+let cur = 0, k = 0, playing = true, all = true, hold = 0;
+$("ctl").innerHTML = `<button id="play" aria-pressed="true">Pause</button><button id="all" aria-pressed="true">Play all 6</button>` +
+  MOT.actions.map((a, i) => `<button data-a="${i}">${i + 1}. ${a.name}</button>`).join("");
+function pick(i){ cur = i; k = 0; hold = 0; view(MOT.actions[i].name); show(cur, 0); document.querySelectorAll("[data-a]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.a === i)); }
+document.querySelectorAll("[data-a]").forEach(b => b.onclick = () => { all = false; $("all").setAttribute("aria-pressed", false); playing = true; $("play").textContent = "Pause"; pick(+b.dataset.a); });
+$("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "Pause" : "Play"; };
+$("all").onclick = e => { all = !all; e.target.setAttribute("aria-pressed", all); if (all) pick(0); };
+pick(0);
+let tPrev = 0;
+(function loop(t){
+  if (!window.__capture && playing && t - tPrev > 50) {
+    tPrev = t;
+    if (k < byAct[cur].length - 1) { k++; show(cur, k); }
+    else if (++hold > 25) { hold = 0; if (all) pick((cur + 1) % 6); else { k = 0; show(cur, 0); } }
+  }
+  controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop);
+})(0);
+window.__frames = ai => byAct[ai].length;
+window.__show = (ai, kk) => { window.__capture = true; size(); if (kk === 0) view(MOT.actions[ai].name); show(ai, kk); controls.update(); renderer.render(scene, camera); };
+window.__ready = true;
+})();
+</script>
+</body>
+</html>

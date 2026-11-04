@@ -1,0 +1,32 @@
+Wiring through each move (backend/cad/wiring_motion.py)
+============================================================
+slack used = length the motion needs between the tie points / loop length (<= 80 % passes)
+clearance = tied runs of the 3 column leads to every part that moves against them, every 3rd frame (>= 0.3 mm passes)
+loop shape = drape with the real cable length, resting on parts it meets (contact allowed: >= 0 mm passes)
+
+1. GRIP     SG90 gripper (D5)           20° ->    95°   PASS
+     slack used (worst frame): Wrist loop (1) 29 %, Lift loop (3) 70 %, Turn loop (6) 54 %
+     tied runs, closest part: 1.9 mm (SG90 gripper lead / base)
+     loops (draped), closest part: 0.5 mm (SG90 gripper lead / base)  = resting on it
+2. LIFT     MG90S lift (D10)            30° ->    75°   PASS
+     slack used (worst frame): Wrist loop (1) 29 %, Lift loop (3) 70 %, Turn loop (6) 54 %
+     tied runs, closest part: 1.9 mm (SG90 gripper lead / base)
+     loops (draped), closest part: 0.5 mm (SG90 gripper lead / base)  = resting on it
+3. FLIP     MG90S wrist (D6)             0° ->   180°   PASS
+     slack used (worst frame): Wrist loop (1) 79 %, Lift loop (3) 63 %, Turn loop (6) 54 %
+     tied runs, closest part: 1.9 mm (SG90 gripper lead / base)
+     loops (draped), closest part: 0.5 mm (SG90 gripper lead / gripper_frame)  = resting on it
+4. TURN     MG996R turntable (D9)      135° ->    45°   PASS
+     slack used (worst frame): Wrist loop (1) 69 %, Lift loop (3) 63 %, Turn loop (6) 75 %
+     tied runs, closest part: 1.9 mm (SG90 gripper lead / base)
+     loops (draped), closest part: 0.5 mm (MG90S lift lead / base)  = resting on it
+5. LOWER    MG90S lift (D10)            75° ->    30°   PASS
+     slack used (worst frame): Wrist loop (1) 69 %, Lift loop (3) 70 %, Turn loop (6) 75 %
+     tied runs, closest part: 1.9 mm (SG90 gripper lead / base)
+     loops (draped), closest part: 0.5 mm (SG90 gripper lead / gripper_frame)  = resting on it
+6. RELEASE  SG90 gripper (D5)           95° ->    70°   PASS
+     slack used (worst frame): Wrist loop (1) 69 %, Lift loop (3) 70 %, Turn loop (6) 75 %
+     tied runs, closest part: 1.9 mm (SG90 gripper lead / base)
+     loops (draped), closest part: 0.5 mm (SG90 gripper lead / gripper_frame)  = resting on it
+
+RESULT: ALL PASS
