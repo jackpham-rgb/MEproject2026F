@@ -20,6 +20,21 @@ A small crane at the corner, with 4 hobby servos doing one move at a time:
 Why A: [the decision matrix](docs/01_concepts_and_decision_matrix.md). The team ranking is
 A 3.85 → B 3.30 → D 3.00 → C 2.75.
 
+## Open in the browser (live site)
+
+| Page | Link |
+|---|---|
+| Home (all viewers) | https://jackpham-rgb.github.io/MEproject2026F/ |
+| **Wiring, 360°** (drag to orbit, Legend on/off) | https://jackpham-rgb.github.io/MEproject2026F/viewer/wiring_360.html |
+| **Detail CAD, animated** (firmware sequence + checks) | https://jackpham-rgb.github.io/MEproject2026F/viewer/concept_a_detail.html |
+| All 4 concepts | https://jackpham-rgb.github.io/MEproject2026F/viewer/concepts.html |
+| Wiring video, with legend / without | https://jackpham-rgb.github.io/MEproject2026F/docs/wiring/wiring_360.mp4 · https://jackpham-rgb.github.io/MEproject2026F/docs/wiring/wiring_360_clean.mp4 |
+
+The site is GitHub Pages, published from the `claude/awesome-brahmagupta-i4dvbh` branch (root).
+The same files open offline: download the repo and double-click the `.html` (needs internet for the 3D library).
+
+![Wiring 360](docs/wiring/wiring_360_clean.gif)
+
 ## Repo map
 
 | Folder | What's in it |
