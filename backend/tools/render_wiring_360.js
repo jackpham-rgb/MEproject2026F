@@ -19,7 +19,7 @@ fs.mkdirSync(OUT, { recursive: true });
 (async () => {
   const b = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"] });
   const p = await b.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
-  const L = process.env.THREE_LOCAL;
+  const L = process.env.THREE_LOCAL;   // optional: the page now loads viewer/lib/ itself
   if (L) {
     await p.route("**/three.min.js", r => r.fulfill({ path: path.join(L, "three.min.js"), contentType: "text/javascript" }));
     await p.route("**/OrbitControls.js", r => r.fulfill({ path: path.join(L, "OrbitControls.js"), contentType: "text/javascript" }));
