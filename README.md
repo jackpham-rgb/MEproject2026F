@@ -26,6 +26,7 @@ A 3.85 → B 3.30 → D 3.00 → C 2.75.
 |---|---|
 | Home (all viewers) | https://jackpham-rgb.github.io/MEproject2026F/ |
 | **Wiring, 360°** (drag to orbit, Legend on/off) | https://jackpham-rgb.github.io/MEproject2026F/viewer/wiring_360.html |
+| **Wiring through each move** (grip, lift, flip, turn, lower, release) | https://jackpham-rgb.github.io/MEproject2026F/viewer/wiring_motion.html |
 | **Detail CAD, animated** (firmware sequence + checks) | https://jackpham-rgb.github.io/MEproject2026F/viewer/concept_a_detail.html |
 | All 4 concepts | https://jackpham-rgb.github.io/MEproject2026F/viewer/concepts.html |
 | Wiring video, with legend / without | https://jackpham-rgb.github.io/MEproject2026F/docs/wiring/wiring_360.mp4 · https://jackpham-rgb.github.io/MEproject2026F/docs/wiring/wiring_360_clean.mp4 |

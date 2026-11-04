@@ -28,6 +28,31 @@ Videos: `docs/wiring/wiring_360.mp4` / `.gif` (with legend) and `wiring_360_clea
 Ties: small zip ties on adhesive mounts (BOM) at the wrist flange, bracket, arm beam, carriage side,
 back of the spine, base floor and tray floor. **The three loops stay free.**
 
+## Through each move
+
+One animation per move, parts see-through (`docs/wiring/motion/`, all six in `all_moves.mp4`,
+interactive: `viewer/wiring_motion.html`). The tied runs move with their part; each free loop is
+drawn with its real cable length, hanging under gravity and resting on any part it meets. The bars
+show how much of each loop's slack the move uses (must stay ≤ 80 %). Check: `cad/wiring/wiring_motion_report.txt`.
+
+| Move | Servo | Worst slack used | Result |
+|---|---|---|---|
+| ![](wiring/motion/1_GRIP.gif) GRIP | SG90 20° → 95° | lift loop 70 % (at rest) | PASS |
+| ![](wiring/motion/2_LIFT.gif) LIFT | MG90S 30° → 75° | lift loop 70 % | PASS |
+| ![](wiring/motion/3_FLIP.gif) FLIP | wrist 0° → 180° | **wrist loop 79 %** | PASS (closest to the limit) |
+| ![](wiring/motion/4_TURN.gif) TURN | MG996R 135° → 45° | turn loop 75 % | PASS |
+| ![](wiring/motion/5_LOWER.gif) LOWER | MG90S 75° → 30° | lift loop 70 % | PASS |
+| ![](wiring/motion/6_RELEASE.gif) RELEASE | SG90 95° → 70° | turn loop 75 % | PASS |
+
+Tied runs stay ≥ 1.9 mm from every part that moves against them. The loops lie on the base top and the
+gripper frame (0.5 mm = resting on them) without passing through anything.
+
+**Build note:** the wrist loop uses 79 % of its slack at the end of the flip. When you tie it, leave the
+loop between the flange tie and the bracket tie **at least 70 mm** (measure the cable, not the gap);
+5 mm shorter would pull tight.
+
+Regenerate: `python3.13 backend/cad/wiring_motion.py && node backend/tools/render_wiring_motion.js`.
+
 ## Lead lengths
 
 | Lead | Route | Buy |
