@@ -24,12 +24,12 @@ A 3.85 → B 3.30 → D 3.00 → C 2.75.
 
 | Folder | What's in it |
 |---|---|
-| **`cad/`** | CAD files only. `step/concept_a_assembly.step` (**open in SolidWorks / Fusion**) + `step/parts/`; `print/stl/` (print-ready STLs); `check/` (collision, mass and **43 engineering checks**: `mech_report.txt`); `claw/` (claw-only STEP for a close-up Fusion animation). See `cad/README.md` |
-| **`docs/`** | Everything to read or hand in: concepts and decision matrix (01), analysis (02), detail design (03), wiring (04), BOM (05), RVTM (06), PDR plan (07), **build guide (08)**, **how the motors and claw work (09)**, **Part C report** (`Engineering_Report_ConceptA.docx`), **2D drawings** (`drawings/all_drawings.pdf`), Excel matrices + BOM, wiring diagram |
+| **`cad/`** | CAD files only. `step/concept_a_assembly.step` (**open in SolidWorks / Fusion**) + `step/parts/`; `print/stl/` (print-ready STLs); `check/` (collision, mass and **43 engineering checks**: `mech_report.txt`); `claw/` (claw-only STEP for a close-up Fusion animation); `wiring/` (wires as solids + routing check). See `cad/README.md` |
+| **`docs/`** | Everything to read or hand in: concepts and decision matrix (01), analysis (02), detail design (03), wiring (04), BOM (05), RVTM (06), PDR plan (07), **build guide (08)**, **how the motors and claw work (09)**, **wire routing in 3D (10)**, **Part C report** (`Engineering_Report_ConceptA.docx`), **2D drawings** (`drawings/all_drawings.pdf`), Excel matrices + BOM, wiring diagram |
 | **`EE/`** | Electronics results: servo PWM signals in firmware order, current budget, buck-vs-no-buck comparison, **LTspice circuit** (`EE/ltspice/`) |
 | **`firmware/`** | Arduino code: `concept_a/` (the robot), `servo_setup/` (fit horns at HOME, find calibration angles) |
 | **`sim/`** | Design-calc results (lift clearance, grip, servo loads) |
-| **`viewer/`** | Open in a browser: the detail CAD animated through the firmware sequence, all 4 concepts, GIFs |
+| **`viewer/`** | Open in a browser (or on the [project site](https://jackpham-rgb.github.io/MEproject2026F/)): the detail CAD animated through the firmware sequence, the **360 wiring view**, all 4 concepts, GIFs |
 | **`wokwi/`** | Wokwi breadboard simulation (Tinkercad steps: `docs/tinkercad_concept_a.md`) |
 | **`backend/`** | All the code that generates the files above: `cad/` (CAD model, checks, exports, drawings, print prep), `ee/`, `sim/`, `tools/` (BOM, wiring diagram, viewers, report, emulator). See `backend/README.md` |
 

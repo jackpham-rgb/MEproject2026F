@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept A Can Flipper</title>
+<meta name="description" content="ME 2331 Project 2, Concept A: interactive CAD, wiring and concept viewers.">
+<style>
+:root{--ground:#eef1f4;--panel:#fff;--ink:#1a1e24;--muted:#5b6572;--line:#d5dbe2;--accent:#2f6fdb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#111418;--panel:#191d23;--ink:#e6eaef;--muted:#9aa4b1;--line:#2b313a;--accent:#6b9cf0;color-scheme:dark}}
+:root[data-theme="dark"]{--ground:#111418;--panel:#191d23;--ink:#e6eaef;--muted:#9aa4b1;--line:#2b313a;--accent:#6b9cf0;color-scheme:dark}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 16px 48px}
+h1{font-size:26px;margin:0 0 4px} p{color:var(--muted);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+a.card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;color:inherit;text-decoration:none}
+a.card:hover{border-color:var(--accent)}
+a.card img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;background:#e9edf2}
+a.card div{padding:10px 12px} a.card b{display:block} a.card span{color:var(--muted);font-size:13.5px}
+</style>
+</head>
+<body><div class="wrap">
+<h1>Concept A: can flipper</h1>
+<p>ME 2331/L Project 2. Inverts an empty Coke can and moves it 90° at 5 in. Pick a viewer.</p>
+<div class="grid">
+<a class="card" href="viewer/wiring_360.html"><img src="docs/wiring/wiring_3d_iso_clean.png" alt="Wiring 360 view"><div><b>Wiring, 360°</b><span>How every wire is routed and tucked in; legend on/off</span></div></a>
+<a class="card" href="viewer/concept_a_detail.html"><img src="viewer/gifs/conceptA_detail_cad.gif" alt="Detail CAD"><div><b>Detail CAD, animated</b><span>The firmware sequence on the real parts, with the check results</span></div></a>
+<a class="card" href="viewer/concepts.html"><img src="viewer/gifs/conceptA_claw_turntable.gif" alt="Concepts"><div><b>All 4 concepts</b><span>The concepts compared in the decision matrix</span></div></a>
+<a class="card" href="docs/wiring/wiring_360_clean.mp4"><img src="docs/wiring/wiring_3d_column_clean.png" alt="Wiring video"><div><b>Wiring video (no legend)</b><span>MP4 of the 360° turn; with legend: docs/wiring/wiring_360.mp4</span></div></a>
+<a class="card" href="https://github.com/jackpham-rgb/MEproject2026F"><img src="docs/wiring/wiring_3d_tray.png" alt="Repository"><div><b>Repository</b><span>CAD, drawings, report, BOM, firmware</span></div></a>
+</div></div></body></html>

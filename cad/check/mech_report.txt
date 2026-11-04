@@ -28,9 +28,9 @@ ENGINEERING CHECKS: 43 checks, 43 PASS, 0 FAIL
    Can        SG90 can't crush the can even at stall                     1.78 N/arm max                 < 8 N                    PASS
    Can        set down, not dropped (bottom height after LOWER, CAD)     -0.00 mm, 0 mm/s               |z| ≤ 0.5 mm             PASS
    Can        inverted can tips only past                                24.3°                          ≥ 3 × wrist tolerance (3°) PASS
-   Stability  tip-over (dynamic ZMP margin, all moves)                   36.8 mm                        ≥ 20 mm                  PASS
-   Stability  base sliding: inertial force / foot friction               1.10%                          ≤ 20 %                   PASS
-   Stability  turntable reaction torque / foot friction torque           2.36%                          ≤ 20 %                   PASS
+   Stability  tip-over (dynamic ZMP margin, all moves)                   37.2 mm                        ≥ 20 mm                  PASS
+   Stability  base sliding: inertial force / foot friction               1.08%                          ≤ 20 %                   PASS
+   Stability  turntable reaction torque / foot friction torque           2.31%                          ≤ 20 %                   PASS
    Strength   finger arm bending at SG90 stall                           3.8 MPa                        ≤ 20 MPa                 PASS
    Strength   finger arm deflection at SG90 stall                        0.71 mm                        ≤ 1.5 mm                 PASS
    Strength   carriage arm (2× dynamic load)                             0.10 MPa, 1.9 µm               ≤ 20 MPa                 PASS
@@ -79,7 +79,7 @@ DETAILS
    inverted on its top rim (r 27.6 mm), CG 61.1 mm up: tips at 24.3°; wrist error budget ±3°
 
 5. ROBOT STABILITY: zero-moment point (dynamic tip-over), sliding, turning reaction
-   dynamic ZMP stays ≥ 36.8 mm inside the support footprint in every pose of the run and homing
+   dynamic ZMP stays ≥ 37.2 mm inside the support footprint in every pose of the run and homing
 
 6. STRENGTH AND STIFFNESS (worst-case loads; PETG allowable 20 MPa = UTS 50 / 2.5)
    finger arm: 1.78 N at 53 mm → σ 3.8 MPa, deflection 0.71 mm

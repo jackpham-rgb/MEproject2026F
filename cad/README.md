@@ -10,6 +10,7 @@ Only CAD files live here. The code that makes them is in `backend/cad/`.
 | `print/stl/*.stl` | **Print-ready parts**, each turned to its best side and placed on the bed | any slicer (Cura, PrusaSlicer, Bambu Studio) |
 | `print/print_orientations.png`, `print/print_table.csv` | How each part sits on the bed, supports, time, mass | — |
 | `claw/` | **Claw only** (`claw.step` + motion file) for a close-up Fusion animation of the gripper: see `claw/README.md` | Fusion (script `backend/cad/fusion_claw/`) |
+| `wiring/wiring_harness.step` | Every wire as a solid, same origin as the assembly; `wiring/wiring_report.txt` is the routing check. See `docs/10_wiring_3d.md` | open with the assembly |
 | `check/check_report.txt` | Motion check: collisions in 289 poses, landing, tip-over, servo loads | text |
 | `check/mass_table.csv` | Mass and centre of gravity of every part | Excel |
 
@@ -55,4 +56,5 @@ python3.13 backend/cad/export.py       # cad/step/
 python3.13 backend/cad/check.py        # cad/check/ (~5 min)
 python3.13 backend/cad/print_prep.py   # cad/print/
 python3.13 backend/cad/drawings.py     # docs/drawings/
+python3.13 backend/cad/wiring.py       # cad/wiring/ (then node backend/tools/render_wiring_360.js)
 ```

@@ -1,0 +1,60 @@
+Concept A wire routing check (backend/cad/wiring.py)
+============================================================
+wires: 20   lead r 1.3 mm, jumper r 0.8 mm, power r 1.1 mm; required gap to any part >= 0.3 mm (first/last 4 mm of a wire may touch what it plugs into)
+
+Tray / panel parts (fixed group, not in the motion check):
+  start_button body (incl. lugs) to the buck: 3.0 mm
+  dc_jack body (incl. lugs) to the buck: 3.0 mm
+  status_led body (incl. lugs) to the buck: 9.0 mm
+  PASS no overlaps
+
+Clearance in each motion pose (min gap from the wire surface to any part):
+  GRIP (as modelled)   PASS
+  HOME, arms open      PASS
+  LIFT up              PASS
+  FLIP done            PASS
+  TURN done            PASS
+  RELEASE at target    PASS
+
+  closest approach over all poses:
+    SG90 gripper lead (D5)                           0.67 mm
+    Wrist servo lead (D6)                            0.79 mm
+    MG90S lift lead (D10)                            0.65 mm
+    MG996R turntable lead (D9, power on the buck)    1.11 mm
+    MG996R + to buck OUT+                            2.90 mm
+    MG996R - to buck OUT-                            2.90 mm
+    MG996R signal to D9                              2.30 mm
+    grip signal jumper to D5                        11.77 mm
+    wrist signal jumper to D6                       11.68 mm
+    lift signal jumper to D10                       12.64 mm
+    buck OUT+ to servo rail                          1.64 mm
+    buck OUT- to rail -                              1.19 mm
+    Uno GND to rail -                                8.53 mm
+    12 V jack + to buck IN+                          1.50 mm
+    12 V jack - to buck IN-                          2.19 mm
+    12 V jack + to Uno VIN                           2.08 mm
+    START button to D4                               0.70 mm
+    START button to GND rail                         0.49 mm
+    status LED to D13                                1.88 mm
+    status LED to GND rail                           0.81 mm
+
+Service loops (loop length between the last rigid points on each side):
+  SG90 gripper lead (D5)   wrist roll 180°  loop    69 mm, motion needs    48 mm -> 1.45x PASS (>= 1.25x so it never pulls tight)
+  SG90 gripper lead (D5)   lift 15.3 mm     loop    52 mm, motion needs    35 mm -> 1.47x PASS (>= 1.25x so it never pulls tight)
+  SG90 gripper lead (D5)   turn 90°         loop    67 mm, motion needs    50 mm -> 1.34x PASS (>= 1.25x so it never pulls tight)
+  Wrist servo lead (D6)    lift 15.3 mm     loop    54 mm, motion needs    38 mm -> 1.42x PASS (>= 1.25x so it never pulls tight)
+  Wrist servo lead (D6)    turn 90°         loop    77 mm, motion needs    45 mm -> 1.72x PASS (>= 1.25x so it never pulls tight)
+  MG90S lift lead (D10)    turn 90°         loop    87 mm, motion needs    46 mm -> 1.89x PASS (>= 1.25x so it never pulls tight)
+
+Lead length (servo exit -> breadboard header, along the route):
+  SG90 gripper lead (D5)                           516 mm; SG90 lead 250 + 500 mm extension = 735 mm -> PASS (219 mm spare, tuck the spare in the tray)
+  Wrist servo lead (D6)                            416 mm; MG90S lead 250 + 300 mm extension = 535 mm -> PASS (119 mm spare, tuck the spare in the tray)
+  MG90S lift lead (D10)                            345 mm; MG90S lead 250 + 300 mm extension = 535 mm -> PASS (190 mm spare, tuck the spare in the tray)
+  MG996R turntable lead (D9, power on the buck)    191 mm; MG996R lead 300 + 300 mm extension = 585 mm -> PASS (394 mm spare, tuck the spare in the tray)
+
+  (stock lead lengths are the usual 250 / 300 mm  VERIFY on the servos you get)
+
+Tie points: small zip ties on adhesive mounts (or a dab of hot glue) at the arm beam, carriage side,
+back of the spine, base floor and tray floor. The loops (wrist, lift, turn) are left free.
+
+RESULT: ALL PASS

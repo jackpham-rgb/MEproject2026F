@@ -324,7 +324,7 @@ def build_parts():
         x, y = uno_o[0] + hx, uno_o[1] + hy
         tray = tray.union(cyl(x, y, 3.0, p["tray_t"], p["tray_t"] + 6)).union(cyl(x, y, TOL["peg"] / 2, p["tray_t"] + 6, p["tray_t"] + 9))
     # buck converter standoffs (XL4015 5 A module, 54 x 23, holes ~48 x 17  VERIFY)
-    bk_o = (8.0, ty0 + 10.0)
+    bk_o = (8.0, ty0 + 22.0)                                                          # 19 mm behind the panel: room for the button / jack bodies
     for hx, hy in ((3, 3), (51, 3), (3, 20), (51, 20)):
         x, y = bk_o[0] + hx, bk_o[1] + hy
         tray = tray.union(cyl(x, y, 3.0, p["tray_t"], p["tray_t"] + 5)).union(cyl(x, y, 1.3, p["tray_t"] + 5, p["tray_t"] + 8))
@@ -341,8 +341,13 @@ def build_parts():
     add("arduino_uno", "fixed", uno, "buy", mass=25.0)
     add("buck_XL4015", "fixed", box(bk_o[0], bk_o[0] + 54, bk_o[1], bk_o[1] + 23, p["tray_t"] + 5, p["tray_t"] + 19),
         "buy", mass=25.0, note="XL4015 5 A buck set to 5.8 V for the servos; MG996R power on its OUT terminals  VERIFY footprint")
-    add("mini_breadboard", "fixed", box(8, 55, ty0 + 45, ty0 + 80, p["tray_t"], p["tray_t"] + 8.5), "buy", mass=10.0,
+    add("mini_breadboard", "fixed", box(8, 55, ty0 + 49, ty0 + 84, p["tray_t"], p["tray_t"] + 8.5), "buy", mass=10.0,
         note="5.8 V servo rail from the buck + 1000 uF capacitor")
+    add("capacitor_1000uF", "fixed", cyl(48, ty0 + 66, 5.0, p["tray_t"] + 8.5, p["tray_t"] + 24.5), "buy", mass=3.0,
+        note="1000 uF 16 V electrolytic across the servo rail (10 x 16 mm)")
+    # panel parts behind the front panel (inner face y = ty0 + 3): body depth incl. solder lugs
+    for nm, x, r, depth, m_ in (("start_button", 15, 6.5, 16, 4.0), ("status_led", 40, 3.0, 10, 0.5), ("dc_jack", 65, 5.0, 16, 3.0)):
+        add(nm, "fixed", cyl_dir((x, ty0 + 3, 15), (0, 1, 0), r, depth), "buy", mass=m_)
 
     # ---------------- turret ----------------
     tz0, tz1 = p["turret_z0"], p["turret_z1"]

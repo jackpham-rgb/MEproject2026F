@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept A Wiring</title>
+<meta name="description" content="360 view of how every Concept A wire is routed and tucked in: servo leads, service loops, tray wiring.">
+<style>
+:root{
+  --ground:#eef1f4; --panel:#ffffff; --ink:#1a1e24; --muted:#5b6572; --line:#d5dbe2; --accent:#2f6fdb;
+  --scene-bg:#e9edf2; --tag-bg:#1a1e24; --tag-ink:#ffffff; color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#111418; --panel:#191d23; --ink:#e6eaef; --muted:#9aa4b1; --line:#2b313a; --accent:#6b9cf0;
+  --scene-bg:#161a20; --tag-bg:#f2f4f7; --tag-ink:#111418; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --ground:#111418; --panel:#191d23; --ink:#e6eaef; --muted:#9aa4b1; --line:#2b313a; --accent:#6b9cf0;
+  --scene-bg:#161a20; --tag-bg:#f2f4f7; --tag-ink:#111418; color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 16px 48px;display:grid;gap:16px}
+h1{font-size:24px;line-height:1.2;margin:0;font-weight:600}
+.sub{color:var(--muted);margin:4px 0 0;max-width:80ch}
+.bench{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(260px,1fr);gap:16px;align-items:start}
+@media (max-width:880px){.bench{grid-template-columns:1fr}}
+.vp{position:relative;background:var(--scene-bg);border:1px solid var(--line);border-radius:8px;overflow:hidden;aspect-ratio:3/2}
+.vp canvas{display:block;width:100%;height:100%}
+.tag{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:var(--tag-bg);color:var(--tag-ink);
+  font:600 12px/22px system-ui,sans-serif;text-align:center;pointer-events:none;box-shadow:0 0 0 2px var(--scene-bg)}
+.title{position:absolute;left:12px;top:10px;font-weight:600;font-size:14px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 9px}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-size:13px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card h2{font-size:15px;margin:0 0 8px}
+ol{margin:0;padding-left:0;list-style:none;display:grid;gap:5px;font-size:13.5px}
+ol li{display:grid;grid-template-columns:24px 1fr;gap:6px;align-items:start}
+ol b{display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--tag-bg);color:var(--tag-ink);font-size:11px;line-height:20px;text-align:center}
+.legend{display:grid;gap:4px;font-size:13px}
+.sw{display:inline-block;width:22px;height:6px;border-radius:3px;margin-right:8px;vertical-align:middle}
+pre{white-space:pre-wrap;font-size:12px;margin:0;max-height:340px;overflow:auto}
+body.capture .wrap{padding:0;max-width:none}
+body.capture .bench{grid-template-columns:1fr 330px;gap:0}
+body.capture .vp{border:0;border-radius:0;aspect-ratio:auto;height:100vh}
+body.capture .ctl,body.capture .rep,body.capture header{display:none}
+body.capture .side{padding:12px;gap:10px}
+body.nolegend .side,body.nolegend .tag{display:none}
+body.nolegend .bench{grid-template-columns:1fr}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Concept A: how the wires are tucked in</h1>
+  <p class="sub">Printed parts are see-through; servos, electronics and every wire are solid. Drag to orbit. Each servo lead runs inside the robot with a free loop at every moving joint, checked against the CAD in six poses of the run (report below).</p>
+</header>
+<div class="bench">
+  <div>
+    <div class="vp" id="vp"><div class="title" id="vtitle">360° view</div></div>
+    <div class="ctl">
+      <button id="spin" aria-pressed="true">Auto-rotate</button>
+      <button data-v="iso">Back-left</button><button data-v="back">Back</button>
+      <button data-v="column">Column + wrist</button><button data-v="tray">Tray</button>
+      <button id="ghost" aria-pressed="true">See-through parts</button>
+      <button id="leg" aria-pressed="true">Legend</button>
+    </div>
+  </div>
+  <div class="side" style="display:grid;gap:12px">
+    <div class="card"><h2>Route, from the claw to the Uno</h2><ol id="steps"></ol></div>
+    <div class="card"><h2>Wires</h2><div class="legend" id="legend"></div></div>
+  </div>
+</div>
+<div class="card rep"><h2>Routing check</h2><pre>__REPORT__</pre></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.128.0/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>const DATA = __MESH__;</script>
+<script>
+(function(){
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+const LEG = [["#e8b923","SG90 gripper lead → D5"],["#9b59d0","Wrist servo lead → D6"],["#2a9df4","MG90S lift lead → D10"],
+  ["#e2552d","MG996R turntable lead → D9 (+/− on the buck)"],["#ff8c1a","Signal jumpers"],["#d42020","+12 V / +5.8 V"],
+  ["#202020","GND"],["#18a058","START button → D4"],["#00b5b5","Status LED → D13"]];
+$("legend").innerHTML = LEG.map(([c,t]) => `<div><span class="sw" style="background:${c}"></span>${t}</div>`).join("");
+$("steps").innerHTML = DATA.labels.map(([n,t]) => `<li><b>${n}</b><span>${t}</span></li>`).join("");
+const vp = $("vp");
+if (!window.THREE) { vp.insertAdjacentHTML("beforeend", "<p style='padding:40px'>The 3D library did not load. Check the network and reload.</p>"); return; }
+
+const renderer = new THREE.WebGLRenderer({antialias:true, preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+vp.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(32, 1.5, 1, 5000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+const root = new THREE.Group(); root.rotation.x = -Math.PI/2; scene.add(root);     // model is z-up, mm
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8090a0, 0.85));
+const sun = new THREE.DirectionalLight(0xffffff, 0.6); sun.position.set(300,500,250); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(-300,200,-300); scene.add(fill);
+scene.background = new THREE.Color(css("--scene-bg"));
+const grid = new THREE.GridHelper(500, 20, 0x9aa6b2, 0x9aa6b2); grid.rotation.x = Math.PI/2; grid.position.set(0,-50,0);
+grid.material.transparent = true; grid.material.opacity = 0.35; root.add(grid);
+
+function mesh(p, mat){
+  let g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(p.v, 3)); g.setIndex(p.f);
+  g = g.toNonIndexed(); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, mat); root.add(m); return m;
+}
+const ghosts = [];
+for (const p of DATA.parts) {
+  const mat = new THREE.MeshStandardMaterial({color:p.color, roughness:0.6, metalness:0.05});
+  if (!p.solid) { mat.transparent = true; mat.opacity = 0.2; mat.depthWrite = false; ghosts.push(mat); }
+  const m = mesh(p, mat); if (!p.solid) m.renderOrder = 2;
+  if (!p.solid) {   // faint outline so the see-through parts keep their shape
+    const e = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 30), new THREE.LineBasicMaterial({color:0x56606c, transparent:true, opacity:0.35}));
+    root.add(e); ghosts.push(e.material);
+  }
+}
+for (const w of DATA.wires) mesh(w, new THREE.MeshStandardMaterial({color:w.color, roughness:0.45, metalness:0.0}));
+
+const tags = DATA.labels.map(([n,,p]) => { const d = document.createElement("div"); d.className = "tag"; d.textContent = n; vp.appendChild(d); return [d, new THREE.Vector3(...p)]; });
+function placeTags(){
+  const r = vp.getBoundingClientRect(); root.updateMatrixWorld();
+  for (const [d, p] of tags) {
+    const v = p.clone().applyMatrix4(root.matrixWorld).project(camera);
+    d.style.left = ((v.x + 1) / 2 * r.width) + "px"; d.style.top = ((1 - v.y) / 2 * r.height) + "px";
+    d.style.display = v.z < 1 ? "" : "none";
+  }
+}
+// views: target (model xyz), distance, azimuth (deg, about model z, 0 = looking from +x), elevation
+const VIEWS = {
+  iso:    {t:[0,-45,62],  d:560, az:-125, el:24, title:"360° view"},
+  back:   {t:[0,-45,62],  d:520, az:-60, el:30, title:"From the back: spine, notch, turn loop"},
+  column: {t:[-10,5,85], d:310, az:-150, el:14, title:"Column + wrist: wrist loop, lift loop, window"},
+  tray:   {t:[0,-125,12], d:300, az:-95, el:58, title:"Electronics tray"},
+};
+function setView(v, az){
+  const V = VIEWS[v]; const a = (az ?? V.az) * Math.PI/180, e = V.el * Math.PI/180;
+  const t = new THREE.Vector3(...V.t), dir = new THREE.Vector3(Math.cos(e)*Math.cos(a), Math.cos(e)*Math.sin(a), Math.sin(e));
+  const pos = t.clone().addScaledVector(dir, V.d);
+  root.updateMatrixWorld();
+  camera.position.copy(pos.applyMatrix4(root.matrixWorld)); controls.target.copy(t.applyMatrix4(root.matrixWorld)); camera.up.set(0,1,0);
+  controls.update(); $("vtitle").textContent = V.title;
+}
+function size(){ const r = vp.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); }
+new ResizeObserver(size).observe(vp); size();
+let spin = true, cur = "iso";
+$("spin").onclick = e => { spin = !spin; e.target.setAttribute("aria-pressed", spin); };
+$("ghost").onclick = e => { const on = e.target.getAttribute("aria-pressed") !== "true"; e.target.setAttribute("aria-pressed", on);
+  ghosts.forEach(m => { m.opacity = on ? (m.type === "LineBasicMaterial" ? 0.35 : 0.2) : 1; m.depthWrite = !on; }); };
+$("leg").onclick = e => { const on = document.body.classList.toggle("nolegend"); e.target.setAttribute("aria-pressed", !on); requestAnimationFrame(size); };
+document.querySelectorAll("[data-v]").forEach(b => b.onclick = () => { cur = b.dataset.v; setView(cur); });
+controls.autoRotateSpeed = 2.0;
+setView("iso");
+(function loop(){ controls.autoRotate = spin && !window.__capture; controls.update(); renderer.render(scene, camera); placeTags(); requestAnimationFrame(loop); })();
+// used by backend/tools/render_wiring_360.js
+window.__frame = (v, az) => { window.__capture = true; size(); setView(v, az); renderer.render(scene, camera); placeTags(); };
+window.__ready = true;
+})();
+</script>
+</body>
+</html>
