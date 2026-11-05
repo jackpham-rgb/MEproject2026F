@@ -67,6 +67,8 @@ L = ["# Build Guide: Concept A", "",
      "**Order of work:** buy → print the coupon → adjust fits → print the rest → set the buck → "
      "assemble with the servo-setup sketch → wire → calibrate → test.", "",
      "## 1. Shopping list", "",
+     "For prototype v1 with the real cart prices, links and what to look for at home first, see "
+     "[11_bom_prototype_v1.md](11_bom_prototype_v1.md).", "",
      "### Must buy", "",
      "| ✓ | Part no. | Item | Qty | Search for | Note |", "|---|---|---|---:|---|---|"]
 for r in buy:
