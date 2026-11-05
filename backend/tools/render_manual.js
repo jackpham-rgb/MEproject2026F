@@ -2,6 +2,8 @@
 //   python3.13 backend/cad/export.py && python3.13 backend/tools/make_manual.py && node backend/tools/render_manual.js
 // Reads backend/cad/build/viewer_mesh.json (parts in place) and manual_steps.json (steps).
 // Writes docs/manual/step_NN.png, cover.png, parts.png and docs/12_assembly_manual.pdf (+ .html).
+// PART E (circuit + electronics bench test) is pulled from docs/04_wiring.md (Wire list) and
+// docs/13_electronics_bench_test.md, so edit those docs, not this file, and re-run.
 const fs = require("fs"), path = require("path");
 const { chromium } = require("playwright");
 const ROOT = path.resolve(__dirname, "..", "..");
@@ -129,9 +131,41 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   .warn::before{content:"!";display:inline-block;width:6mm;height:6mm;border:1.6px solid #000;border-radius:50%;text-align:center;font-weight:700;margin-right:2mm;line-height:5.4mm}
   .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4mm;margin-top:6mm}.cell{border:1px solid #000;border-radius:2mm;padding:2mm;text-align:center;font-size:12px}
   .cell img{width:100%}h1{font-size:34px;margin:0}h2{font-size:20px;margin:0 0 3mm}.two{display:grid;grid-template-columns:1fr 1fr;gap:8mm}
-  table{border-collapse:collapse;font-size:12.5px}td,th{border:1px solid #000;padding:1.2mm 2mm;text-align:left}`;
+  table{border-collapse:collapse;font-size:12.5px}
+  .ebody{position:absolute;left:14mm;right:14mm;top:30mm;bottom:10mm;font-size:12px}.ebody.withimg{display:grid;grid-template-columns:1.15fr 1fr;gap:6mm}
+  .eimg{width:100%;align-self:start}.md{width:100%;margin-bottom:3mm}.md td,.md th{font-size:11px;padding:1mm 1.6mm;vertical-align:top}.ck{width:5mm;text-align:center;font-size:13px}
+  .ebody p{margin:0 0 2mm}.li{margin:0 0 1.5mm}.sec{position:absolute;right:14mm;top:12mm;font:700 13px Helvetica,Arial,sans-serif;border:1.6px solid #000;border-radius:2mm;padding:1mm 3mm}td,th{border:1px solid #000;padding:1.2mm 2mm;text-align:left}`;
   const img = f => `data:image/png;base64,${fs.readFileSync(path.join(OUT, f)).toString("base64")}`;
   const imgAny = f => `data:image/png;base64,${fs.readFileSync(path.join(ROOT, f)).toString("base64")}`;
+
+  // ---- markdown (tables, paragraphs, lists) from the source docs, so the manual never drifts from them
+  const inline = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+  const mdSection = (file, heading, tablesOnly) => {
+    const lines = fs.readFileSync(path.join(ROOT, file), "utf8").split("\n");
+    const i0 = lines.findIndex(l => l.startsWith("## ") && l.includes(heading));
+    if (i0 < 0) throw new Error(`${file}: no section "${heading}"`);
+    let i = i0 + 1, out = "", tbl = [];
+    const flush = () => { if (!tbl.length) return;
+      const rows = tbl.filter(r => !/^\|[\s:-]+\|/.test(r.replace(/[^|:\s-]/g, "x").replace(/x+/g, "x")) || /[A-Za-z0-9]/.test(r))
+        .filter(r => !/^\|(\s*:?-+:?\s*\|)+\s*$/.test(r)).map(r => r.trim().replace(/^\||\|$/g, "").split("|").map(c => inline(c.trim())));
+      out += `<table class="md"><tr><th class="ck"></th>${rows[0].map(c => `<th>${c}</th>`).join("")}</tr>` +
+        rows.slice(1).map(r => `<tr><td class="ck">☐</td>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("") + "</table>"; tbl = []; };
+    let para = "", kind = "";
+    const endPara = () => { if (para && !tablesOnly) out += kind === "li" ? `<div class="li">• ${inline(para)}</div>` : `<p>${inline(para)}</p>`; para = ""; };
+    for (; i < lines.length && !lines[i].startsWith("## "); i++) {
+      const l = lines[i];
+      if (l.startsWith("|")) { endPara(); tbl.push(l); continue; }
+      flush();
+      if (!l.trim()) { endPara(); continue; }
+      if (l.startsWith("- ")) { endPara(); para = l.slice(2); kind = "li"; }
+      else if (para) para += " " + l.trim();
+      else { para = l.trim(); kind = "p"; }
+    }
+    endPara(); flush(); return out;
+  };
+  const ePage = (n, title, body, imgSrc) => `<div class="pg"><div class="num">${n}</div><div class="ttl">${title}</div>
+    <div class="ebody ${imgSrc ? "withimg" : ""}">${imgSrc ? `<img class="eimg" src="${imgSrc}">` : ""}<div>${body}</div></div></div>`;
   let H = `<!doctype html><html><head><meta charset="utf-8"><title>Concept A Assembly Manual</title><style>${css}</style></head><body>`;
   H += `<div class="pg"><h1>CONCEPT A</h1><div style="font-size:16px;margin-top:2mm">Can-flipping robot · assembly manual · ME 2331/L</div>
     <div class="img" style="left:14mm;top:30mm"><img src="${img("cover.png")}"></div>
@@ -144,12 +178,24 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
     <tr><td>Servos: MG996R / MG90S / SG90</td><td>1 / 2 / 1</td></tr></table>
     <p style="font-size:12.5px;margin-top:4mm"><span class="warn"></span>Before building: bench-test the electronics (docs/13_electronics_bench_test.md) and set the buck to <b>5.8 V</b>.</p></div></div></div>`;
   H += `<div class="pg"><h2>Printed parts</h2><div class="grid">${printed.map(n => `<div class="cell"><img src="${img(`part_${n}.png`)}"><b>${PN[n]}</b><br>${NAME[n]}</div>`).join("")}</div></div>`;
+
+  // ---------------- PART E: electronics first (circuit + bench test), before any mechanical step
+  H += `<div class="pg"><h1>PART E</h1><div style="font-size:18px;margin-top:3mm">Electronics first: wire it flat on the table and test it while the parts print</div>
+    <div class="img" style="left:14mm;top:34mm"><img src="${imgAny("docs/wiring/wiring_diagram.png")}"></div></div>`;
+  H += ePage("E1", "Circuit: every connection", mdSection("docs/04_wiring.md", "Wire list", true) +
+    `<p><b>Never</b> connect the 5.8 V rail to the Uno's 5V pin: the Uno gets 12 V on VIN only. Servo plug: brown = GND, red = +, orange = signal.</p>`,
+    imgAny("docs/wiring/wiring_diagram.png"));
+  H += ePage("E2", "Bench test 1: power, no servos yet", mdSection("docs/13_electronics_bench_test.md", "1. Power"));
+  H += ePage("E3", "Bench test 2: one servo at a time (firmware/bench_test)", mdSection("docs/13_electronics_bench_test.md", "2. One servo"));
+  H += ePage("E4", "If something is wrong", mdSection("docs/13_electronics_bench_test.md", "3. If something"));
+  H += ePage("E5", "Wiring dry run (decides what to return)", mdSection("docs/13_electronics_bench_test.md", "4. Then the wiring dry run") +
+    `<h2 style="margin-top:6mm">Then: PART M, the mechanics</h2><p>Print plates 0–3 (cad/print/plates), then follow steps 1–${steps.length}. Keep the bench-test wiring: it moves into the tray in step ${steps.length - 2}.</p>`);
   for (const s of steps) {
     const hw = {}; for (const [q, n] of s.hw) hw[n] = (hw[n] || 0) + q;
     const box = Object.keys(hw).length ? `<div class="box">${Object.entries(hw).map(([n, q]) => `<div class="hw">${q}×&nbsp;${screw(n)}<small>${n.replace(" screw", "")}</small></div>`).join("")}</div>` : "";
     const cmd = s.badge ? { "135°": "t 135", "30°": "l 30", "0°": "w 0", "20°": "g 20" }[s.badge[1]] : "";
     const badge = s.badge ? `<div class="servo"><span>${s.badge[0]}</span><b>${s.badge[1]}</b><span><code>${cmd}</code></span></div>` : "";
-    H += `<div class="pg"><div class="num">${s.n}</div><div class="ttl">${s.title}</div>${box}${badge}
+    H += `<div class="pg"><div class="num">${s.n}</div><div class="ttl">${s.title}</div>${s.n === 1 ? '<div class="sec">PART M</div>' : ""}${box}${badge}
       <div class="img"><img src="${img(`step_${String(s.n).padStart(2, "0")}.png`)}"></div>
       ${s.note ? `<div class="note ${/GLUE|must|first|don't|5.8/.test(s.note) ? "warn" : ""}">${s.note}</div>` : ""}</div>`;
   }
@@ -170,5 +216,6 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   const b2 = await chromium.launch(); const p2 = await b2.newPage();
   await p2.goto("file://" + html); await p2.pdf({ path: path.join(ROOT, "docs/12_assembly_manual.pdf"), format: "A4", landscape: true, printBackground: true });
   await b2.close();
-  console.log(`docs/12_assembly_manual.pdf: ${steps.length + 5} pages, ${(fs.statSync(path.join(ROOT, "docs/12_assembly_manual.pdf")).size / 1024) | 0} KB`);
+  const nPages = (H.match(/class="pg"/g) || []).length;
+  console.log(`docs/12_assembly_manual.pdf: ${nPages} pages, ${(fs.statSync(path.join(ROOT, "docs/12_assembly_manual.pdf")).size / 1024) | 0} KB`);
 })();

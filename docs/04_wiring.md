@@ -51,14 +51,14 @@ servo jumps at a time. All four at once would pull 4.8 A, over the 12 V adapter'
 
 | From | To | Wire | Notes |
 |---|---|---|---|
-| Jack + | XL4015 IN+ and Uno **VIN** | red | 12 V |
+| Jack + | XL4015 IN+ and Uno **VIN** | red | 12 V. "Jack" = the DC panel jack or the LIZVOR terminal-block tip |
 | Jack − | XL4015 IN− and Uno **GND** | black | |
 | XL4015 OUT+ / OUT− | servo rail + / GND, and the MG996R's red / brown | red / black | 5.8 V. MG996R power on the terminals, not the breadboard |
 | GND rail | Uno GND | black | common ground (servo signals need it) |
 | Turntable servo MG996R | signal → **D9** (+ / − at the buck terminals) | orange | One extension lead is cut to split its power from its signal |
 | Lift servo MG90S | signal → **D10** | orange | 300 mm extension lead |
 | Wrist servo MG90S | signal → **D6** | orange | 300 mm lead. Code widens its pulse range to 500–2500 µs to reach 180° |
-| Gripper servo SG90 | signal → **D5** | orange | 300 mm lead |
+| Gripper servo SG90 | signal → **D5** | orange | 500 mm extension lead (or a taped jumper chain, see 11_bom) |
 | START button (12 mm) | **D4** → button → GND | green / black | `INPUT_PULLUP`, debounced in code |
 | Status LED | **D13** → 220 Ω → LED → GND | yellow / black | off = idle, blinking = moving, on = done |
 
