@@ -276,8 +276,10 @@ for label, sv, a0, a1, secs, attached in STEPS:
 by_servo = {}
 for (label, sv, *_), pk in zip(STEPS, step_peaks):
     by_servo.setdefault(sv, []).append(pk)
+worst_ratio = {}
 for sv, lst in by_servo.items():
     worst = max(x[4] for x in lst)
+    worst_ratio[sv] = worst
     wmax = max(x[3] for x in lst)
     check("Servos", f"{SERVO[sv]['name']} ({sv}): torque demand / torque available", f"{worst:.1%}", f"≤ {LIMIT_TORQUE:.0%}", worst <= LIMIT_TORQUE)
     check("Servos", f"{SERVO[sv]['name']} ({sv}): peak speed / no-load speed", f"{wmax / SERVO[sv]['speed']:.1%}", f"≤ {LIMIT_SPEED:.0%}", wmax / SERVO[sv]["speed"] <= LIMIT_SPEED)
@@ -543,6 +545,43 @@ for sv in SERVO:
     t_ = np.array(duty[sv]["t"]); o = np.argsort(t_, kind="stable")
     E_run += float(np.trapezoid((np.array(duty[sv]["tau"]) * np.radians(np.array(duty[sv]["w"])))[o], t_[o]))
 out(f"   mechanical energy per run (all servos, run + homing): {E_run:.3f} J")
+out("")
+
+# ------------------------------------------------------------------ 8. prototype v1 (the parts actually bought + household swaps)
+out("8. PROTOTYPE v1: the purchased parts and the household swaps (docs/11_bom_prototype_v1.md)")
+# servos: what each one must at least deliver for the 2x torque margin to hold
+for sv, listed in (("turn", None), ("lift", 2.0), ("wrist", 2.0)):
+    need_kgcm = SERVO[sv]["stall"] / 0.0981 * worst_ratio[sv] / LIMIT_TORQUE
+    if listed is None:
+        check("Proto v1", f"Adeept 996R: stall needed for 2× margin (VERIFY ≥ this)", f"≥ {need_kgcm:.1f} kg·cm", "MG996R class 9.4", need_kgcm <= 9.4)
+    else:
+        check("Proto v1", f"Miuzei MG90S ({sv}): listed 2.0 kg·cm vs needed", f"{need_kgcm:.2f} kg·cm needed", "≤ 2.0 listed", need_kgcm <= listed)
+# pads: household rubber, worst friction
+MU_HOME = 0.35          # rubber band / shelf liner on aluminium, worst case (EST)
+check("Proto v1", f"household pad rubber (μ {MU_HOME}): squeeze margin", f"{0.8 / (N_min * MU_PAD / MU_HOME):.1f}× the minimum", "≥ 2×", 0.8 / (N_min * MU_PAD / MU_HOME) >= 2)
+for t_ in (1.0, 2.0):
+    d_alpha = math.degrees((t_ - 1.6) / 44.0)
+    out(f"   pad rubber {t_:.1f} mm instead of 1.6: closed angle shifts {d_alpha:+.1f}° (re-set GRIP_CLOSED with servo_setup), release gap {13.3 - (t_ - 1.6) - 1.6:.1f} mm")
+check("Proto v1", "pad rubber 2.0 mm: release gap to the can", f"{13.3 - 2.0:.1f} mm", "≥ 5 mm", 13.3 - 2.0 >= 5)
+# ballast: not in the mass model, so every stability result above already holds without it
+check("Proto v1", "tip-over with NO ballast (ballast is not in the model)", f"{zmp_margin:.1f} mm", "≥ 20 mm", zmp_margin >= 20)
+# LIZVOR adjustable adapter set to 12 V, 2 A
+eta, v_in = 0.88, 12.0
+I_in_run = pk_I * 5.8 / (eta * v_in) + 0.059
+I_in_stall = (2.5 + 0.3) * 5.8 / (eta * v_in) + 0.059     # MG996R stalled (2.5 A EST) + the rest idle
+check("Proto v1", "LIZVOR 2 A adapter: current in a normal run", f"{I_in_run:.2f} A", "≤ 1.0 A (50 %)", I_in_run <= 1.0)
+check("Proto v1", "LIZVOR 2 A adapter: MG996R stalled (worst case)", f"{I_in_stall:.2f} A", "≤ 2.0 A", I_in_stall <= 2.0)
+out("   the knob: Uno VIN is fine 7-12 V and dies above 20 V; the servos stay at 5.8 V whatever comes in (buck). Tape it at 12.0 V")
+# jumper chains instead of servo extensions (gripper: ~270 mm added, 2 jumpers per wire)
+R_wire = 0.213 * 0.40 * 2          # 28 AWG ohm/m x 0.4 m, + and - wires
+R_joint = 0.03 * 4                 # 4 dupont joints in the loop
+I_sg90 = 0.65                      # SG90 stall current (EST)
+dV = I_sg90 * (R_wire + R_joint)
+check("Proto v1", "jumper chain on the gripper lead: voltage drop at SG90 stall", f"{dV:.2f} V", "≤ 0.3 V (5 %)", dV <= 0.3)
+# h8 rod instead of h6 in the LM6UU
+play = 0.022 + 0.008               # extra rod undersize (h8) + LM6UU clearance (EST), mm
+wobble = 2 * play / 43.0 * 110.0   # bearing pair 43 mm apart, pads ~110 mm in front of the rods
+check("Proto v1", "h8 rod: extra wobble at the pads", f"{wobble:.2f} mm", "≤ 0.5 mm", wobble <= 0.5)
 out("")
 
 # ------------------------------------------------------------------ plots

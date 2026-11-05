@@ -52,25 +52,27 @@ Already have (check before you start):
 
 ## 2. Printing
 
-Files: `cad/print/stl/` (already turned to the best side and placed on the bed). Orientation preview: `cad/print/print_orientations.png`. Bed size assumed 220 × 220 mm.
+**Print by plate:** `cad/print/plates/plate0_coupon` → `plate1_base` (overnight) → `plate2_tray_spine` → `plate3_arm_claw` (.3mf keeps every part separate; layout in `cad/print/plates/plates.png`). **Settings:** `cad/print/settings/printer_settings.txt` (all slicers) and `concept_a_PETG_prusaslicer.ini` (PrusaSlicer: File → Import → Import Config). Fingers CA-402/403 at **100 % infill** (solid gear teeth).
+
+Single parts: `cad/print/stl/` (already turned to the best side). Orientation preview: `cad/print/print_orientations.png`. Bed size assumed 220 × 220 mm.
 
 **PETG settings (start here, tune for your printer):** nozzle 0.4 mm at 235 °C, bed 80 °C, layer 0.2 mm, 3 walls (1.2 mm), 4 top / 4 bottom layers, 30 % gyroid infill, cooling fan 30–50 %, elephant-foot compensation 0.15 mm (holes on the bed side), print speed ~60 mm/s. Use glue stick on smooth PEI so PETG doesn't weld to the bed.
 
 | Order | Part no. | Part | Qty | Lay it on the bed with | Size on bed (mm) | Supports | PETG (g) | ≈ hours |
 |---:|---|---|---:|---|---|---|---:|---:|
 | 1 | CA-900 | Tolerance coupon | 1 | -Z (as modelled, bottom down) | 70 × 22 × 8 | none | 8.2 | 0.8 |
-| 2 | CA-101 | Base | 1 | +Z (upside down, top face down) | 152 × 112 × 52 | yes: supports on build plate | 102.3 | 9.8 |
-| 3 | CA-102 | Electronics tray | 1 | -Z (as modelled, bottom down) | 152 × 104 × 28 | none | 57.0 | 5.5 |
+| 2 | CA-101 | Base | 1 | +Z (upside down, top face down) | 152 × 112 × 52 | yes: supports on build plate | 101.9 | 9.8 |
+| 3 | CA-102 | Electronics tray | 1 | -Z (as modelled, bottom down) | 152 × 104 × 28 | none | 56.9 | 5.5 |
 | 4 | CA-201 | Turret plate | 1 | -Z (as modelled, bottom down) | 80 × 62 × 19 | yes: supports on build plate | 24.4 | 2.3 |
-| 5 | CA-202 | Spine | 1 | -Y face down | 50 × 103 × 24 | none | 22.4 | 2.1 |
+| 5 | CA-202 | Spine | 1 | -Y face down | 50 × 99 × 24 | none | 21.5 | 2.1 |
 | 6 | CA-203 | Top cap | 1 | +Z (upside down, top face down) | 54 × 44 × 6 | none | 10.5 | 1.0 |
-| 7 | CA-301 | Carriage + arm | 1 | -Y face down | 52 × 100 × 44 | yes: supports on build plate | 46.0 | 4.4 |
+| 7 | CA-301 | Carriage + arm | 1 | -Y face down | 52 × 100 × 44 | yes: supports on build plate | 45.8 | 4.4 |
 | 8 | CA-302 | Lift link | 1 | +X face down | 16 × 7 × 3 | none | 0.2 | 0.3 |
-| 9 | CA-401 | Gripper frame | 1 | -Y face down | 62 × 39 × 33 | none | 11.8 | 1.1 |
+| 9 | CA-401 | Gripper frame | 1 | -Y face down | 62 × 39 × 33 | none | 11.7 | 1.1 |
 | 10 | CA-402 | Finger, right | 1 | -Z (as modelled, bottom down) | 42 × 79 × 40 | yes: supports on build plate | 9.7 | 0.9 |
 | 11 | CA-403 | Finger, left | 1 | -Z (as modelled, bottom down) | 42 × 78 × 40 | yes: supports on build plate | 9.7 | 0.9 |
 
-Total ≈ 302 g of PETG (+ ~15 % for supports and purge) and ≈ 29 h of printing (EST).
+Total ≈ 300 g of PETG (+ ~15 % for supports and purge) and ≈ 29 h of printing (EST).
 
 **Print CA-900 first.** Check each hole with the real part:
 
@@ -96,6 +98,8 @@ Cut the 6 mm rod into 2 × 112 mm; file the ends square and deburr.
 3. Unplug. Mark the pot with a dot of nail polish so it isn't turned by accident.
 
 ## 4. Assembly
+
+**Picture manual (IKEA style): [12_assembly_manual.pdf](12_assembly_manual.pdf).** Electronics bench test first: [13_electronics_bench_test.md](13_electronics_bench_test.md).
 
 Servos are fitted **at their HOME angle**, so the horns go on at the right orientation. Load `firmware/servo_setup/servo_setup.ino` on the Uno, wire the servos as in section 5, power up: every servo goes to HOME (turntable 135°, lift 30°, wrist 0°, gripper 20°). Type `t 135`, `l 30`, etc. in the Serial Monitor (9600 baud, Newline) to move one.
 

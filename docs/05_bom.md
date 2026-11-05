@@ -8,20 +8,20 @@ Each row says **why we need it** and **what else we considered**, so the list an
 
 | Part no. | Part | Material | Qty | Mass (g) | What it does | Why we need it | Alternative → why not |
 |---|---|---|---:|---:|---|---|---|
-| CA-101 | Base | PETG | 1 | 102.3 | Bearing tower, MG996R pocket, ballast pockets; sweep sector cut away | Holds the turntable and gives the robot its footprint (CG stays ≥ 39 mm inside it in every pose) | Flat plywood/acrylic plate → the tower, servo pocket and sweep cut-out would be several glued pieces |
-| CA-102 | Electronics tray | PETG | 1 | 57.0 | Uno, buck, servo rail, button / LED / DC-jack panel | Keeps the electronics and wires out of the arm's 175° sweep | Loose on the table → wires can snag the turning arm and the button moves around |
+| CA-101 | Base | PETG | 1 | 101.9 | Bearing tower, MG996R pocket, ballast pockets; sweep sector cut away | Holds the turntable and gives the robot its footprint (CG stays ≥ 39 mm inside it in every pose) | Flat plywood/acrylic plate → the tower, servo pocket and sweep cut-out would be several glued pieces |
+| CA-102 | Electronics tray | PETG | 1 | 56.9 | Uno, buck, servo rail, button / LED / DC-jack panel | Keeps the electronics and wires out of the arm's 175° sweep | Loose on the table → wires can snag the turning arm and the button moves around |
 | CA-201 | Turret plate | PETG | 1 | 24.4 | D plate + hub pressed into the 6807 bore, rod bosses | Puts the column's weight and tipping load on the bearing, so the servo only turns it | Column screwed to the servo horn → the servo spline carries all the bending load |
-| CA-202 | Spine | PETG | 1 | 22.4 | Column back + lift-servo bracket | Ties the rods to the turret and holds the lift servo | Aluminium extrusion → extra cost and brackets for no gain at this load |
+| CA-202 | Spine | PETG | 1 | 21.5 | Column back + lift-servo bracket | Ties the rods to the turret and holds the lift servo | Aluminium extrusion → extra cost and brackets for no gain at this load |
 | CA-203 | Top cap | PETG | 1 | 10.5 | Captures the rod tops | Keeps the 2 rods parallel so the 4 LM6UU slide without binding | Rods held only at the bottom → they splay and the carriage jams |
-| CA-301 | Carriage + arm | PETG | 1 | 46.0 | 4 LM6UU pockets, arm, wrist-servo bracket | One print: the arm can't work loose; bearings 43 mm apart keep the jam ratio at 0.018 | Separate arm screwed on → the joint sags under the can's 2.6 in offset |
+| CA-301 | Carriage + arm | PETG | 1 | 45.8 | 4 LM6UU pockets, arm, wrist-servo bracket | One print: the arm can't work loose; bearings 43 mm apart keep the jam ratio at 0.018 | Separate arm screwed on → the joint sags under the can's 2.6 in offset |
 | CA-302 | Lift link | PETG | 1 | 0.2 | Crank pin to carriage | Turns the lift servo's 45° swing into a 15.3 mm (0.6 in) straight lift | Printed rack and pinion → more teeth to print, more backlash |
-| CA-401 | Gripper frame | PETG | 1 | 11.8 | Flange + 2 plates + posts | Holds the gripper servo and both finger axles on the wrist horn | Servo bracket from a kit → doesn't hold geared fingers at the right centre distance (16.2 mm) |
+| CA-401 | Gripper frame | PETG | 1 | 11.7 | Flange + 2 plates + posts | Holds the gripper servo and both finger axles on the wrist horn | Servo bracket from a kit → doesn't hold geared fingers at the right centre distance (16.2 mm) |
 | CA-402 | Finger, right | PETG | 1 | 9.7 | Gear m1 16T + arm + curved pad | Geared to the left finger so one servo closes both arms equally and centres the can | One fixed + one moving arm → pushes the can off-centre |
 | CA-403 | Finger, left | PETG | 1 | 9.7 | Mirror; gear has the servo-spline socket | As CA-402 | As CA-402 |
 | CA-404 | Can bumper | Silicone sheet | 1 | 0.1 | Cut from the pad sheet, glued to the gripper frame | Sets how deep the can sits in the gripper, so every grip and landing is the same | No stop → grip depth varies with how the can is placed |
 | CA-900 | Tolerance coupon | PETG | 1 | 8.2 | 6 test holes | Checks screw, rod and bearing fits on our printer before ~300 g of parts | Print the parts first → one wrong fit wastes hours of printing |
 
-Printed robot parts: **≈ 294 g PETG** (+ ~15 % for supports/purge). STL files: `cad/step/parts/`. Part numbers match the Part C drawings.
+Printed robot parts: **≈ 292 g PETG** (+ ~15 % for supports/purge). STL files: `cad/step/parts/`. Part numbers match the Part C drawings.
 
 ## Purchased parts
 

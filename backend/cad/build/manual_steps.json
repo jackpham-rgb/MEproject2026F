@@ -1,0 +1,978 @@
+{
+ "steps": [
+  {
+   "n": 1,
+   "title": "Bearing into the base",
+   "new": [
+    "bearing_6807"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {},
+   "dist": 40,
+   "hw": [],
+   "badge": null,
+   "note": "Press on the outer ring only, evenly (flat block + vise)",
+   "az": -60,
+   "el": 35,
+   "show": [
+    "base",
+    "bearing_6807"
+   ],
+   "ok": true
+  },
+  {
+   "n": 2,
+   "title": "Turntable servo",
+   "new": [
+    "turntable_servo_MG996R"
+   ],
+   "dir": [
+    0,
+    0,
+    -1
+   ],
+   "per_part_dir": {},
+   "dist": 60,
+   "hw": [
+    [
+     4,
+     "#8-32 \u00d7 \u00bd\u2033 screw"
+    ]
+   ],
+   "badge": null,
+   "note": "From underneath; body points away from the arm side",
+   "az": -120,
+   "el": -30,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R"
+   ],
+   "ok": true
+  },
+  {
+   "n": 3,
+   "title": "Weight + feet",
+   "new": [
+    "base"
+   ],
+   "dir": null,
+   "per_part_dir": {},
+   "dist": 0,
+   "hw": [],
+   "badge": null,
+   "note": "~100 g in the 2 back pockets (washers, pennies, rocks): GLUE or TAPE it in. 4 feet or hot-glue dots",
+   "az": -120,
+   "el": -40,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R"
+   ],
+   "ok": true
+  },
+  {
+   "n": 4,
+   "title": "Servo horn",
+   "new": [
+    "turntable_horn"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {},
+   "dist": 40,
+   "hw": [
+    [
+     1,
+     "servo-bag screw"
+    ]
+   ],
+   "badge": [
+    "MG996R",
+    "135\u00b0"
+   ],
+   "note": "Set the servo to 135\u00b0 first (servo_setup: t 135)",
+   "az": -60,
+   "el": 40,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn"
+   ],
+   "ok": true
+  },
+  {
+   "n": 5,
+   "title": "Turret plate",
+   "new": [
+    "turret_plate"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {},
+   "dist": 60,
+   "hw": [
+    [
+     4,
+     "servo-bag screw"
+    ]
+   ],
+   "badge": null,
+   "note": "Hub into the bearing; rod bosses point at the START can. Turns 90\u00b0 freely",
+   "az": -60,
+   "el": 35,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate"
+   ],
+   "ok": true
+  },
+  {
+   "n": 6,
+   "title": "Linear bearings into the carriage",
+   "new": [
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2"
+   ],
+   "dir": null,
+   "per_part_dir": {
+    "LM6UU_L1": [
+     0,
+     0,
+     -1
+    ],
+    "LM6UU_R1": [
+     0,
+     0,
+     -1
+    ],
+    "LM6UU_L2": [
+     0,
+     0,
+     1
+    ],
+    "LM6UU_R2": [
+     0,
+     0,
+     1
+    ]
+   },
+   "dist": 30,
+   "hw": [],
+   "badge": null,
+   "note": "2 from below, 2 from above, flush with the faces",
+   "az": -40,
+   "el": 20,
+   "show": [
+    "carriage_arm",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2"
+   ],
+   "ok": true
+  },
+  {
+   "n": 7,
+   "title": "Rods",
+   "new": [
+    "rod_L",
+    "rod_R"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {},
+   "dist": 120,
+   "hw": [],
+   "badge": null,
+   "note": "Press into the blind holes of the turret plate",
+   "az": -60,
+   "el": 25,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R"
+   ],
+   "ok": true
+  },
+  {
+   "n": 8,
+   "title": "Carriage onto the rods",
+   "new": [
+    "carriage_arm",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {
+    "LM6UU_L1": [
+     0,
+     0,
+     -1
+    ],
+    "LM6UU_R1": [
+     0,
+     0,
+     -1
+    ],
+    "LM6UU_L2": [
+     0,
+     0,
+     1
+    ],
+    "LM6UU_R2": [
+     0,
+     0,
+     1
+    ]
+   },
+   "dist": 110,
+   "hw": [],
+   "badge": null,
+   "note": "It must slide down under its own weight",
+   "az": -60,
+   "el": 20,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm"
+   ],
+   "ok": true
+  },
+  {
+   "n": 9,
+   "title": "Spine",
+   "new": [
+    "spine"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {},
+   "dist": 80,
+   "hw": [
+    [
+     2,
+     "#6-32 \u00d7 \u00bd\u2033 screw"
+    ]
+   ],
+   "badge": null,
+   "note": "Onto the turret plate behind the rods, screws from above",
+   "az": -130,
+   "el": 25,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine"
+   ],
+   "ok": true
+  },
+  {
+   "n": 10,
+   "title": "Top cap",
+   "new": [
+    "top_cap"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {},
+   "dist": 40,
+   "hw": [
+    [
+     2,
+     "#6-32 \u00d7 \u00bd\u2033 screw"
+    ]
+   ],
+   "badge": null,
+   "note": "Over the rod tops onto the spine. Carriage still slides freely?",
+   "az": -130,
+   "el": 30,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap"
+   ],
+   "ok": true
+  },
+  {
+   "n": 11,
+   "title": "Lift servo",
+   "new": [
+    "lift_servo_MG90S"
+   ],
+   "dir": [
+    -1,
+    0,
+    0
+   ],
+   "per_part_dir": {},
+   "dist": 40,
+   "hw": [
+    [
+     2,
+     "servo-bag screw"
+    ]
+   ],
+   "badge": [
+    "MG90S lift",
+    "30\u00b0"
+   ],
+   "note": "Body through the spine bracket from the left",
+   "az": -150,
+   "el": 15,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S"
+   ],
+   "ok": true
+  },
+  {
+   "n": 12,
+   "title": "Lift link",
+   "new": [
+    "lift_link"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {},
+   "dist": 15,
+   "hw": [
+    [
+     1,
+     "#6-32 \u00d7 \u00bd\u2033 screw"
+    ]
+   ],
+   "badge": null,
+   "note": "Carriage end: #6-32 as the pivot, don't over-tighten: it must turn",
+   "az": -150,
+   "el": 15,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S",
+    "lift_link"
+   ],
+   "ok": true
+  },
+  {
+   "n": 13,
+   "title": "Crank",
+   "new": [
+    "lift_crank"
+   ],
+   "dir": [
+    -1,
+    0,
+    0
+   ],
+   "per_part_dir": {},
+   "dist": 8,
+   "hw": [
+    [
+     1,
+     "servo-bag screw"
+    ],
+    [
+     1,
+     "servo-bag screw"
+    ]
+   ],
+   "badge": [
+    "MG90S lift",
+    "30\u00b0"
+   ],
+   "note": "Single-arm horn trimmed to 20 mm, on the spline at 30\u00b0; pin screw into the link",
+   "az": -150,
+   "el": 15,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S",
+    "lift_link",
+    "lift_crank"
+   ],
+   "ok": true
+  },
+  {
+   "n": 14,
+   "title": "Wrist servo",
+   "new": [
+    "wrist_servo"
+   ],
+   "dir": [
+    0,
+    1,
+    0
+   ],
+   "per_part_dir": {},
+   "dist": 45,
+   "hw": [
+    [
+     2,
+     "servo-bag screw"
+    ]
+   ],
+   "badge": [
+    "MG90S wrist",
+    "0\u00b0"
+   ],
+   "note": "Body through the bracket from the front",
+   "az": -140,
+   "el": 20,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S",
+    "lift_link",
+    "lift_crank",
+    "wrist_servo"
+   ],
+   "ok": true
+  },
+  {
+   "n": 15,
+   "title": "Wrist horn",
+   "new": [
+    "wrist_horn"
+   ],
+   "dir": [
+    0,
+    1,
+    0
+   ],
+   "per_part_dir": {},
+   "dist": 25,
+   "hw": [
+    [
+     1,
+     "servo-bag screw"
+    ]
+   ],
+   "badge": [
+    "MG90S wrist",
+    "0\u00b0"
+   ],
+   "note": "",
+   "az": -140,
+   "el": 20,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S",
+    "lift_link",
+    "lift_crank",
+    "wrist_servo",
+    "wrist_horn"
+   ],
+   "ok": true
+  },
+  {
+   "n": 16,
+   "title": "Gripper frame",
+   "new": [
+    "gripper_frame"
+   ],
+   "dir": [
+    0,
+    1,
+    0
+   ],
+   "per_part_dir": {},
+   "dist": 45,
+   "hw": [
+    [
+     4,
+     "servo-bag screw"
+    ]
+   ],
+   "badge": null,
+   "note": "Upright: plates level, opening facing out",
+   "az": -140,
+   "el": 25,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S",
+    "lift_link",
+    "lift_crank",
+    "wrist_servo",
+    "wrist_horn",
+    "gripper_frame"
+   ],
+   "ok": true
+  },
+  {
+   "n": 17,
+   "title": "Both fingers, gears meshed",
+   "new": [
+    "finger_L",
+    "finger_R"
+   ],
+   "dir": [
+    0,
+    1,
+    0
+   ],
+   "per_part_dir": {},
+   "dist": 70,
+   "hw": [],
+   "badge": null,
+   "note": "Slide them in together between the plates, open by the same angle",
+   "az": -60,
+   "el": 55,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S",
+    "lift_link",
+    "lift_crank",
+    "wrist_servo",
+    "wrist_horn",
+    "gripper_frame",
+    "finger_L",
+    "finger_R"
+   ],
+   "ok": true
+  },
+  {
+   "n": 18,
+   "title": "Right finger axle",
+   "new": [
+    "axle_R"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {},
+   "dist": 25,
+   "hw": [
+    [
+     1,
+     "#6-32 \u00d7 \u00bd\u2033 screw"
+    ]
+   ],
+   "badge": null,
+   "note": "From the top through the right finger; it must swing freely",
+   "az": -60,
+   "el": 55,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S",
+    "lift_link",
+    "lift_crank",
+    "wrist_servo",
+    "wrist_horn",
+    "gripper_frame",
+    "finger_L",
+    "finger_R",
+    "axle_R"
+   ],
+   "ok": true
+  },
+  {
+   "n": 19,
+   "title": "Gripper servo",
+   "new": [
+    "gripper_servo_SG90"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {},
+   "dist": 40,
+   "hw": [
+    [
+     2,
+     "servo-bag screw"
+    ],
+    [
+     1,
+     "servo-bag screw"
+    ]
+   ],
+   "badge": [
+    "SG90",
+    "20\u00b0"
+   ],
+   "note": "Spline down into the left finger's socket (it is the horn)",
+   "az": -60,
+   "el": 55,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S",
+    "lift_link",
+    "lift_crank",
+    "wrist_servo",
+    "wrist_horn",
+    "gripper_frame",
+    "finger_L",
+    "finger_R",
+    "axle_R",
+    "gripper_servo_SG90"
+   ],
+   "ok": true
+  },
+  {
+   "n": 20,
+   "title": "Can bumper",
+   "new": [
+    "can_bumper"
+   ],
+   "dir": [
+    0,
+    1,
+    0
+   ],
+   "per_part_dir": {},
+   "dist": 25,
+   "hw": [],
+   "badge": null,
+   "note": "Silicone or rubber, 9 \u00d7 13.5 mm, superglue to the frame",
+   "az": -60,
+   "el": 35,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S",
+    "lift_link",
+    "lift_crank",
+    "wrist_servo",
+    "wrist_horn",
+    "gripper_frame",
+    "finger_L",
+    "finger_R",
+    "axle_R",
+    "gripper_servo_SG90",
+    "can_bumper"
+   ],
+   "ok": true
+  },
+  {
+   "n": 21,
+   "title": "Electronics on the tray",
+   "new": [
+    "arduino_uno",
+    "buck_XL4015",
+    "mini_breadboard",
+    "capacitor_1000uF"
+   ],
+   "dir": [
+    0,
+    0,
+    1
+   ],
+   "per_part_dir": {},
+   "dist": 40,
+   "hw": [],
+   "badge": null,
+   "note": "Pegs + a dab of hot glue; breadboard is self-adhesive. Buck already set to 5.8 V",
+   "az": -70,
+   "el": 50,
+   "show": [
+    "electronics_tray",
+    "arduino_uno",
+    "buck_XL4015",
+    "mini_breadboard",
+    "capacitor_1000uF"
+   ],
+   "ok": true
+  },
+  {
+   "n": 22,
+   "title": "Panel: button, LED, power",
+   "new": [
+    "start_button",
+    "status_led",
+    "dc_jack"
+   ],
+   "dir": [
+    0,
+    -1,
+    0
+   ],
+   "per_part_dir": {},
+   "dist": 30,
+   "hw": [],
+   "badge": null,
+   "note": "Through the panel holes from the front, nuts inside. Power: DC jack, or the LIZVOR terminal-block tip",
+   "az": -110,
+   "el": 30,
+   "show": [
+    "electronics_tray",
+    "arduino_uno",
+    "buck_XL4015",
+    "mini_breadboard",
+    "capacitor_1000uF",
+    "start_button",
+    "status_led",
+    "dc_jack"
+   ],
+   "ok": true
+  },
+  {
+   "n": 23,
+   "title": "Tray onto the base",
+   "new": [
+    "electronics_tray",
+    "arduino_uno",
+    "buck_XL4015",
+    "mini_breadboard",
+    "capacitor_1000uF",
+    "start_button",
+    "status_led",
+    "dc_jack"
+   ],
+   "dir": [
+    0,
+    -1,
+    0
+   ],
+   "per_part_dir": {},
+   "dist": 45,
+   "hw": [
+    [
+     2,
+     "#6-32 \u00d7 \u00bd\u2033 screw"
+    ]
+   ],
+   "badge": null,
+   "note": "Tabs slide under the base wall, screws from below",
+   "az": -120,
+   "el": 35,
+   "show": [
+    "base",
+    "bearing_6807",
+    "turntable_servo_MG996R",
+    "turntable_horn",
+    "turret_plate",
+    "LM6UU_L1",
+    "LM6UU_R1",
+    "LM6UU_L2",
+    "LM6UU_R2",
+    "rod_L",
+    "rod_R",
+    "carriage_arm",
+    "spine",
+    "top_cap",
+    "lift_servo_MG90S",
+    "lift_link",
+    "lift_crank",
+    "wrist_servo",
+    "wrist_horn",
+    "gripper_frame",
+    "finger_L",
+    "finger_R",
+    "axle_R",
+    "gripper_servo_SG90",
+    "can_bumper",
+    "arduino_uno",
+    "buck_XL4015",
+    "mini_breadboard",
+    "capacitor_1000uF",
+    "start_button",
+    "status_led",
+    "dc_jack",
+    "electronics_tray"
+   ],
+   "ok": true
+  }
+ ]
+}

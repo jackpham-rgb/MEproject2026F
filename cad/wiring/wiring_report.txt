@@ -31,11 +31,11 @@ Clearance in each motion pose (min gap from the wire surface to any part):
     buck OUT- to rail -                              1.19 mm
     Uno GND to rail -                                8.53 mm
     12 V jack + to buck IN+                          1.50 mm
-    12 V jack - to buck IN-                          2.19 mm
-    12 V jack + to Uno VIN                           2.08 mm
+    12 V jack - to buck IN-                          2.34 mm
+    12 V jack + to Uno VIN                           2.58 mm
     START button to D4                               0.70 mm
     START button to GND rail                         0.49 mm
-    status LED to D13                                1.88 mm
+    status LED to D13                                2.31 mm
     status LED to GND rail                           0.81 mm
 
 Service loops (loop length between the last rigid points on each side):

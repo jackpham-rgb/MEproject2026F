@@ -1,0 +1,52 @@
+CONCEPT A: 3D PRINTER SETTINGS (PETG, 0.4 mm nozzle, 220 x 220 mm bed)
+=======================================================================
+Files: cad/print/plates/plate0..3 (.3mf = separate parts, keeps per-part settings; .stl = one piece)
+       Parts are already turned to their best side. Don't rotate them, except 90 deg flat on the bed.
+Slicer: PrusaSlicer -> File > Import > Import Config... -> concept_a_PETG_prusaslicer.ini
+        Cura / Bambu / Orca: type the values below in by hand (names in brackets).
+
+PRINT ORDER
+  0. plate0_coupon        ~0.8 h   CHECK THE FITS FIRST (build guide section 2). Fix TOL if needed.
+  1. plate1_base         ~13.4 h   overnight. Supports: base, turret plate. Brim on the lift link.
+  2. plate2_tray_spine    ~7.6 h   no supports
+  3. plate3_arm_claw      ~7.3 h   supports: carriage arm, both fingers. Fingers at 100 % infill.
+  Total ~29 h, ~300 g PETG (+ ~15 % supports and purge)
+
+MATERIAL: PETG 1.75 mm
+  Nozzle temperature        235 C (first layer 240 C)        [printing temperature]
+  Bed temperature           80 C (first layer 80 C)          [build plate temperature]
+  Cooling fan               30 % (max 50 % on small layers), off for the first 3 layers
+  Retraction                bowden (Ender-3): 5 mm at 40 mm/s; direct drive: 1 mm at 35 mm/s
+  Bed surface               glue stick on smooth PEI or glass (PETG can weld to bare PEI)
+  Dry the filament          if it pops / strings a lot: 65 C for 4 h
+
+QUALITY
+  Layer height              0.20 mm (first layer 0.24 mm)
+  Line width                0.42 mm
+  Walls / perimeters        3 (= 1.2 mm)                     [wall line count]
+  Top / bottom layers       4 / 4
+  Infill                    30 % gyroid                      [infill density / pattern]
+  Elephant-foot comp.       0.15 mm                          [initial layer horizontal expansion = -0.15]
+  Seam                      aligned / rear
+
+SPEED
+  Outer walls 35 mm/s, inner walls 50 mm/s, infill 70 mm/s, first layer 20 mm/s, travel 150 mm/s
+
+SUPPORTS (only on the parts listed, from the build plate only, never "everywhere")
+  Type                      normal / grid (tree is fine too)
+  Overhang threshold        50 deg
+  Z distance                0.2 mm (one layer: PETG sticks to supports, more gap = easier removal)
+  XY distance               0.8 mm
+  Parts that need them      CA-101 base, CA-201 turret plate, CA-301 carriage arm, CA-402 / CA-403 fingers
+  In a .3mf each part is its own object: right-click it -> add "support enforcer/blocker" or per-object
+  settings. Or turn supports on for the plate; the other parts have nothing that needs them.
+
+PER-PART OVERRIDES
+  CA-402 / CA-403 fingers   100 % infill (the 16 gear teeth must be solid)  [per-object infill]
+  CA-302 lift link          5 mm brim (it's 16 mm long, it would come loose)
+  CA-101 base               5 mm brim only if the corners lift
+
+AFTER PRINTING
+  Remove supports with pliers; file the pad and gear faces smooth.
+  Holes: run the screw in once by hand to cut threads; ream the LM6UU seats with a 12 mm drill bit
+  turned by hand if they are tight. Don't use a power drill on PETG (it melts).

@@ -1,0 +1,5 @@
+plate,title,parts,hours_est,petg_g,parts_needing_supports,when
+plate0_coupon,"Plate 0: tolerance coupon (print first, check fits)",CA-900,0.8,8,none,"first, ~1 h"
+plate1_base,Plate 1: base + turret plate + top cap + lift link,CA-101 CA-201 CA-203 CA-302,13.4,137,CA-101 CA-201,overnight
+plate2_tray_spine,Plate 2: electronics tray + spine,CA-102 CA-202,7.6,78,none,day
+plate3_arm_claw,Plate 3: carriage arm + gripper frame + both fingers,CA-301 CA-401 CA-402 CA-403,7.3,77,CA-301 CA-402 CA-403,day

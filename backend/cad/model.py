@@ -297,6 +297,8 @@ def build_parts():
         base = base.union(servo_frame(blk))
     for cx, cy in ((-60, -60), (60, -60)):                                                     # ballast pockets (outside the sweep)
         base = base.union(cyl(cx, cy, 12.5, 0, H - top).cut(cyl(cx, cy, 10.5, 0, H - top - 2)))
+    for x in (-50, 50):                                                                         # notches: the tray tabs slide under here
+        base = base.cut(box(x - 6.4, x + 6.4, -half - 1, -half + 9.4, -1, 5.4))
     base = base.cut(cyl(-34, -34, 7.0, H - top - 1, H + 1))                                    # cable hole from the turret
     base = base.cut(box(-15, 15, -half - 1, -half + wall + 1, 8, 22))                          # cable exit to the tray
     for x in (-50, 50):
@@ -328,6 +330,7 @@ def build_parts():
     for hx, hy in ((3, 3), (51, 3), (3, 20), (51, 20)):
         x, y = bk_o[0] + hx, bk_o[1] + hy
         tray = tray.union(cyl(x, y, 3.0, p["tray_t"], p["tray_t"] + 5)).union(cyl(x, y, 1.3, p["tray_t"] + 5, p["tray_t"] + 8))
+    tray = tray.cut(box(-half - 1, -half + 4, uno_o[1] + 30, uno_o[1] + 46, p["tray_t"] + 6.5, 13))   # Uno jack / USB overhang the side wall
     add("electronics_tray", "fixed", tray, "PETG", note="2x #6-32x1/2 up through the tabs into the base. "
         "The Uno and the buck sit on printed pegs (dab of hot glue); mini breadboard is self-adhesive.")
 
@@ -338,15 +341,21 @@ def build_parts():
     add("turntable_servo_MG996R", "fixed", srv, "buy", mass=55.0)
     uno = box(uno_o[0], uno_o[0] + 68.6, uno_o[1], uno_o[1] + 53.3, p["tray_t"] + 6, p["tray_t"] + 7.6)
     uno = uno.union(box(uno_o[0] - 6, uno_o[0] + 10, uno_o[1] + 32, uno_o[1] + 44, p["tray_t"] + 7.6, p["tray_t"] + 18.6))
+    for hx, hy in uno_holes:                                                             # 3.2 mm mounting holes (the pegs go through)
+        uno = uno.cut(cyl(uno_o[0] + hx, uno_o[1] + hy, 1.6, p["tray_t"] + 5, p["tray_t"] + 9))
     add("arduino_uno", "fixed", uno, "buy", mass=25.0)
-    add("buck_XL4015", "fixed", box(bk_o[0], bk_o[0] + 54, bk_o[1], bk_o[1] + 23, p["tray_t"] + 5, p["tray_t"] + 19),
+    buck = box(bk_o[0], bk_o[0] + 54, bk_o[1], bk_o[1] + 23, p["tray_t"] + 5, p["tray_t"] + 19)
+    for hx, hy in ((3, 3), (51, 3), (3, 20), (51, 20)):                                  # 3 mm mounting holes (the pegs go through)
+        buck = buck.cut(cyl(bk_o[0] + hx, bk_o[1] + hy, 1.5, p["tray_t"] + 4, p["tray_t"] + 20))
+    add("buck_XL4015", "fixed", buck,
         "buy", mass=25.0, note="XL4015 5 A buck set to 5.8 V for the servos; MG996R power on its OUT terminals  VERIFY footprint")
     add("mini_breadboard", "fixed", box(8, 55, ty0 + 49, ty0 + 84, p["tray_t"], p["tray_t"] + 8.5), "buy", mass=10.0,
         note="5.8 V servo rail from the buck + 1000 uF capacitor")
     add("capacitor_1000uF", "fixed", cyl(48, ty0 + 66, 5.0, p["tray_t"] + 8.5, p["tray_t"] + 24.5), "buy", mass=3.0,
         note="1000 uF 16 V electrolytic across the servo rail (10 x 16 mm)")
     # panel parts behind the front panel (inner face y = ty0 + 3): body depth incl. solder lugs
-    for nm, x, r, depth, m_ in (("start_button", 15, 6.5, 16, 4.0), ("status_led", 40, 3.0, 10, 0.5), ("dc_jack", 65, 5.0, 16, 3.0)):
+    # bodies go in from the front through the panel holes (12.2 / 5.2 / 8.2 mm), so they are no wider than the holes
+    for nm, x, r, depth, m_ in (("start_button", 15, 6.0, 16, 4.0), ("status_led", 40, 2.5, 10, 0.5), ("dc_jack", 65, 3.9, 16, 3.0)):
         add(nm, "fixed", cyl_dir((x, ty0 + 3, 15), (0, 1, 0), r, depth), "buy", mass=m_)
 
     # ---------------- turret ----------------
@@ -372,7 +381,8 @@ def build_parts():
         add(nm, "turret", cyl(sx * rx, ry, 2.99, tz0 + 2, tz0 + 2 + p["rod_len"]), "buy",
             mass=math.pi * 0.3 ** 2 * p["rod_len"] / 10 * 7.85, note="6 mm steel rod, cut to 112 mm, captured in blind holes")
     spine = box(-25, 25, -24, -18, tz1 + 4, p["rod_top"] - 6)
-    spine = spine.union(box(-25, 25, -24, -12, tz1, tz1 + 4)).cut(cyl(-15, -16, TOL["n6_clear"] / 2, tz1 - 1, tz1 + 6)).cut(cyl(15, -16, TOL["n6_clear"] / 2, tz1 - 1, tz1 + 6))
+    # flange on top of the turret plate's spine foot (tz1 .. tz1+4), screws from above into the plate
+    spine = spine.union(box(-25, 25, -24, -12, tz1 + 4, tz1 + 8)).cut(cyl(-15, -16, TOL["n6_clear"] / 2, tz1 + 3, tz1 + 9)).cut(cyl(15, -16, TOL["n6_clear"] / 2, tz1 + 3, tz1 + 9))
     spine = spine.cut(cyl(-15, -21, TOL["n6_pilot"] / 2, p["rod_top"] - 18, p["rod_top"])).cut(cyl(15, -21, TOL["n6_pilot"] / 2, p["rod_top"] - 18, p["rod_top"]))
     spine = spine.cut(box(-8, 8, -25, -17, tz1 + 12, tz1 + 50))                          # cable window
     # lift-servo bracket: frame behind the servo tabs (servo body x 2.8..25.5, tabs at x 7.1..9.6)
@@ -410,7 +420,8 @@ def build_parts():
         car = car.cut(cyl(sx * rx, ry, 3.6, cz0 - 1, cz1 + 1))                           # rod clearance
         for z0, z1 in lm_z:
             car = car.cut(cyl(sx * rx, ry, TOL["lm_press"] / 2, z0, z1))                  # LM6UU press pockets
-    car = car.union(box(-11.5, -8.5, 8, 16, cz1 - 4, cz1 + 6)).cut(
+    car = car.cut(box(-9.0, -5.0, 6.5, 17.5, cz1 - 3.5, cz1 + 1))                       # relief: the link end swings here
+    car = car.union(box(-11.5, -9.0, 8, 16, cz1, cz1 + 6)).cut(
         cyl_dir((-12.5, 12, cz1 + 2), (1, 0, 0), TOL["n6_pilot"] / 2, 5))                 # link pivot: #6-32x1/2 threads in
     # arm beam + wrist bracket (wrist servo body passes through the bracket window)
     by1 = p["wrist_tip_y"] - 28.5 + 15.9                                                   # tab plane y (45.9)
@@ -456,7 +467,7 @@ def build_parts():
     tab_z = gs_face - 5.8 + 10.1                                                          # underside of the servo tabs
     gs_cx = -pvx - MICRO_HOLES_X
     for hx in (gs_cx - 13.75, gs_cx + 13.75):
-        gr = gr.union(box(hx - 3, hx + 3, pvy - 3, pvy + 3, pt[1], tab_z)).cut(cyl(hx, pvy, 0.85, tab_z - 6, tab_z + 1))
+        gr = gr.union(box(hx - 2, hx + 2, pvy - 3, pvy + 3, pt[1], tab_z)).cut(cyl(hx, pvy, 0.85, tab_z - 6, tab_z + 1))   # 4 mm: only under the tabs
     add("gripper_frame", "wrist", gr, "PETG", note="Flange + 2 plates + posts in one print. Wrist horn: 4 servo-bag "
         "screws. Right gear axle: #6-32x1/2 from the top. Left gear rides on the gripper-servo horn. Servo: 2 servo-bag screws.")
     add("can_bumper", "wrist", box(-2.5, 2.5, py1, py1 + 1.6, pb[0], pt[1]), "silicone", note="can stop, 5 mm wide (clears the gear tips by 0.67 mm), cut from the 1/16 in silicone sheet: place the can against it")

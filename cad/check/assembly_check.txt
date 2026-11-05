@@ -1,0 +1,28 @@
+ASSEMBLY CHECK: every part slides to its place along its arrow (backend/tools/make_manual.py)
+solid booleans every 3 mm of travel; overlap > 1.0 mm³ with an assembled part = blocked
+
+ 1. Bearing into the base                PASS
+ 2. Turntable servo                      PASS
+ 3. Weight + feet                        PASS
+ 4. Servo horn                           PASS
+ 5. Turret plate                         PASS
+ 6. Linear bearings into the carriage    PASS
+ 7. Rods                                 PASS
+ 8. Carriage onto the rods               PASS
+ 9. Spine                                PASS
+10. Top cap                              PASS
+11. Lift servo                           PASS
+12. Lift link                            PASS
+13. Crank                                PASS
+14. Wrist servo                          PASS
+15. Wrist horn                           PASS
+16. Gripper frame                        PASS
+17. Both fingers, gears meshed           PASS
+18. Right finger axle                    PASS
+19. Gripper servo                        PASS
+20. Can bumper                           PASS
+21. Electronics on the tray              PASS
+22. Panel: button, LED, power            PASS
+23. Tray onto the base                   PASS
+
+RESULT: every step can be assembled in this order

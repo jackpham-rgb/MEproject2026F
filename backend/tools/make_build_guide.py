@@ -92,7 +92,11 @@ L += ["", "**Tools:** Phillips #1 and #2 screwdrivers, multimeter, hot-glue gun,
       "clamp (pressing the bearing), superglue (silicone liners), a 12 mm drill bit turned by hand (to "
       "ream the LM6UU seats if tight).", "",
       "## 2. Printing", "",
-      "Files: `cad/print/stl/` (already turned to the best side and placed on the bed). Orientation preview: "
+      "**Print by plate:** `cad/print/plates/plate0_coupon` → `plate1_base` (overnight) → `plate2_tray_spine` → "
+      "`plate3_arm_claw` (.3mf keeps every part separate; layout in `cad/print/plates/plates.png`). "
+      "**Settings:** `cad/print/settings/printer_settings.txt` (all slicers) and `concept_a_PETG_prusaslicer.ini` "
+      "(PrusaSlicer: File → Import → Import Config). Fingers CA-402/403 at **100 % infill** (solid gear teeth).", "",
+      "Single parts: `cad/print/stl/` (already turned to the best side). Orientation preview: "
       "`cad/print/print_orientations.png`. Bed size assumed 220 × 220 mm.", "",
       "**PETG settings (start here, tune for your printer):** nozzle 0.4 mm at 235 °C, bed 80 °C, layer "
       "0.2 mm, 3 walls (1.2 mm), 4 top / 4 bottom layers, 30 % gyroid infill, cooling fan 30–50 %, "
@@ -128,6 +132,8 @@ L += ["", f"Total ≈ {tot_g:.0f} g of PETG (+ ~15 % for supports and purge) and
       "2. Meter on OUT+ / OUT−. Turn the pot (it usually needs many turns) until it reads **5.8 V**.",
       "3. Unplug. Mark the pot with a dot of nail polish so it isn't turned by accident.", "",
       "## 4. Assembly", "",
+      "**Picture manual (IKEA style): [12_assembly_manual.pdf](12_assembly_manual.pdf).** Electronics bench test first: "
+      "[13_electronics_bench_test.md](13_electronics_bench_test.md).", "",
       "Servos are fitted **at their HOME angle**, so the horns go on at the right orientation. Load "
       "`firmware/servo_setup/servo_setup.ino` on the Uno, wire the servos as in section 5, power up: every "
       "servo goes to HOME (turntable 135°, lift 30°, wrist 0°, gripper 20°). Type `t 135`, `l 30`, etc. in "
