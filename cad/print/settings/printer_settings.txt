@@ -21,12 +21,20 @@ Files: cad/print/plates/plate0..3 (.3mf = separate parts, keeps per-part setting
 Slicer: PrusaSlicer -> File > Import > Import Config... -> concept_a_PETG_prusaslicer.ini
         Cura / Bambu / Orca: type the values below in by hand (names in brackets).
 
-PRINT ORDER
-  0. plate0_coupon        ~0.8 h   CHECK THE FITS FIRST (build guide section 2). Fix TOL if needed.
-  1. plate1_base         ~13.4 h   overnight. Supports: base, turret plate. Brim on the lift link.
-  2. plate2_tray_spine    ~7.6 h   no supports
-  3. plate3_arm_claw      ~7.3 h   supports: carriage arm, both fingers. Fingers at 100 % infill.
-  Total ~29 h, ~300 g PETG (+ ~15 % supports and purge)
+PRINT ORDER (times = PrusaSlicer 2.7 estimates with these settings; each plate test-sliced)
+  0. plate0_coupon        ~1.0 h   CHECK THE FITS FIRST (build guide section 2). Fix TOL if needed.
+  1. plate1_base         ~17 h     overnight: base, turret plate, top cap, lift link
+  2. plate2_tray_spine   ~12 h     tray, spine, right finger
+  3. plate3_arm_claw      ~8 h     carriage arm, gripper frame, left finger
+  Total ~38 h, ~330 g PETG. The fingers are on different plates on purpose: PrusaSlicer 2.7 crashes
+  ("G-code path conflict") when the supported left finger shares a plate with the right finger, the
+  tray or the base.
+
+PER-PART SETTINGS ARE ALREADY IN THE .3MF FILES (PrusaSlicer)
+  Open a plate: supports are on only for the base, turret plate, carriage arm and fingers; the
+  fingers are at 100 % infill; the lift link has a 5 mm brim. Right-click a part to see its settings.
+  Leave global supports OFF. Cura does not read these: in Cura add them per part by hand
+  (Per Model Settings).
 
 MATERIAL: PETG 1.75 mm
   Nozzle temperature        235 C (first layer 238 C, max 240) [printing temperature]
@@ -54,13 +62,11 @@ SUPPORTS (only on the parts listed, from the build plate only, never "everywhere
   Z distance                0.2 mm (one layer: PETG sticks to supports, more gap = easier removal)
   XY distance               0.8 mm
   Parts that need them      CA-101 base, CA-201 turret plate, CA-301 carriage arm, CA-402 / CA-403 fingers
-  In a .3mf each part is its own object: right-click it -> add "support enforcer/blocker" or per-object
-  settings. Or turn supports on for the plate; the other parts have nothing that needs them.
 
-PER-PART OVERRIDES
-  CA-402 / CA-403 fingers   100 % infill (the 16 gear teeth must be solid)  [per-object infill]
+PER-PART OVERRIDES (already set in the .3mf for PrusaSlicer)
+  CA-402 / CA-403 fingers   supports + 100 % infill (the 16 gear teeth must be solid)
+  CA-101, CA-201, CA-301    supports (from the build plate only)
   CA-302 lift link          5 mm brim (it's 16 mm long, it would come loose)
-  CA-101 base               5 mm brim only if the corners lift
 
 AFTER PRINTING
   Remove supports with pliers; file the pad and gear faces smooth.

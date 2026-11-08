@@ -95,9 +95,9 @@ L += ["", "**Tools:** Phillips #1 and #2 screwdrivers, multimeter, hot-glue gun,
       "**Print by plate:** `cad/print/plates/plate0_coupon` → `plate1_base` (overnight) → `plate2_tray_spine` → "
       "`plate3_arm_claw` (.3mf keeps every part separate; layout in `cad/print/plates/plates.png`). "
       "**Settings:** `cad/print/settings/printer_settings.txt` (all slicers) and `concept_a_PETG_prusaslicer.ini` "
-      "(PrusaSlicer: File → Import → Import Config). Fingers CA-402/403 at **100 % infill** (solid gear teeth).", "",
+      "(PrusaSlicer: File → Import → Import Config, then set the Printer preset back to Creality CR-6 SE). The .3mf files already carry the per-part settings (supports, 100 % infill fingers, brim on the link): every plate was test-sliced in PrusaSlicer.", "",
       "Single parts: `cad/print/stl/` (already turned to the best side). Orientation preview: "
-      "`cad/print/print_orientations.png`. Bed size assumed 220 × 220 mm.", "",
+      "`cad/print/print_orientations.png`. Printer: Creality CR-6 SE, 235 × 235 mm bed.", "",
       "**PETG settings (start here, tune for your printer):** nozzle 0.4 mm at 235 °C, bed 80 °C, layer "
       "0.2 mm, 3 walls (1.2 mm), 4 top / 4 bottom layers, 30 % gyroid infill, cooling fan 30–50 %, "
       "elephant-foot compensation 0.15 mm (holes on the bed side), print speed ~60 mm/s. Use glue stick "

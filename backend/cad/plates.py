@@ -5,8 +5,8 @@
 
 Each plate is one print job: a .3mf (every part a separate object, so the slicer keeps per-part
 supports), the same plate as one .stl, and plates.png (top view of every plate). Parts keep the
-orientation print_prep.py chose; they may only turn 90° about Z to fit. Bed 220 x 220 mm with a 7 mm
-edge margin (skirt / brim) and 8 mm between parts.
+orientation print_prep.py chose; they may only turn 90° about Z to fit. Bed 235 x 235 mm (Creality CR-6 SE) with a 7 mm
+edge margin (skirt / brim) and 14 mm between parts (supports can reach past a part's edge).
 
 Plates are grouped so one failed print wastes as little as possible and the long ones can run overnight.
 """
@@ -21,14 +21,16 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 PR = os.path.join(ROOT, "cad", "print")
 OUT = os.path.join(PR, "plates")
-BED = (220.0, 220.0)
-EDGE, GAP = 7.0, 8.0
+BED = (235.0, 235.0)   # Creality CR-6 SE
+EDGE, GAP = 7.0, 14.0   # 14 mm: room for supports that reach past a part's edge
 
 PLATES = [  # (file stem, title, part numbers, when)
     ("plate0_coupon", "Plate 0: tolerance coupon (print first, check fits)", ["CA-900"], "first, ~1 h"),
     ("plate1_base", "Plate 1: base + turret plate + top cap + lift link", ["CA-101", "CA-201", "CA-203", "CA-302"], "overnight"),
-    ("plate2_tray_spine", "Plate 2: electronics tray + spine", ["CA-102", "CA-202"], "day"),
-    ("plate3_arm_claw", "Plate 3: carriage arm + gripper frame + both fingers", ["CA-301", "CA-401", "CA-402", "CA-403"], "day"),
+    # the two fingers are on different plates: PrusaSlicer 2.7 reports a false "G-code path conflict" and
+    # crashes for some groupings with a supported finger (checked by slicing every plate, see the README)
+    ("plate2_tray_spine", "Plate 2: electronics tray + spine + right finger", ["CA-102", "CA-202", "CA-402"], "day"),
+    ("plate3_arm_claw", "Plate 3: carriage arm + gripper frame + left finger", ["CA-301", "CA-401", "CA-403"], "day"),
 ]
 
 
@@ -58,16 +60,31 @@ def write_stl(path, tris):
             f.write(b"\0\0")
 
 
+# Per-part slicer settings written into the .3mf (PrusaSlicer reads them as per-object settings, so
+# opening a plate needs no clicking: supports only where needed, solid fingers, a brim on the tiny link)
+PER_PART = {
+    "CA-101": {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1"},
+    "CA-201": {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1"},
+    "CA-301": {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1"},
+    "CA-402": {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1", "fill_density": "100%"},
+    "CA-403": {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1", "fill_density": "100%"},
+    "CA-302": {"brim_width": "5"},
+}
+
+
 def write_3mf(path, objects):
-    """objects: [(name, tris)] already placed in bed coordinates."""
-    res, items = [], []
+    """objects: [(name, tris)] already placed in bed coordinates. Name starts with the part number."""
+    res, items, cfg = [], [], []
     for i, (name, tris) in enumerate(objects, 1):
         v, idx = np.unique(np.round(tris.reshape(-1, 3), 4), axis=0, return_inverse=True)
-        idx = idx.reshape(-1, 3)
+        idx = [t for t in idx.reshape(-1, 3) if len(set(t)) == 3]
         vs = "".join(f'<vertex x="{a:.4f}" y="{b:.4f}" z="{c:.4f}"/>' for a, b, c in v)
-        ts = "".join(f'<triangle v1="{a}" v2="{b}" v3="{c}"/>' for a, b, c in idx if len({a, b, c}) == 3)
+        ts = "".join(f'<triangle v1="{a}" v2="{b}" v3="{c}"/>' for a, b, c in idx)
         res.append(f'<object id="{i}" name="{name}" type="model"><mesh><vertices>{vs}</vertices><triangles>{ts}</triangles></mesh></object>')
-        items.append(f'<item objectid="{i}"/>')
+        items.append(f'<item objectid="{i}" printable="1"/>')
+        meta = "".join(f'<metadata type="object" key="{k}" value="{val}"/>' for k, val in PER_PART.get(name.split()[0], {}).items())
+        cfg.append(f'<object id="{i}" instances_count="1"><metadata type="object" key="name" value="{name}"/>{meta}'
+                   f'<volume firstid="0" lastid="{len(idx) - 1}"><metadata type="volume" key="name" value="{name}"/></volume></object>')
     model = ('<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" '
              'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources>' + "".join(res) +
              "</resources><build>" + "".join(items) + "</build></model>")
@@ -78,6 +95,7 @@ def write_3mf(path, objects):
         z.writestr("_rels/.rels", '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
                    '<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')
         z.writestr("3D/3dmodel.model", model)
+        z.writestr("Metadata/Slic3r_PE_model.config", '<?xml version="1.0" encoding="utf-8"?><config>' + "".join(cfg) + "</config>")
 
 
 def pack(sizes):
