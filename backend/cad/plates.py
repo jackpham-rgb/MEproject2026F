@@ -31,6 +31,9 @@ PLATES = [  # (file stem, title, part numbers, when)
     # crashes for some groupings with a supported finger (checked by slicing every plate, see the README)
     ("plate2_tray_spine", "Plate 2: electronics tray + spine + right finger", ["CA-102", "CA-202", "CA-402"], "day"),
     ("plate3_arm_claw", "Plate 3: carriage arm + gripper frame + left finger", ["CA-301", "CA-401", "CA-403"], "day"),
+    # Plan P (quick prototype, docs/14_plan_p_quick_prototype.md): only the claw, as two short prints
+    ("planP_1_claw", "Plan P 1: gripper frame + right finger", ["CA-401", "CA-402"], "~2 h"),
+    ("planP_2_finger", "Plan P 2: left finger + tolerance coupon", ["CA-403", "CA-900"], "~2 h"),
 ]
 
 

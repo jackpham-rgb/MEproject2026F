@@ -21,6 +21,9 @@ Files: cad/print/plates/plate0..3 (.3mf = separate parts, keeps per-part setting
 Slicer: PrusaSlicer -> File > Import > Import Config... -> concept_a_PETG_prusaslicer.ini
         Cura / Bambu / Orca: type the values below in by hand (names in brackets).
 
+PRINTER PROBLEMS: docs/15_cr6se_print_troubleshooting.md (symptom -> cause -> fix)
+QUICK PROTOTYPE FIRST: docs/14_plan_p_quick_prototype.md (only the claw printed: planP_1_claw, planP_2_finger)
+
 PRINT ORDER (times = PrusaSlicer 2.7 estimates with these settings; each plate test-sliced)
   0. plate0_coupon        ~1.0 h   CHECK THE FITS FIRST (build guide section 2). Fix TOL if needed.
   1. plate1_base         ~17 h     overnight: base, turret plate, top cap, lift link

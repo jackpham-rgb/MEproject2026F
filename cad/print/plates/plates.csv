@@ -3,3 +3,5 @@ plate0_coupon,"Plate 0: tolerance coupon (print first, check fits)",CA-900,0.8,8
 plate1_base,Plate 1: base + turret plate + top cap + lift link,CA-101 CA-201 CA-203 CA-302,13.4,137,CA-101 CA-201,overnight
 plate2_tray_spine,Plate 2: electronics tray + spine + right finger,CA-102 CA-202 CA-402,8.5,88,CA-402,day
 plate3_arm_claw,Plate 3: carriage arm + gripper frame + left finger,CA-301 CA-401 CA-403,6.4,67,CA-301 CA-403,day
+planP_1_claw,Plan P 1: gripper frame + right finger,CA-401 CA-402,2.0,21,CA-402,~2 h
+planP_2_finger,Plan P 2: left finger + tolerance coupon,CA-403 CA-900,1.7,18,CA-403,~2 h
