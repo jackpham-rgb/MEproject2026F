@@ -1,5 +1,21 @@
-CONCEPT A: 3D PRINTER SETTINGS (PETG, 0.4 mm nozzle, 220 x 220 mm bed)
-=======================================================================
+CONCEPT A: 3D PRINTER SETTINGS (PETG, 0.4 mm nozzle)
+=====================================================
+PRINTER: Creality CR-6 SE (235 x 235 x 250 mm bed, Bowden extruder, nozzle-probe auto-levelling,
+carborundum glass bed). The plates are laid out for 220 x 220, so they fit with room to spare.
+
+CR-6 SE SPECIFICS
+  Slicer profile            Cura: Add printer > Creality > "Creality CR-6 SE" (its start code uses the
+                            saved levelling mesh). PrusaSlicer: Creality > CR-6 SE, then import the .ini
+  Nozzle temperature        235 C, first layer 238 C. Keep it <= 240 C: the stock hotend has a PTFE
+                            tube down to the nozzle and PTFE breaks down above ~240 C
+  Retraction (Bowden)       5 mm at 40 mm/s. Stringing: try 6 mm; never above 7 mm
+  Bed                       carborundum glass at 80 C. PETG grips it hard: thin glue stick as a
+                            release layer so the parts don't pull chips out of the glass. Remove parts
+                            after the bed has cooled to room temperature
+  Levelling                 touch screen > Level, with a CLEAN nozzle (no plastic on the tip: the
+                            nozzle itself is the probe). Then adjust Z-offset on the first layer
+  Card                      short file names, no spaces (P0COUPON.gcode ...): the screen cuts long names
+
 Files: cad/print/plates/plate0..3 (.3mf = separate parts, keeps per-part settings; .stl = one piece)
        Parts are already turned to their best side. Don't rotate them, except 90 deg flat on the bed.
 Slicer: PrusaSlicer -> File > Import > Import Config... -> concept_a_PETG_prusaslicer.ini
@@ -13,7 +29,7 @@ PRINT ORDER
   Total ~29 h, ~300 g PETG (+ ~15 % supports and purge)
 
 MATERIAL: PETG 1.75 mm
-  Nozzle temperature        235 C (first layer 240 C)        [printing temperature]
+  Nozzle temperature        235 C (first layer 238 C, max 240) [printing temperature]
   Bed temperature           80 C (first layer 80 C)          [build plate temperature]
   Cooling fan               30 % (max 50 % on small layers), off for the first 3 layers
   Retraction                bowden (Ender-3): 5 mm at 40 mm/s; direct drive: 1 mm at 35 mm/s
