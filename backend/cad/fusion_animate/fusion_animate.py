@@ -136,7 +136,7 @@ INTRO = ("HOW IT MOVES: 4 servos, one at a time\n\n"
          "2  Lift        MG90S   pin D10   raises the arm 0.6 in (crank + link on 2 rods)\n"
          "3  Wrist       MG90S   pin D6    rolls the gripper 180°\n"
          "4  Gripper     SG90    pin D5    closes 2 geared arms on the can\n\n"
-         "Sequence: GRIP -> LIFT -> FLIP -> TURN -> LOWER -> RELEASE (6.4 s on the real robot).\n"
+         "Sequence: GRIP -> LIFT -> FLIP -> TURN -> LOWER -> RELEASE (7.4 s on the real robot).\n"
          "Every move eases in and out (slow - fast - slow) so the light can isn't shaken loose.\n\n"
          "Before each move a box explains which motor moves and why. Press OK to play it.")
 

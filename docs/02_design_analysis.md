@@ -32,7 +32,7 @@ flip. The worst point is 28° into the roll, and again at 152°.
 
 ## 3. Motion profile (`concept_a_sequence.png`)
 
-The robot does one move at a time: grip → lift → flip → turn → lower → release, **6.4 s** in all.
+The robot does one move at a time: grip → lift → flip → turn → lower → release, **7.4 s** in all (TURN 2.5 s).
 Every move follows a minimum-jerk (slow–fast–slow) curve, so speed and acceleration are zero at
 both ends.
 

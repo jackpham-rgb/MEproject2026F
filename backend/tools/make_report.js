@@ -108,7 +108,7 @@ C.push(new Paragraph({ children: [new PageBreak()] }));
 // 1 summary
 C.push(h1("1. Summary"));
 C.push(para("An Arduino Uno robot picks up an empty standard 12 oz Coke can standing upright 5 in from the robot, turns it upside down, and sets it down free-standing 90° around the robot at the same 5 in radius, with one button press and no other human input."));
-C.push(para([r("The selected design (Concept A) is a small crane on a turntable. Four hobby servos move one at a time: "), b("grip → lift 0.6 in → wrist flips 180° → turntable turns 90° → lower → release"), r(", in 6.4 s.")]));
+C.push(para([r("The selected design (Concept A) is a small crane on a turntable. Four hobby servos move one at a time: "), b("grip → lift 0.6 in → wrist flips 180° → turntable turns 90° → lower → release"), r(", in 7.4 s.")]));
 C.push(para("Before ordering hardware, the design was verified as far as possible on the laptop:"));
 [
   "Detail CAD of every printed and purchased part, with PETG print tolerances and screws from the team's Harbor Freight #67675 kit.",

@@ -34,7 +34,7 @@ struct FakeSerial {
   void println(int v) { printf("%d\n", v); fflush(stdout); }
   void println() { puts(""); fflush(stdout); }
 } Serial;
-struct Servo { void attach(int) {} void attach(int, int, int) {} void write(int) {} };
+struct Servo { void attach(int) {} void attach(int, int, int) {} void write(int) {} void writeMicroseconds(int) {} };
 #include "../../../firmware/concept_a/concept_a.ino"
 int main() {
   std::thread([] { char c; while (::read(0, &c, 1) == 1) { std::lock_guard<std::mutex> g(mu); Serial.in.push_back(c); } exit(0); }).detach();

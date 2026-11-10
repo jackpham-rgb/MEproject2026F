@@ -68,6 +68,7 @@ Tested without hardware: the firmware's commands on a simulated Uno (`backend/to
 | Servos twitch or don't respond at all | No common ground | Uno GND ↔ rail − (row 5b) |
 | Servo buzzes / jitters | Signal without ground, loose jumper | Re-seat; shorter jumpers; ground first |
 | Servo doesn't move at all | Signal on the wrong pin, dead servo | Swap the plug to a known-good test; try the spare |
+| One servo works sometimes, then stops responding | Cable / dupont joint (most often), power at its plug, or the servo | **Swap test** (unmounted, horn off): plug that servo into a good servo's cable, and a good servo into its cable. Problem follows the servo → servo; stays with the cable / pin → wiring; both fine → it was a loose joint. Same code drives all four, so code alone is unlikely |
 | Wrist stops short of 180° | That MG90S's range | `servo_setup`: try `WRIST_MIN_US` / `WRIST_MAX_US` 450 / 2550; else swap MG90S (buy a spare) |
 | Rail below 5.5 V in test 5 | Weak adapter / long thin wires / no capacitor | Shorter rail wires; check the adapter is at 12.0 V under load; fit the 1000 µF |
 | Buck gets hot | Pot set too high, short | Unplug, re-check OUT = 5.8 V with nothing connected |

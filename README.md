@@ -6,7 +6,7 @@ robot, **turns it upside down, and sets it down free-standing 90° away** at the
 ## Selected design: Concept A (claw + wrist flip + turntable)
 
 A small crane at the corner, with 4 hobby servos doing one move at a time:
-**grip → lift 0.6 in → wrist flips 180° → turntable turns 90° → lower → release** (6.4 s).
+**grip → lift 0.6 in → wrist flips 180° → turntable turns 90° → lower → release** (7.4 s; the 90° turn takes 2.5 s so the arm doesn't swing).
 
 - **The 90° is literal:** the turntable sits at the robot's location, so the robot visibly turns
   90° and the can stays 5 in away the whole time.

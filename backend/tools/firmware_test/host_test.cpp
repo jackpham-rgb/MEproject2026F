@@ -38,6 +38,8 @@ struct Servo {
   void attach(int p) { pin = p; }
   void attach(int p, int, int) { pin = p; }
   void write(int a) { angle = a; if (pin < 0) writesBeforeAttach++; }
+  int us = 0;
+  void writeMicroseconds(int u) { us = u; }
 };
 #include "../../../firmware/concept_a/concept_a.ino"
 
@@ -67,10 +69,19 @@ int main() {
 
   out.clear(); Serial.send("h"); runFor(4000);
   expect(lastStatus() == "@ IDLE - 135 30 0 20", "h: back to HOME, one servo at a time", lastStatus());
+
+  out.clear(); unsigned long t0 = t_ms; Serial.send("t 45"); while (t_ms - t0 < 5000 && !has("Moved.")) loop();
+  unsigned long baseMs = t_ms - t0;
+  expect(baseMs >= 1550 && baseMs <= 1750, "base moves slowly: 90 deg in ~1.6 s (18 ms/deg)", std::to_string(baseMs) + " ms");
+  out.clear(); t0 = t_ms; Serial.send("t 75"); runFor(200);
+  int us1 = turnServo.us; runFor(10); int us2 = turnServo.us;
+  expect(us1 > 0 && us1 != us2 && abs(us2 - us1) < 10, "fine steps: base gets microseconds, < 1 degree per update",
+         std::to_string(us1) + " -> " + std::to_string(us2));
+  runFor(2000); out.clear(); Serial.send("h"); runFor(4000);
   size_t a = out.find("M-LIFT"), b = out.find("M-WRIST"), c = out.find("M-TURN"), d = out.find("M-LOWER");
   expect(a < b && b < c && c < d, "home order: lift up, wrist, turn, ..., lower");
 
-  out.clear(); Serial.send("t 10"); runFor(1500);
+  out.clear(); Serial.send("t 10"); runFor(2500);
   expect(has("limited to 35"), "out-of-range angle is clamped (turntable 35..145)");
   out.clear(); Serial.send("h"); runFor(4000);
 
@@ -78,10 +89,12 @@ int main() {
   expect(has("Busy"), "a second command while moving is refused");
   Serial.send("x"); runFor(50);
   expect(has("Stopped") && lastStatus().rfind("@ IDLE", 0) == 0, "x stops and holds", lastStatus());
-  out.clear(); Serial.send("h"); runFor(4000);
+  out.clear(); Serial.send("h"); runFor(5000);
   expect(lastStatus() == "@ IDLE - 135 30 0 20", "h after a stop returns HOME", lastStatus());
 
-  out.clear(); Serial.send("s"); runFor(9000);
+  out.clear(); Serial.send("s"); t0 = t_ms; while (t_ms - t0 < 12000 && !has("DONE")) loop();
+  expect(t_ms - t0 >= 7300 && t_ms - t0 <= 7600, "sequence takes ~7.4 s (TURN now 2.5 s)", std::to_string(t_ms - t0) + " ms");
+  runFor(100);
   expect(has("> GRIP") && has("> RELEASE") && has("DONE"), "laptop START runs the whole sequence");
   expect(lastStatus() == "@ DONE - 45 30 180 70", "ends at the target, inverted, released", lastStatus());
 

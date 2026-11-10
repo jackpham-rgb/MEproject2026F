@@ -40,13 +40,16 @@ const int GRIP_RELEASE = 70;   // at the target the gripper is upside down: open
 
 // ---------- Move times (ms) ----------
 const unsigned long ATTACH_GAP_MS = 300;
-const unsigned long T_GRIP = 800, T_LIFT = 1000, T_FLIP = 1500, T_TURN = 1500, T_RELEASE = 600;
+const unsigned long T_GRIP = 800, T_LIFT = 1000, T_FLIP = 1500, T_TURN = 2500, T_RELEASE = 600;   // turn slowed: 1.5 -> 2.5 s
 
 // ---------- Pins ----------
 const int PIN_TURN = 9, PIN_LIFT = 10, PIN_WRIST = 6, PIN_GRIP = 5;
 const int PIN_BUTTON = 4, PIN_LED = 13;
 // The wrist needs a full 180 deg: a wider pulse range (500-2500 us) lets an MG90S reach it.
 const int WRIST_MIN_US = 500, WRIST_MAX_US = 2500;
+const int SERVO_MIN_US = 544, SERVO_MAX_US = 2400;   // Servo library defaults (the other three servos)
+// Laptop moves: ms per degree. The base carries the whole arm, so it moves slower (90 deg in ~1.6 s).
+const unsigned long MS_PER_DEG[4] = {18, 8, 8, 8};   // turn, lift, wrist, grip
 
 Servo turnServo, liftServo, wristServo, gripServo;
 
@@ -107,6 +110,18 @@ void writePose(const Pose& p) {
   gripServo.write(p.grip);
 }
 
+// During a move: send the in-between angle in microseconds (~10 us per degree) instead of whole degrees,
+// so slow moves glide instead of stepping 1 degree at a time.
+int usFor(float deg, int lo, int hi) { return lo + (int)((hi - lo) * deg / 180.0 + 0.5); }
+float mix(int a, int b, float e) { return a + (b - a) * e; }
+
+void writeSmooth(const Pose& a, const Pose& b, float e) {
+  turnServo.writeMicroseconds(usFor(mix(a.turn, b.turn, e), SERVO_MIN_US, SERVO_MAX_US));
+  liftServo.writeMicroseconds(usFor(mix(a.lift, b.lift, e), SERVO_MIN_US, SERVO_MAX_US));
+  wristServo.writeMicroseconds(usFor(mix(a.wrist, b.wrist, e), WRIST_MIN_US, WRIST_MAX_US));
+  gripServo.writeMicroseconds(usFor(mix(a.grip, b.grip, e), SERVO_MIN_US, SERVO_MAX_US));
+}
+
 bool buttonPressed() {                     // true once per press (debounced)
   static bool last = false;
   static unsigned long changed = 0;
@@ -144,8 +159,8 @@ void startSteps(Step* list, int count, Mode m) {
   status();
 }
 
-unsigned long moveMs(int a, int b) {       // ~8 ms per degree, at least 300 ms: gentle
-  unsigned long d = (unsigned long)abs(b - a) * 8;
+unsigned long moveMs(int i, int a, int b) {   // MS_PER_DEG for that servo, at least 300 ms: gentle
+  unsigned long d = (unsigned long)abs(b - a) * MS_PER_DEG[i];
   return d < 300 ? 300 : d;
 }
 
@@ -180,11 +195,11 @@ void command(char c, int value, bool hasValue) {
   afterManual = IDLE;                      // after a laptop move: IDLE (START then needs HOME)
   if (c == 'h') {                          // HOME, one servo at a time
     Pose p = now; int n = 0;
-    p.lift = LIFT_UP;     manualSteps[n].name = "M-LIFT";  manualSteps[n].to = p; manualSteps[n++].ms = moveMs(now.lift, LIFT_UP);
-    p.wrist = WRIST_UP;   manualSteps[n].name = "M-WRIST"; manualSteps[n].to = p; manualSteps[n++].ms = moveMs(now.wrist, WRIST_UP);
-    p.turn = TURN_START;  manualSteps[n].name = "M-TURN";  manualSteps[n].to = p; manualSteps[n++].ms = moveMs(now.turn, TURN_START);
-    p.grip = GRIP_OPEN;   manualSteps[n].name = "M-GRIP";  manualSteps[n].to = p; manualSteps[n++].ms = moveMs(now.grip, GRIP_OPEN);
-    p.lift = LIFT_DOWN;   manualSteps[n].name = "M-LOWER"; manualSteps[n].to = p; manualSteps[n++].ms = moveMs(LIFT_UP, LIFT_DOWN);
+    p.lift = LIFT_UP;     manualSteps[n].name = "M-LIFT";  manualSteps[n].to = p; manualSteps[n++].ms = moveMs(1, now.lift, LIFT_UP);
+    p.wrist = WRIST_UP;   manualSteps[n].name = "M-WRIST"; manualSteps[n].to = p; manualSteps[n++].ms = moveMs(2, now.wrist, WRIST_UP);
+    p.turn = TURN_START;  manualSteps[n].name = "M-TURN";  manualSteps[n].to = p; manualSteps[n++].ms = moveMs(0, now.turn, TURN_START);
+    p.grip = GRIP_OPEN;   manualSteps[n].name = "M-GRIP";  manualSteps[n].to = p; manualSteps[n++].ms = moveMs(3, now.grip, GRIP_OPEN);
+    p.lift = LIFT_DOWN;   manualSteps[n].name = "M-LOWER"; manualSteps[n].to = p; manualSteps[n++].ms = moveMs(1, LIFT_UP, LIFT_DOWN);
     startSteps(manualSteps, n, MANUAL);
     return;
   }
@@ -197,7 +212,7 @@ void command(char c, int value, bool hasValue) {
   int* field = (i == 0) ? &to.turn : (i == 1) ? &to.lift : (i == 2) ? &to.wrist : &to.grip;
   int was = *field; *field = a;
   manualSteps[0].name = (i == 0) ? "M-TURN" : (i == 1) ? "M-LIFT" : (i == 2) ? "M-WRIST" : "M-GRIP";
-  manualSteps[0].to = to; manualSteps[0].ms = moveMs(was, a);
+  manualSteps[0].to = to; manualSteps[0].ms = moveMs(i, was, a);
   if (a != value) { Serial.print(F("limited to ")); Serial.println(a); }
   startSteps(manualSteps, 1, MANUAL);
 }
@@ -268,7 +283,7 @@ void loop() {
       now = makePose(blend(from.turn, to.turn, e), blend(from.lift, to.lift, e),
                      blend(from.wrist, to.wrist, e), blend(from.grip, to.grip, e));
 
-      writePose(now);
+      writeSmooth(from, to, e);                          // fine steps; "now" (whole degrees) is for the status line
 #if PRINT_ANGLES
       Serial.print(now.turn); Serial.print(' '); Serial.print(now.lift); Serial.print(' ');
       Serial.print(now.wrist); Serial.print(' '); Serial.println(now.grip);

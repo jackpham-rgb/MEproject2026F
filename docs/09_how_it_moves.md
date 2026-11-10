@@ -41,7 +41,7 @@ can isn't shaken loose.
 | LOWER | 2 lift | can comes down 0.6 in onto the table | flipped about its centre, so the same distance sets it exactly on the table |
 | RELEASE | 4 gripper | arms open 25° | can stands free and inverted at TARGET |
 
-Total 6.4 s. The status LED blinks while moving and stays on at DONE. **Homing** (lift, close the
+Total 7.4 s (the 90° turn is 2.5 s: slowed so the arm doesn't swing). Laptop moves: base 18 ms per degree, others 8. The status LED blinks while moving and stays on at DONE. **Homing** (lift, close the
 arms, un-flip, turn back, lower, open) only starts after the can is lifted off and START is pressed
 again, because the open arms straddle the can.
 
