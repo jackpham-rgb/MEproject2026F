@@ -41,6 +41,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .cmd{display:flex;gap:6px;margin-top:8px}
 .cmd input{flex:1;min-width:0;font:13px ui-monospace,Menlo,monospace;padding:7px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
 .note{font-size:13px;color:var(--muted)}
+#caltab th,#caltab td{border-bottom:1px solid var(--line);padding:6px 6px;text-align:left;vertical-align:middle}
+#caltab td.num{font-variant-numeric:tabular-nums;font-family:ui-monospace,Menlo,monospace}
+#caltab input{width:64px;font:13px ui-monospace,Menlo,monospace;padding:4px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--ink)}
+#caltab button{padding:4px 8px;font-size:12.5px}
+#caltab tr.changed td.mine input{border-color:var(--warn)}
 .warnbox{border-left:4px solid var(--warn);padding:8px 12px;background:var(--panel);border-radius:6px;font-size:13.5px}
 kbd{font:12px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px}
 </style>
@@ -71,6 +76,19 @@ kbd{font:12px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-b
 
 <div class="grid" id="servos"></div>
 
+<div class="card" id="calib">
+  <div class="bar" style="justify-content:space-between"><b>Calibration</b><span class="note">After assembly: find each angle on the real robot, then paste the code into <code>concept_a.ino</code> and upload.</span></div>
+  <ol class="note" style="margin:8px 0 10px 18px;padding:0">
+    <li>Real empty can on the START mark (5 in from the turntable axis), against the bumper. 12 V on.</li>
+    <li>For each row: move that servo with its card above (±1° for the last bit) until it looks right, then <b>Use current angle</b>.</li>
+    <li><b>Test</b> sends the saved value again so you can check it. Saved values stay in this browser.</li>
+    <li>Copy the code block, replace the angle lines at the top of <code>concept_a.ino</code>, upload, reconnect: the "firmware" column should now match.</li>
+  </ol>
+  <div style="overflow-x:auto"><table id="caltab" style="width:100%;border-collapse:collapse;font-size:13.5px"></table></div>
+  <div class="bar" style="margin-top:10px;justify-content:space-between"><b>Code for concept_a.ino</b><span><button id="calreset">Reset to firmware values</button> <button id="calcopy" class="primary">Copy code</button></span></div>
+  <pre id="calcode" style="font:12.5px/1.45 ui-monospace,Menlo,monospace;background:var(--ground);border:1px solid var(--line);border-radius:6px;padding:8px;margin:6px 0 0;white-space:pre;overflow-x:auto"></pre>
+</div>
+
 <div class="card">
   <div class="bar" style="justify-content:space-between"><b>Serial log</b><button id="clear">Clear</button></div>
   <pre id="log"></pre>
@@ -83,32 +101,86 @@ kbd{font:12px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-b
 <script>
 (function(){
 const $ = id => document.getElementById(id);
-// key, title, part, pin, min, max, presets — limits match LIM[] in concept_a.ino
+// Calibration constants and laptop-move limits: defaults = concept_a.ino; replaced by what the firmware
+// reports ("= NAME value ..." line, sent at power-up and on "c").
+const CFG = {TURN_START:135, TURN_TARGET:45, LIFT_DOWN:30, LIFT_UP:75, WRIST_UP:0, WRIST_FLIP:180,
+             GRIP_OPEN:20, GRIP_CLOSED:95, GRIP_RELEASE:70, LIM_t:[35,145], LIM_l:[25,80], LIM_w:[0,180], LIM_g:[10,100]};
 const SERVOS = [
-  {k:"t", name:"Base (turntable)", part:"MG996R · D9", min:35, max:145, presets:[["START",135],["TARGET",45]]},
-  {k:"l", name:"Lift", part:"MG90S · D10", min:25, max:80, presets:[["DOWN",30],["UP",75]]},
-  {k:"w", name:"Wrist", part:"MG90S · D6", min:0, max:180, presets:[["UPRIGHT",0],["FLIPPED",180]]},
-  {k:"g", name:"Grip", part:"SG90 · D5", min:10, max:100, presets:[["OPEN",20],["RELEASE",70],["CLOSED",95]]},
+  {k:"t", name:"Base (turntable)", part:"MG996R · D9", presets:[["START","TURN_START"],["TARGET","TURN_TARGET"]]},
+  {k:"l", name:"Lift", part:"MG90S · D10", presets:[["DOWN","LIFT_DOWN"],["UP","LIFT_UP"]]},
+  {k:"w", name:"Wrist", part:"MG90S · D6", presets:[["UPRIGHT","WRIST_UP"],["FLIPPED","WRIST_FLIP"]]},
+  {k:"g", name:"Grip", part:"SG90 · D5", presets:[["OPEN","GRIP_OPEN"],["RELEASE","GRIP_RELEASE"],["CLOSED","GRIP_CLOSED"]]},
 ];
-$("servos").innerHTML = SERVOS.map(s => `
+const lim = k => CFG["LIM_" + k];
+function renderServos(){
+  $("servos").innerHTML = SERVOS.map(s => { const [lo, hi] = lim(s.k), v0 = CFG[s.presets[0][1]]; return `
   <div class="card servo" id="card-${s.k}">
-    <h2>${s.name}</h2><div class="meta">${s.part} · ${s.min}–${s.max}°</div>
-    <div class="angle"><span id="a-${s.k}">–</span>°</div>
+    <h2>${s.name}</h2><div class="meta">${s.part} · ${lo}–${hi}°</div>
+    <div class="angle"><span id="a-${s.k}">${cur[s.k] ?? "–"}</span>°</div>
     <div class="gauge"><span id="gauge-${s.k}"></span></div>
-    <input type="range" id="r-${s.k}" min="${s.min}" max="${s.max}" value="${s.presets[0][1]}" aria-label="${s.name} target angle">
+    <input type="range" id="r-${s.k}" min="${lo}" max="${hi}" value="${cur[s.k] ?? v0}" aria-label="${s.name} target angle">
     <div class="row">
-      <button data-k="${s.k}" data-d="-5">−5</button>
-      <button data-k="${s.k}" data-go>Go to <span id="v-${s.k}">${s.presets[0][1]}</span>°</button>
-      <button data-k="${s.k}" data-d="5">+5</button>
+      <button data-k="${s.k}" data-d="-5">−5</button><button data-k="${s.k}" data-d="-1">−1</button>
+      <button data-k="${s.k}" data-go>Go to <span id="v-${s.k}">${cur[s.k] ?? v0}</span>°</button>
+      <button data-k="${s.k}" data-d="1">+1</button><button data-k="${s.k}" data-d="5">+5</button>
     </div>
-    <div class="row">${s.presets.map(([n, a]) => `<button data-k="${s.k}" data-a="${a}">${n} ${a}°</button>`).join("")}</div>
-  </div>`).join("");
+    <div class="row">${s.presets.map(([n, c]) => `<button data-k="${s.k}" data-a="${CFG[c]}">${n} ${CFG[c]}°</button>`).join("")}</div>
+  </div>`; }).join("");
+  for (const s of SERVOS) { const r = $("r-" + s.k); r.addEventListener("input", () => $("v-" + s.k).textContent = r.value); }
+  setButtons();
+}
+
+// ---------- calibration ----------
+const CAL = [  // constant, servo, what it should look like
+  ["TURN_START", "t", "Gripper centred on the START can"],
+  ["TURN_TARGET", "t", "Gripper centred on the TARGET mark (90° away)"],
+  ["LIFT_DOWN", "l", "Pads at the can's mid-height, can just on the table"],
+  ["LIFT_UP", "l", "≈ LIFT_DOWN + 45 (0.6 in up); the flipped can clears the table"],
+  ["WRIST_UP", "w", "Gripper level, can upright (phone level app on the frame)"],
+  ["WRIST_FLIP", "w", "Gripper exactly upside down"],
+  ["GRIP_OPEN", "g", "Arms open wide enough to pass around the can"],
+  ["GRIP_CLOSED", "g", "Pads touch the can, then +3 to +5° (no dent, no slipping)"],
+  ["GRIP_RELEASE", "g", "Upside down at TARGET: pads clear the can by a few mm (don't open further)"],
+];
+let mine = {};
+try { mine = JSON.parse(localStorage.getItem("conceptA_cal") || "{}"); } catch (e) { mine = {}; }
+const saveMine = () => { try { localStorage.setItem("conceptA_cal", JSON.stringify(mine)); } catch (e) {} };
+function renderCal(){
+  $("caltab").innerHTML = `<tr><th>Constant</th><th>Servo</th><th>What it should look like</th><th>firmware</th><th>yours</th><th></th></tr>` +
+    CAL.map(([c, k, how]) => { const v = mine[c] ?? CFG[c]; return `<tr id="cal-${c}" class="${v !== CFG[c] ? "changed" : ""}">
+      <td><code>${c}</code></td><td>${SERVOS.find(s => s.k === k).name.split(" ")[0]}</td><td>${how}</td>
+      <td class="num">${CFG[c]}</td><td class="mine"><input type="number" data-c="${c}" value="${v}" aria-label="${c} value"></td>
+      <td><button data-use="${c}" data-k="${k}">Use current angle</button> <button data-test="${c}" data-k="${k}">Test</button></td></tr>`; }).join("");
+  renderCode(); setButtons();
+}
+function renderCode(){
+  const v = c => mine[c] ?? CFG[c], pad = c => (c + " ").padEnd(13, " ");
+  const notes = {TURN_START:"arm pointing at the start spot", TURN_TARGET:"90 degrees later, pointing at the target spot",
+    LIFT_DOWN:"gripper at can mid-height", LIFT_UP:"about 0.6 in higher", WRIST_UP:"can upright", WRIST_FLIP:"can upside down",
+    GRIP_OPEN:"", GRIP_CLOSED:"just past where the pads touch the can", GRIP_RELEASE:"upside down at the target: open only ~25 deg"};
+  $("calcode").textContent = "// calibrated " + new Date().toISOString().slice(0, 10) + " with viewer/control_panel.html\n" +
+    CAL.map(([c]) => `const int ${pad(c)}= ${String(v(c)).padStart(3)};` + (notes[c] ? `   // ${notes[c]}` : "")).join("\n");
+}
+$("caltab").addEventListener("input", e => { const c = e.target.dataset.c; if (!c) return; mine[c] = +e.target.value; saveMine();
+  e.target.closest("tr").className = mine[c] !== CFG[c] ? "changed" : ""; renderCode(); });
+$("caltab").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return;
+  if (b.dataset.use) { const k = b.dataset.k; if (cur[k] === undefined) return; mine[b.dataset.use] = cur[k]; saveMine(); renderCal(); }
+  if (b.dataset.test) { const c = b.dataset.test; send(`${b.dataset.k} ${mine[c] ?? CFG[c]}`); }
+});
+$("calreset").onclick = () => { mine = {}; saveMine(); renderCal(); };
+$("calcopy").onclick = async () => {
+  const t = $("calcode").textContent;
+  try { await navigator.clipboard.writeText(t); $("calcopy").textContent = "Copied ✓"; }
+  catch (e) { const r = document.createRange(); r.selectNodeContents($("calcode")); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); $("calcopy").textContent = "Selected: press Ctrl+C"; }
+  setTimeout(() => $("calcopy").textContent = "Copy code", 2500);
+};
 
 let port = null, writer = null, reader = null, connected = false, busy = false, cur = {};
 const log = (s) => { const l = $("log"); l.textContent += s + "\n"; if (l.textContent.length > 20000) l.textContent = l.textContent.slice(-15000); l.scrollTop = l.scrollHeight; };
 function setButtons(){
   const can = connected && !busy;
-  document.querySelectorAll(".servo button").forEach(b => b.disabled = !can);
+  document.querySelectorAll(".servo button, #caltab button").forEach(b => b.disabled = !can);
   $("home").disabled = !can; $("start").disabled = !connected; $("stop").disabled = !connected; $("send").disabled = !connected;
 }
 async function send(cmd){
@@ -118,6 +190,11 @@ async function send(cmd){
 }
 function onLine(line){
   log(line);
+  if (line.startsWith("= ")) {                     // calibration constants + limits from the firmware
+    const tok = line.slice(2).trim().split(/\s+/);
+    for (let i = 0; i < tok.length; ) { const n = tok[i]; if (n.startsWith("LIM_")) { CFG[n] = [+tok[i + 1], +tok[i + 2]]; i += 3; } else { CFG[n] = +tok[i + 1]; i += 2; } }
+    renderServos(); renderCal(); return;
+  }
   const m = line.match(/^@ (\w+) (\S+) (-?\d+) (-?\d+) (-?\d+) (-?\d+)/);
   if (!m) { if (/Not at HOME/.test(line)) $("hint").textContent = "Press HOME first, then START."; return; }
   const [, mode, step, t, l, w, g] = m;
@@ -129,9 +206,10 @@ function onLine(line){
     const r = $("r-" + s.k);
     if (!busy && document.activeElement !== r) { r.value = cur[s.k]; $("v-" + s.k).textContent = cur[s.k]; }   // follow the real angle
     $("a-" + s.k).textContent = cur[s.k];
-    $("gauge-" + s.k).style.width = ((cur[s.k] - s.min) / (s.max - s.min) * 100) + "%";
+    const [lo, hi] = lim(s.k);
+    $("gauge-" + s.k).style.width = ((cur[s.k] - lo) / (hi - lo) * 100) + "%";
   }
-  const home = cur.t === 135 && cur.l === 30 && cur.w === 0 && cur.g === 20;
+  const home = cur.t === CFG.TURN_START && cur.l === CFG.LIFT_DOWN && cur.w === CFG.WRIST_UP && cur.g === CFG.GRIP_OPEN;
   $("hint").textContent = mode === "DONE" ? "DONE: remove the can, then START goes home." : (!busy && !home ? "Not at HOME: START needs HOME first." : "");
   setButtons();
 }
@@ -160,7 +238,7 @@ async function connect(){
     $("conn").textContent = "connected"; $("conn").className = "pill ok"; $("connect").textContent = "Disconnect";
     log("Connected. The Uno restarts when the port opens: wait ~2 s for 'ready'.");
     setButtons(); readLoop();
-    setTimeout(() => send("?"), 2500);
+    setTimeout(() => { send("c"); send("?"); }, 2500);
   } catch (e) { log("! " + e.message); }
 }
 if (!("serial" in navigator)) { $("unsupported").hidden = false; $("connect").disabled = true; }
@@ -172,18 +250,15 @@ $("clear").onclick = () => $("log").textContent = "";
 $("send").onclick = () => { const v = $("raw").value.trim(); if (v) { send(v); $("raw").value = ""; } };
 $("raw").addEventListener("keydown", e => { if (e.key === "Enter") $("send").click(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && connected) send("x"); });
-for (const s of SERVOS) {
-  const r = $("r-" + s.k);
-  r.addEventListener("input", () => $("v-" + s.k).textContent = r.value);
-}
 $("servos").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b || b.disabled) return;
   const k = b.dataset.k, r = $("r-" + k), s = SERVOS.find(x => x.k === k);
-  if (b.dataset.d) { const base = cur[k] ?? +r.value; r.value = Math.max(s.min, Math.min(s.max, base + +b.dataset.d)); $("v-" + k).textContent = r.value; send(`${k} ${r.value}`); }
+  const [lo, hi] = lim(k);
+  if (b.dataset.d) { const base = cur[k] ?? +r.value; r.value = Math.max(lo, Math.min(hi, base + +b.dataset.d)); $("v-" + k).textContent = r.value; send(`${k} ${r.value}`); }
   else if (b.dataset.a) { r.value = b.dataset.a; $("v-" + k).textContent = r.value; send(`${k} ${b.dataset.a}`); }
   else if ("go" in b.dataset) send(`${k} ${r.value}`);
 });
-setButtons();
+renderServos(); renderCal();
 window.__panel = {onLine};
 })();
 </script>

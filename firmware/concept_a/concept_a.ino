@@ -18,6 +18,7 @@
 //   h            go to the HOME pose safely, one servo at a time (lift up, wrist, turn, open, lift down)
 //   x            stop: hold where it is
 //   ?            print the status line
+//   c            print the calibration constants and the laptop-move limits ("= NAME value ..." line)
 // The Uno reports "@ MODE STEP turn lift wrist grip" while moving and after every change.
 
 #include <Servo.h>
@@ -125,6 +126,17 @@ void status() {                            // one line the laptop page reads
   Serial.print(now.wrist); Serial.print(' '); Serial.println(now.grip);
 }
 
+void config() {                            // calibration constants + move limits, for the laptop page
+  Serial.print(F("= TURN_START ")); Serial.print(TURN_START); Serial.print(F(" TURN_TARGET ")); Serial.print(TURN_TARGET);
+  Serial.print(F(" LIFT_DOWN ")); Serial.print(LIFT_DOWN); Serial.print(F(" LIFT_UP ")); Serial.print(LIFT_UP);
+  Serial.print(F(" WRIST_UP ")); Serial.print(WRIST_UP); Serial.print(F(" WRIST_FLIP ")); Serial.print(WRIST_FLIP);
+  Serial.print(F(" GRIP_OPEN ")); Serial.print(GRIP_OPEN); Serial.print(F(" GRIP_CLOSED ")); Serial.print(GRIP_CLOSED);
+  Serial.print(F(" GRIP_RELEASE ")); Serial.print(GRIP_RELEASE);
+  const char* k = "tlwg";
+  for (int i = 0; i < 4; i++) { Serial.print(F(" LIM_")); Serial.print(k[i]); Serial.print(' '); Serial.print(LIM[i][0]); Serial.print(' '); Serial.print(LIM[i][1]); }
+  Serial.println();
+}
+
 void startSteps(Step* list, int count, Mode m) {
   steps = list; stepCount = count; stepIndex = 0;
   from = now; stepStart = millis(); mode = m;
@@ -158,6 +170,7 @@ void pressStart() {
 void command(char c, int value, bool hasValue) {
   bool busy = (mode == RUNNING || mode == RETURNING || mode == MANUAL);
   if (c == '?') { status(); return; }
+  if (c == 'c') { config(); return; }
   if (c == 'x') {                          // stop and hold where it is
     mode = IDLE;
     Serial.println(F("Stopped. Send h (home) before starting again.")); status(); return;
@@ -177,7 +190,7 @@ void command(char c, int value, bool hasValue) {
   }
   const char* names = "tlwg";
   const char* p = strchr(names, c);
-  if (!p || !hasValue) { Serial.println(F("? commands: s, t/l/w/g <angle>, h, x, ?")); return; }
+  if (!p || !hasValue) { Serial.println(F("? commands: s, t/l/w/g <angle>, h, x, ?, c")); return; }
   int i = p - names;
   Pose to = now;
   int a = clampAngle(i, value);
@@ -221,6 +234,7 @@ void setup() {
   gripServo.attach(PIN_GRIP);
   writePose(now);
   Serial.println(F("Concept A ready. Press the button (or send s) to start."));
+  config();
   status();
 }
 

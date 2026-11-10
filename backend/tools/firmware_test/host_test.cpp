@@ -91,6 +91,10 @@ int main() {
   out.clear(); buttonLevel = LOW; runFor(60); buttonLevel = HIGH; runFor(9000);
   expect(has("DONE"), "physical button from HOME: runs the sequence");
 
+  out.clear(); Serial.send("c"); runFor(50);
+  expect(has("= TURN_START 135 TURN_TARGET 45 LIFT_DOWN 30 LIFT_UP 75 WRIST_UP 0 WRIST_FLIP 180 GRIP_OPEN 20 GRIP_CLOSED 95 GRIP_RELEASE 70 LIM_t 35 145 LIM_l 25 80 LIM_w 0 180 LIM_g 10 100"),
+         "c: reports the calibration constants and limits", out.substr(0, 200));
+
   printf("\n%s (%d failed)\n", fails ? "FAIL" : "ALL PASS", fails);
   return fails ? 1 : 0;
 }

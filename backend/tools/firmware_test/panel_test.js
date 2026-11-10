@@ -61,6 +61,20 @@ const expect = (ok, what) => { console.log((ok ? "PASS  " : "FAIL  ") + what); i
   await p.waitForTimeout(1500); await p.click("#stop"); await p.waitForTimeout(300);
   expect((await mode()) === "IDLE" && (await p.textContent("#log")).includes("Stopped"), "STOP mid-move holds and reports");
 
+  // calibration: firmware values shown, capture a new angle, code block, test button
+  await p.click("#home"); await waitMode("MANUAL", 1500); await waitMode("IDLE", 8000);
+  expect((await p.textContent("#cal-TURN_START td.num")) === "135", "calibration table shows the firmware's values (from 'c')");
+  await p.click('#card-t button[data-d="-1"]'); await waitMode("MANUAL", 1000); await waitMode("IDLE", 3000);
+  await p.click('#card-t button[data-d="-1"]'); await waitMode("MANUAL", 1000); await waitMode("IDLE", 3000);
+  expect((await angle("t")) === "133", "±1° buttons nudge the base (135 → 133)");
+  await p.click('button[data-use="TURN_START"]');
+  expect((await p.inputValue('#cal-TURN_START input')) === "133" && (await p.textContent("#calcode")).includes("const int TURN_START   = 133;"),
+         "Use current angle captures 133 and writes it into the code block");
+  await p.click('#card-t button[data-a="45"]'); await waitMode("MANUAL", 1000); await waitMode("IDLE", 5000);
+  await p.click('button[data-test="TURN_START"]'); await waitMode("MANUAL", 1000); await waitMode("IDLE", 5000);
+  expect((await angle("t")) === "133", "Test sends the saved value (base back to 133)");
+  if (process.env.SHOT2) await p.screenshot({ path: process.env.SHOT2, fullPage: true });
+
   console.log(fails ? `FAIL (${fails})` : "ALL PASS");
   await b.close(); fw.kill(); process.exit(fails ? 1 : 0);
 })();

@@ -156,21 +156,25 @@ Follow `docs/04_wiring.md` and the diagram `docs/wiring/wiring_diagram.png`:
 6. Button: D4 → button → GND. LED: D13 → 220 Ω → LED long leg; short leg → GND.
 7. Route the column servo leads down the spine with a loose loop: the turret turns 90° and the carriage moves 15 mm. Tie the loop to the spine so it can't catch the arm.
 
-## 6. Calibration (servo_setup sketch)
+## 6. Calibration (laptop control panel)
 
-Place a real empty can at the START mark (5.0 in from the turntable axis), against the can bumper.
+Upload `firmware/concept_a/concept_a.ino`, close the IDE's Serial Monitor, open `viewer/control_panel.html` in Chrome / Edge and click **Connect** (docs/13, section 2b). Real empty can on the START mark (5.0 in from the turntable axis), against the can bumper; 12 V on.
 
-| Constant | How to find it | Default |
+For each constant in the panel's **Calibration** table: move that servo with its card (±5°, then ±1°) until it looks right, click **Use current angle**, and **Test** to check it again. Then **Copy code**, replace the angle lines at the top of `concept_a.ino`, upload, reconnect: the table's *firmware* column now shows your values and the presets follow them.
+
+| Constant | Looks right when | Default |
 |---|---|---:|
-| `TURN_START` | `t` until the gripper is centred on the START can | 135 |
-| `TURN_TARGET` | `t` until the gripper is centred on the TARGET mark (90° away) | 45 |
-| `LIFT_DOWN` | `l` until the pads are at the can's mid-height and the can just touches the table | 30 |
-| `LIFT_UP` | `LIFT_DOWN` + 45 (0.6 in higher); check the flipped can clears the table | 75 |
-| `WRIST_FLIP` | `w` until the gripper is exactly upside down (use a phone level app on the frame) | 180 |
-| `GRIP_CLOSED` | `g` until the pads touch the can, then +3 to +5° for a light squeeze (0.5–1 N per arm: the can shouldn't dent, and shouldn't slide when you tug it) | 95 |
-| `GRIP_RELEASE` | upside down at the target: open until the pads clear the can by a few mm (CAD: 13 mm at 70°); don't open further, the arm would reach the base | 70 |
+| `TURN_START` | the gripper is centred on the START can | 135 |
+| `TURN_TARGET` | the gripper is centred on the TARGET mark (90° away) | 45 |
+| `LIFT_DOWN` | the pads are at the can's mid-height and the can just touches the table | 30 |
+| `LIFT_UP` | `LIFT_DOWN` + 45 (0.6 in higher); the flipped can clears the table | 75 |
+| `WRIST_UP` | the gripper is level, can upright (phone level app on the frame) | 0 |
+| `WRIST_FLIP` | the gripper is exactly upside down | 180 |
+| `GRIP_OPEN` | the arms pass around the can without touching it | 20 |
+| `GRIP_CLOSED` | the pads touch the can, then +3 to +5° for a light squeeze (0.5–1 N per arm: the can shouldn't dent, and shouldn't slide when you tug it) | 95 |
+| `GRIP_RELEASE` | upside down at the target, the pads clear the can by a few mm (CAD: 13 mm at 70°); don't open further, the arm would reach the base | 70 |
 
-`p` prints all four angles. Copy them into the constants at the top of `firmware/concept_a/concept_a.ino`, upload it, then press START.
+The panel only moves each servo inside a window around its current constants (base ±10°, lift ±5°, grip −10/+5°). If a real angle is outside it, set that constant roughly in `concept_a.ino`, upload and fine-tune again. Without a laptop: `firmware/servo_setup` does the same over the Serial Monitor.
 
 ## 7. Tests (fill in the report's section 10)
 
