@@ -13,5 +13,8 @@ ME 2331/L Project 2, Concept A can-flipping robot. Push only to the session's `c
 - Any CAD change: re-run the checks (`backend/cad/check.py`, `backend/mech/mech_checks.py`,
   `backend/tools/make_manual.py` assembly check, `backend/cad/wiring.py`) and regenerate the print
   plates (`print_prep.py`, `plates.py`), drawings and manual.
+- Any firmware change: run `python3 backend/tools/arduino_build_check.py` (compiles every sketch the way the
+  Arduino IDE does, with its auto-prototypes) and `backend/tools/firmware_test/run.sh` before pushing.
+  Keep every struct/enum above the first function in a sketch.
 - When the user asks to "just answer in chat", don't edit files.
 - **No collaboration / attribution lines anywhere**: no `Co-Authored-By`, no `Claude-Session`, no "Generated with Claude Code" in commits or PRs (also set in `.claude/settings.json`).

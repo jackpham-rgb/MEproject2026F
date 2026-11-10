@@ -49,12 +49,15 @@ const int WRIST_MIN_US = 500, WRIST_MAX_US = 2500;
 
 Servo turnServo, liftServo, wristServo, gripServo;
 
+// All types first, before any function: the Arduino IDE writes a prototype for every function and puts
+// them above the first function in the file, so a type used in a function header must already exist there.
 struct Pose { int turn, lift, wrist, grip; };
+struct Step { const char* name; Pose to; unsigned long ms; };   // one move: where every servo is at the END
+enum Mode { IDLE, RUNNING, DONE, RETURNING, MANUAL };   // MANUAL = moves asked for from the laptop
+
 Pose makePose(int turn, int lift, int wrist, int grip) { Pose p; p.turn = turn; p.lift = lift; p.wrist = wrist; p.grip = grip; return p; }
 
 // The run, one move per step. Each row = where every servo should be at the END of the step.
-struct Step { const char* name; Pose to; unsigned long ms; };
-
 Step RUN[] = {
   {"GRIP",    {TURN_START,  LIFT_DOWN, WRIST_UP,   GRIP_CLOSED}, T_GRIP},
   {"LIFT",    {TURN_START,  LIFT_UP,   WRIST_UP,   GRIP_CLOSED}, T_LIFT},
@@ -77,7 +80,6 @@ Step HOMING[] = {
 };
 const int HOME_STEPS = sizeof(HOMING) / sizeof(HOMING[0]);
 
-enum Mode { IDLE, RUNNING, DONE, RETURNING, MANUAL };   // MANUAL = moves asked for from the laptop
 Mode mode = IDLE;
 Step* steps = RUN;
 int stepCount = RUN_STEPS, stepIndex = 0;
