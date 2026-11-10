@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept A Control Panel</title>
+<meta name="description" content="Drive the Concept A robot from a laptop over USB: move each servo, go home, start or stop the sequence.">
+<style>
+:root{--ground:#eef1f4;--panel:#fff;--ink:#1a1e24;--muted:#5b6572;--line:#d5dbe2;--accent:#2f6fdb;--ok:#1f8a5b;--bad:#c8413a;--warn:#b7791f;--track:#e3e8ee;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#111418;--panel:#191d23;--ink:#e6eaef;--muted:#9aa4b1;--line:#2b313a;--accent:#6b9cf0;--ok:#43b883;--bad:#e8645c;--warn:#e0a84f;--track:#232932;color-scheme:dark}}
+:root[data-theme="dark"]{--ground:#111418;--panel:#191d23;--ink:#e6eaef;--muted:#9aa4b1;--line:#2b313a;--accent:#6b9cf0;--ok:#43b883;--bad:#e8645c;--warn:#e0a84f;--track:#232932;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{overflow-x:hidden}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 40px;display:grid;gap:14px}
+h1{font-size:23px;margin:0}
+.sub{color:var(--muted);margin:2px 0 0;max-width:80ch}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+button{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:7px 12px;cursor:pointer}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.big{font-size:17px;padding:12px 20px;font-weight:600}
+.go{background:var(--ok);border-color:var(--ok);color:#fff}
+.stop{background:var(--bad);border-color:var(--bad);color:#fff}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:600;font-size:13px;background:var(--track)}
+.pill.ok{background:var(--ok);color:#fff}.pill.busy{background:var(--warn);color:#fff}.pill.off{background:var(--track);color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.servo h2{font-size:16px;margin:0}
+.servo .meta{color:var(--muted);font-size:12.5px;margin-bottom:8px}
+.angle{font:600 30px/1 ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.gauge{height:6px;background:var(--track);border-radius:3px;margin:8px 0 10px;overflow:hidden}
+.gauge span{display:block;height:100%;background:var(--accent);width:0}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.row button{padding:5px 9px;font-size:13px}
+.big-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#log{font:12px/1.4 ui-monospace,Menlo,monospace;height:190px;overflow:auto;white-space:pre-wrap;background:var(--ground);border:1px solid var(--line);border-radius:6px;padding:8px;margin:0}
+.cmd{display:flex;gap:6px;margin-top:8px}
+.cmd input{flex:1;min-width:0;font:13px ui-monospace,Menlo,monospace;padding:7px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink)}
+.note{font-size:13px;color:var(--muted)}
+.warnbox{border-left:4px solid var(--warn);padding:8px 12px;background:var(--panel);border-radius:6px;font-size:13.5px}
+kbd{font:12px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Concept A control panel</h1>
+  <p class="sub">Move each servo, send it home, or run the whole sequence from the laptop. The physical START button keeps working too. Chrome or Edge, USB cable to the Uno, firmware <code>concept_a.ino</code>.</p>
+</header>
+
+<div class="card bar">
+  <button id="connect" class="primary">Connect to Arduino</button>
+  <span id="conn" class="pill off">not connected</span>
+  <span>Mode: <span id="mode" class="pill off">–</span></span>
+  <span>Step: <b id="step">–</b></span>
+  <span class="note" id="hint"></span>
+</div>
+
+<div id="unsupported" class="warnbox" hidden>This browser can't talk to USB serial. Open this page in <b>Chrome</b> or <b>Edge</b> on a laptop (Web Serial). Firefox and Safari don't support it.</div>
+
+<div class="card big-row">
+  <button id="start" class="big go" disabled>▶ START sequence</button>
+  <button id="home" class="big" disabled>⌂ HOME</button>
+  <button id="stop" class="big stop" disabled>■ STOP</button>
+  <span class="note">STOP holds where it is: <kbd>Esc</kbd> works too. START only runs from HOME (send HOME first).</span>
+</div>
+
+<div class="grid" id="servos"></div>
+
+<div class="card">
+  <div class="bar" style="justify-content:space-between"><b>Serial log</b><button id="clear">Clear</button></div>
+  <pre id="log"></pre>
+  <div class="cmd"><input id="raw" placeholder="type a command, e.g. w 90 or ?" aria-label="raw command"><button id="send" disabled>Send</button></div>
+</div>
+
+<div class="warnbox">Before START: robot at HOME, can on the START mark, 12 V adapter on (servo power). The 9 V battery or USB powers the Uno. Testing without the 1000 µF capacitor is fine; keep your hand near STOP.</div>
+</div>
+
+<script>
+(function(){
+const $ = id => document.getElementById(id);
+// key, title, part, pin, min, max, presets — limits match LIM[] in concept_a.ino
+const SERVOS = [
+  {k:"t", name:"Base (turntable)", part:"MG996R · D9", min:35, max:145, presets:[["START",135],["TARGET",45]]},
+  {k:"l", name:"Lift", part:"MG90S · D10", min:25, max:80, presets:[["DOWN",30],["UP",75]]},
+  {k:"w", name:"Wrist", part:"MG90S · D6", min:0, max:180, presets:[["UPRIGHT",0],["FLIPPED",180]]},
+  {k:"g", name:"Grip", part:"SG90 · D5", min:10, max:100, presets:[["OPEN",20],["RELEASE",70],["CLOSED",95]]},
+];
+$("servos").innerHTML = SERVOS.map(s => `
+  <div class="card servo" id="card-${s.k}">
+    <h2>${s.name}</h2><div class="meta">${s.part} · ${s.min}–${s.max}°</div>
+    <div class="angle"><span id="a-${s.k}">–</span>°</div>
+    <div class="gauge"><span id="gauge-${s.k}"></span></div>
+    <input type="range" id="r-${s.k}" min="${s.min}" max="${s.max}" value="${s.presets[0][1]}" aria-label="${s.name} target angle">
+    <div class="row">
+      <button data-k="${s.k}" data-d="-5">−5</button>
+      <button data-k="${s.k}" data-go>Go to <span id="v-${s.k}">${s.presets[0][1]}</span>°</button>
+      <button data-k="${s.k}" data-d="5">+5</button>
+    </div>
+    <div class="row">${s.presets.map(([n, a]) => `<button data-k="${s.k}" data-a="${a}">${n} ${a}°</button>`).join("")}</div>
+  </div>`).join("");
+
+let port = null, writer = null, reader = null, connected = false, busy = false, cur = {};
+const log = (s) => { const l = $("log"); l.textContent += s + "\n"; if (l.textContent.length > 20000) l.textContent = l.textContent.slice(-15000); l.scrollTop = l.scrollHeight; };
+function setButtons(){
+  const can = connected && !busy;
+  document.querySelectorAll(".servo button").forEach(b => b.disabled = !can);
+  $("home").disabled = !can; $("start").disabled = !connected; $("stop").disabled = !connected; $("send").disabled = !connected;
+}
+async function send(cmd){
+  if (!writer) return;
+  log("→ " + cmd);
+  await writer.write(new TextEncoder().encode(cmd + "\n"));
+}
+function onLine(line){
+  log(line);
+  const m = line.match(/^@ (\w+) (\S+) (-?\d+) (-?\d+) (-?\d+) (-?\d+)/);
+  if (!m) { if (/Not at HOME/.test(line)) $("hint").textContent = "Press HOME first, then START."; return; }
+  const [, mode, step, t, l, w, g] = m;
+  busy = mode === "RUNNING" || mode === "RETURNING" || mode === "MANUAL";
+  $("mode").textContent = mode; $("mode").className = "pill " + (busy ? "busy" : "ok");
+  $("step").textContent = step;
+  cur = {t:+t, l:+l, w:+w, g:+g};
+  for (const s of SERVOS) {
+    const r = $("r-" + s.k);
+    if (!busy && document.activeElement !== r) { r.value = cur[s.k]; $("v-" + s.k).textContent = cur[s.k]; }   // follow the real angle
+    $("a-" + s.k).textContent = cur[s.k];
+    $("gauge-" + s.k).style.width = ((cur[s.k] - s.min) / (s.max - s.min) * 100) + "%";
+  }
+  const home = cur.t === 135 && cur.l === 30 && cur.w === 0 && cur.g === 20;
+  $("hint").textContent = mode === "DONE" ? "DONE: remove the can, then START goes home." : (!busy && !home ? "Not at HOME: START needs HOME first." : "");
+  setButtons();
+}
+async function readLoop(){
+  const dec = new TextDecoder(); let buf = "";
+  while (port && port.readable) {
+    reader = port.readable.getReader();
+    try {
+      for (;;) {
+        const {value, done} = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, {stream:true});
+        let i; while ((i = buf.indexOf("\n")) >= 0) { const line = buf.slice(0, i).replace(/\r$/, ""); buf = buf.slice(i + 1); if (line) onLine(line); }
+      }
+    } catch (e) { log("! " + e.message); break; } finally { reader.releaseLock(); }
+  }
+}
+async function connect(){
+  if (connected) { try { await reader?.cancel(); writer?.releaseLock(); await port.close(); } catch (e) {} connected = false; port = null; writer = null;
+    $("conn").textContent = "not connected"; $("conn").className = "pill off"; $("connect").textContent = "Connect to Arduino"; setButtons(); return; }
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({baudRate: 9600});
+    writer = port.writable.getWriter();
+    connected = true;
+    $("conn").textContent = "connected"; $("conn").className = "pill ok"; $("connect").textContent = "Disconnect";
+    log("Connected. The Uno restarts when the port opens: wait ~2 s for 'ready'.");
+    setButtons(); readLoop();
+    setTimeout(() => send("?"), 2500);
+  } catch (e) { log("! " + e.message); }
+}
+if (!("serial" in navigator)) { $("unsupported").hidden = false; $("connect").disabled = true; }
+$("connect").onclick = connect;
+$("start").onclick = () => send("s");
+$("home").onclick = () => send("h");
+$("stop").onclick = () => send("x");
+$("clear").onclick = () => $("log").textContent = "";
+$("send").onclick = () => { const v = $("raw").value.trim(); if (v) { send(v); $("raw").value = ""; } };
+$("raw").addEventListener("keydown", e => { if (e.key === "Enter") $("send").click(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && connected) send("x"); });
+for (const s of SERVOS) {
+  const r = $("r-" + s.k);
+  r.addEventListener("input", () => $("v-" + s.k).textContent = r.value);
+}
+$("servos").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return;
+  const k = b.dataset.k, r = $("r-" + k), s = SERVOS.find(x => x.k === k);
+  if (b.dataset.d) { const base = cur[k] ?? +r.value; r.value = Math.max(s.min, Math.min(s.max, base + +b.dataset.d)); $("v-" + k).textContent = r.value; send(`${k} ${r.value}`); }
+  else if (b.dataset.a) { r.value = b.dataset.a; $("v-" + k).textContent = r.value; send(`${k} ${b.dataset.a}`); }
+  else if ("go" in b.dataset) send(`${k} ${r.value}`);
+});
+setButtons();
+window.__panel = {onLine};
+})();
+</script>
+</body>
+</html>

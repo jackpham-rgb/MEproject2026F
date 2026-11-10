@@ -164,7 +164,7 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
     }
     endPara(); flush(); return out;
   };
-  const ePage = (n, title, body, imgSrc) => `<div class="pg"><div class="num">${n}</div><div class="ttl">${title}</div>
+  const ePage = (n, title, body, imgSrc) => `<div class="pg"><div class="num">${n}</div><div class="ttl" style="left:${n.length > 2 ? 62 : 44}mm">${title}</div>
     <div class="ebody ${imgSrc ? "withimg" : ""}">${imgSrc ? `<img class="eimg" src="${imgSrc}">` : ""}<div>${body}</div></div></div>`;
   let H = `<!doctype html><html><head><meta charset="utf-8"><title>Concept A Assembly Manual</title><style>${css}</style></head><body>`;
   H += `<div class="pg"><h1>CONCEPT A</h1><div style="font-size:16px;margin-top:2mm">Can-flipping robot · assembly manual · ME 2331/L</div>
@@ -190,6 +190,7 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
     <div class="note">Uno on its own 9 V battery; the 12 V adapter feeds only the buck (servos). Uno GND and servo GND must be joined.</div></div>`;
   H += ePage("E2", "Bench test 1: power, no servos yet", mdSection("docs/13_electronics_bench_test.md", "1. Power"));
   H += ePage("E3", "Bench test 2: one servo at a time (firmware/bench_test)", mdSection("docs/13_electronics_bench_test.md", "2. One servo"));
+  H += ePage("E3b", "Laptop control panel (viewer/control_panel.html)", mdSection("docs/13_electronics_bench_test.md", "2b. Laptop control panel"));
   H += ePage("E4", "If something is wrong", mdSection("docs/13_electronics_bench_test.md", "3. If something"));
   H += ePage("E5", "Wiring dry run (decides what to return)", mdSection("docs/13_electronics_bench_test.md", "4. Then the wiring dry run") +
     `<h2 style="margin-top:6mm">Then: PART M, the mechanics</h2><p>Print plates 0–3 (cad/print/plates), then follow steps 1–${steps.length}. Keep the bench-test wiring: it moves into the tray in step ${steps.length - 2}.</p>`);

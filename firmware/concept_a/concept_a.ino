@@ -7,10 +7,18 @@
 // Wiring (see docs/tinkercad_concept_a.md):
 //   D9  turntable servo      D10 lift servo       D6 wrist servo     D5 gripper servo
 //   D4  start button to GND  D13 LED (+220 ohm)
-// Real robot: 12 V adapter -> Uno VIN, and -> XL4015 buck at 5.8 V -> servo rail (docs/04_wiring.md, EE/).
+// Real robot: Uno on its own 9 V battery; 12 V adapter -> XL4015 buck at 5.8 V -> servos only (docs/04_wiring.md, EE/).
 //
 // Button: press to run. After DONE, take the can away, then press again to go home.
 // (Going home with the can still there would knock it over: the open arms are on both sides.)
+//
+// Laptop control (USB, 9600 baud, one command per line; viewer/control_panel.html does this for you):
+//   s            same as pressing START (run, or go home after DONE)
+//   t 135        move one servo to an angle, eased: t = turntable, l = lift, w = wrist, g = gripper
+//   h            go to the HOME pose safely, one servo at a time (lift up, wrist, turn, open, lift down)
+//   x            stop: hold where it is
+//   ?            print the status line
+// The Uno reports "@ MODE STEP turn lift wrist grip" while moving and after every change.
 
 #include <Servo.h>
 
@@ -69,12 +77,16 @@ Step HOMING[] = {
 };
 const int HOME_STEPS = sizeof(HOMING) / sizeof(HOMING[0]);
 
-enum Mode { IDLE, RUNNING, DONE, RETURNING };
+enum Mode { IDLE, RUNNING, DONE, RETURNING, MANUAL };   // MANUAL = moves asked for from the laptop
 Mode mode = IDLE;
 Step* steps = RUN;
 int stepCount = RUN_STEPS, stepIndex = 0;
 Pose now, from;
 unsigned long stepStart = 0;
+Mode afterManual = IDLE;                   // where a laptop move returns to
+Step manualSteps[5];                       // built on the fly for laptop moves
+// Laptop moves stay inside these angles (a bit past the working angles, not the servo's full travel)
+const int LIM[4][2] = {{TURN_TARGET - 10, TURN_START + 10}, {LIFT_DOWN - 5, LIFT_UP + 5}, {0, 180}, {GRIP_OPEN - 10, GRIP_CLOSED + 5}};
 
 // ---------- helpers ----------
 float ease(float s) {                      // slow - fast - slow (minimum-jerk curve)
@@ -100,10 +112,96 @@ bool buttonPressed() {                     // true once per press (debounced)
   return false;
 }
 
+const char* modeName(Mode m) {
+  switch (m) { case RUNNING: return "RUNNING"; case DONE: return "DONE"; case RETURNING: return "RETURNING"; case MANUAL: return "MANUAL"; default: return "IDLE"; }
+}
+
+void status() {                            // one line the laptop page reads
+  Serial.print(F("@ ")); Serial.print(modeName(mode)); Serial.print(' ');
+  Serial.print((mode == IDLE || mode == DONE) ? "-" : steps[stepIndex].name); Serial.print(' ');
+  Serial.print(now.turn); Serial.print(' '); Serial.print(now.lift); Serial.print(' ');
+  Serial.print(now.wrist); Serial.print(' '); Serial.println(now.grip);
+}
+
 void startSteps(Step* list, int count, Mode m) {
   steps = list; stepCount = count; stepIndex = 0;
   from = now; stepStart = millis(); mode = m;
   Serial.print(F("> ")); Serial.println(steps[0].name);
+  status();
+}
+
+unsigned long moveMs(int a, int b) {       // ~8 ms per degree, at least 300 ms: gentle
+  unsigned long d = (unsigned long)abs(b - a) * 8;
+  return d < 300 ? 300 : d;
+}
+
+int clampAngle(int i, int a) { return a < LIM[i][0] ? LIM[i][0] : (a > LIM[i][1] ? LIM[i][1] : a); }
+
+bool atHome() {
+  return now.turn == TURN_START && now.lift == LIFT_DOWN && now.wrist == WRIST_UP && now.grip == GRIP_OPEN;
+}
+
+// START (button or laptop): run from HOME; after DONE, go home. From anywhere else it refuses,
+// because the first step would move several servos at once from an unknown pose.
+void pressStart() {
+  if (mode == IDLE) {
+    if (atHome()) startSteps(RUN, RUN_STEPS, RUNNING);
+    else Serial.println(F("Not at HOME: send h (or use the HOME button) first."));
+  } else if (mode == DONE) {
+    Serial.println(F("Going home (can should be removed).")); startSteps(HOMING, HOME_STEPS, RETURNING);
+  } else Serial.println(F("Busy: wait, or x to stop."));
+}
+
+// ---------- laptop commands ----------
+void command(char c, int value, bool hasValue) {
+  bool busy = (mode == RUNNING || mode == RETURNING || mode == MANUAL);
+  if (c == '?') { status(); return; }
+  if (c == 'x') {                          // stop and hold where it is
+    mode = IDLE;
+    Serial.println(F("Stopped. Send h (home) before starting again.")); status(); return;
+  }
+  if (c == 's') { pressStart(); return; }  // same as the button
+  if (busy) { Serial.println(F("Busy: wait, or x to stop.")); return; }
+  afterManual = IDLE;                      // after a laptop move: IDLE (START then needs HOME)
+  if (c == 'h') {                          // HOME, one servo at a time
+    Pose p = now; int n = 0;
+    p.lift = LIFT_UP;     manualSteps[n].name = "M-LIFT";  manualSteps[n].to = p; manualSteps[n++].ms = moveMs(now.lift, LIFT_UP);
+    p.wrist = WRIST_UP;   manualSteps[n].name = "M-WRIST"; manualSteps[n].to = p; manualSteps[n++].ms = moveMs(now.wrist, WRIST_UP);
+    p.turn = TURN_START;  manualSteps[n].name = "M-TURN";  manualSteps[n].to = p; manualSteps[n++].ms = moveMs(now.turn, TURN_START);
+    p.grip = GRIP_OPEN;   manualSteps[n].name = "M-GRIP";  manualSteps[n].to = p; manualSteps[n++].ms = moveMs(now.grip, GRIP_OPEN);
+    p.lift = LIFT_DOWN;   manualSteps[n].name = "M-LOWER"; manualSteps[n].to = p; manualSteps[n++].ms = moveMs(LIFT_UP, LIFT_DOWN);
+    startSteps(manualSteps, n, MANUAL);
+    return;
+  }
+  const char* names = "tlwg";
+  const char* p = strchr(names, c);
+  if (!p || !hasValue) { Serial.println(F("? commands: s, t/l/w/g <angle>, h, x, ?")); return; }
+  int i = p - names;
+  Pose to = now;
+  int a = clampAngle(i, value);
+  int* field = (i == 0) ? &to.turn : (i == 1) ? &to.lift : (i == 2) ? &to.wrist : &to.grip;
+  int was = *field; *field = a;
+  manualSteps[0].name = (i == 0) ? "M-TURN" : (i == 1) ? "M-LIFT" : (i == 2) ? "M-WRIST" : "M-GRIP";
+  manualSteps[0].to = to; manualSteps[0].ms = moveMs(was, a);
+  if (a != value) { Serial.print(F("limited to ")); Serial.println(a); }
+  startSteps(manualSteps, 1, MANUAL);
+}
+
+void readSerial() {                        // "t 135\n" style lines, no String class
+  static char buf[16]; static byte len = 0;
+  while (Serial.available()) {
+    char ch = Serial.read();
+    if (ch == '\r') continue;
+    if (ch == '\n') {
+      buf[len] = 0; len = 0;
+      char* q = buf; while (*q == ' ') q++;
+      if (!*q) continue;
+      char c = *q++;
+      while (*q == ' ') q++;
+      bool hasValue = (*q >= '0' && *q <= '9') || *q == '-';
+      command(c, hasValue ? atoi(q) : 0, hasValue);
+    } else if (len < sizeof(buf) - 1) buf[len++] = ch;
+  }
 }
 
 // ---------- setup / loop ----------
@@ -120,11 +218,13 @@ void setup() {
   wristServo.attach(PIN_WRIST, WRIST_MIN_US, WRIST_MAX_US);    delay(ATTACH_GAP_MS);
   gripServo.attach(PIN_GRIP);
   writePose(now);
-  Serial.println(F("Concept A ready. Press the button to start."));
+  Serial.println(F("Concept A ready. Press the button (or send s) to start."));
+  status();
 }
 
 void loop() {
   bool pressed = buttonPressed();
+  readSerial();
 #ifdef AUTO_START
   static bool autoDone = false;            // headless test only: press once after 1 s
   if (!autoDone && millis() > 1000) { pressed = true; autoDone = true; }
@@ -133,15 +233,16 @@ void loop() {
   // LED: off = idle, blinking = moving, on = done
   unsigned long t = millis();
   digitalWrite(PIN_LED, mode == DONE ? HIGH : (mode == IDLE ? LOW : (t / 400) % 2));
+  static unsigned long lastReport = 0;     // live angles for the laptop page while moving
+  if ((mode == RUNNING || mode == RETURNING || mode == MANUAL) && t - lastReport >= 100) { lastReport = t; status(); }
 
   switch (mode) {
     case IDLE:
-      if (pressed) startSteps(RUN, RUN_STEPS, RUNNING);
+    case DONE:
+      if (pressed) pressStart();
       break;
 
-    case DONE:
-      if (pressed) { Serial.println(F("Going home (can should be removed).")); startSteps(HOMING, HOME_STEPS, RETURNING); }
-      break;
+    case MANUAL:
 
     case RUNNING:
     case RETURNING: {
@@ -160,8 +261,12 @@ void loop() {
       if (e >= 1) {                                      // step finished
         from = to; now = to;
         if (++stepIndex >= stepCount) {
-          mode = (mode == RUNNING) ? DONE : IDLE;
-          Serial.println(mode == DONE ? F("DONE: can is upside down at the target.") : F("Home."));
+          if (mode == MANUAL) { mode = afterManual; Serial.println(F("Moved.")); }
+          else {
+            mode = (mode == RUNNING) ? DONE : IDLE;
+            Serial.println(mode == DONE ? F("DONE: can is upside down at the target.") : F("Home."));
+          }
+          status();
         } else {
           stepStart = millis();
           Serial.print(F("> ")); Serial.println(steps[stepIndex].name);

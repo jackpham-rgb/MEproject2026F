@@ -38,6 +38,28 @@ The MG996R's + / − go to the **buck OUT terminals** (cut extension), its signa
 
 Each test: smooth, no buzzing, the Uno doesn't reset (no 3× blink in the middle).
 
+## 2b. Laptop control panel (the whole program, from the laptop)
+
+1. Upload `firmware/concept_a/concept_a.ino` with the Arduino IDE, then **close the IDE's Serial Monitor**
+   (only one program can use the USB port).
+2. Open `viewer/control_panel.html` in **Chrome or Edge** (or the project site link). Click
+   **Connect to Arduino** and pick the Uno's port. The Uno restarts; after ~2 s the angles appear.
+3. Each servo has a slider, ±5° buttons and its working angles (base START 135° / TARGET 45°, lift DOWN / UP,
+   wrist UPRIGHT / FLIPPED, grip OPEN / RELEASE / CLOSED). Every move is smooth and stays inside safe limits.
+4. **HOME** brings the robot home one servo at a time. **START** runs the whole sequence (same as the
+   physical button, which keeps working). START only runs from HOME. **STOP** (or Esc) holds where it is.
+
+| Check | Expected |
+|---|---|
+| Each servo button | Only that servo moves, to that angle, smoothly |
+| HOME | Lift up → wrist → base → grip → lift down |
+| START at HOME | GRIP → LIFT → FLIP → TURN → LOWER → RELEASE, ends DONE |
+| START again after DONE (can removed) | Goes home |
+| STOP during a move | Holds; HOME before the next START |
+
+Tested without hardware: the firmware's commands on a simulated Uno (`backend/tools/firmware_test/run.sh`,
+15 checks) and the page driving the live firmware through a fake USB port (`panel_test.js`, 11 checks).
+
 ## 3. If something is wrong
 
 | Symptom | Likely cause | Fix |
