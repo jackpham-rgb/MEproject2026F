@@ -52,6 +52,8 @@ If a stage fails, fix it there before building the next: each one is independent
 
 ## No-print claw (only if the printer can't do even the two small prints)
 
+Templates (1:1 PDF), the full zero-print build and the print-service order sheet: `fallback_no_printer/`.
+
 SG90 horn with a popsicle stick hot-glued on as one finger, a second stick glued fixed opposite it, both
 with a strip of rubber band as a pad, 66 mm apart minus the squeeze. One moving finger instead of two
 geared ones: it proves the grip, the flip and the whole sequence, but not the gear mesh.
