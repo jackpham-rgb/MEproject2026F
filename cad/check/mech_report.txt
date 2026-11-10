@@ -1,4 +1,4 @@
-ENGINEERING CHECKS: 53 checks, 53 PASS, 0 FAIL
+ENGINEERING CHECKS: 54 checks, 54 PASS, 0 FAIL
 (backend/mech/mech_checks.py; CAD masses/inertias, firmware timing; EST = datasheet value)
 
    area       check                                                      value                          limit                    result
@@ -44,15 +44,16 @@ ENGINEERING CHECKS: 53 checks, 53 PASS, 0 FAIL
    Power      peak servo current vs XL4015 rating 5 A                    0.65 A                         ≤ 2.5 A (50 %)           PASS
    Power      buck dissipation (no heatsink ≤ 1 W)                       0.42 W                         ≤ 1 W                    PASS
    Power      SG90 holding heat (5 s per run)                            1.69 W for 5 s                 ≤ 2 W                    PASS
-   Power      Uno regulator (12 V in, 59 mA)                             0.35 W                         ≤ 1 W (SOT-223)          PASS
+   Power      Uno regulator (own 9 V battery, 59 mA)                     0.19 W                         ≤ 1 W (SOT-223)          PASS
+   Power      9 V battery life (Uno + LED, 59 mA, ~550 mAh)              9 h                            ≥ 4 h (a day of testing) PASS
    Proto v1   Adeept 996R: stall needed for 2× margin (VERIFY ≥ this)    ≥ 0.1 kg·cm                    MG996R class 9.4         PASS
    Proto v1   Miuzei MG90S (lift): listed 2.0 kg·cm vs needed            0.71 kg·cm needed              ≤ 2.0 listed             PASS
    Proto v1   Miuzei MG90S (wrist): listed 2.0 kg·cm vs needed           1.15 kg·cm needed              ≤ 2.0 listed             PASS
    Proto v1   household pad rubber (μ 0.35): squeeze margin              3.8× the minimum               ≥ 2×                     PASS
    Proto v1   pad rubber 2.0 mm: release gap to the can                  11.3 mm                        ≥ 5 mm                   PASS
    Proto v1   tip-over with NO ballast (ballast is not in the model)     37.2 mm                        ≥ 20 mm                  PASS
-   Proto v1   LIZVOR 2 A adapter: current in a normal run                0.42 A                         ≤ 1.0 A (50 %)           PASS
-   Proto v1   LIZVOR 2 A adapter: MG996R stalled (worst case)            1.60 A                         ≤ 2.0 A                  PASS
+   Proto v1   LIZVOR 2 A adapter: current in a normal run                0.36 A                         ≤ 1.0 A (50 %)           PASS
+   Proto v1   LIZVOR 2 A adapter: MG996R stalled (worst case)            1.54 A                         ≤ 2.0 A                  PASS
    Proto v1   jumper chain on the gripper lead: voltage drop at SG90 stall 0.19 V                         ≤ 0.3 V (5 %)            PASS
    Proto v1   h8 rod: extra wobble at the pads                           0.15 mm                        ≤ 0.5 mm                 PASS
 
@@ -102,5 +103,5 @@ DETAILS
 8. PROTOTYPE v1: the purchased parts and the household swaps (docs/11_bom_prototype_v1.md)
    pad rubber 1.0 mm instead of 1.6: closed angle shifts -0.8° (re-set GRIP_CLOSED with servo_setup), release gap 12.3 mm
    pad rubber 2.0 mm instead of 1.6: closed angle shifts +0.5° (re-set GRIP_CLOSED with servo_setup), release gap 11.3 mm
-   the knob: Uno VIN is fine 7-12 V and dies above 20 V; the servos stay at 5.8 V whatever comes in (buck). Tape it at 12.0 V
+   the knob: the adapter feeds only the buck now (the Uno has its own 9 V battery); the servos stay at 5.8 V whatever comes in. Tape it at 12.0 V
 

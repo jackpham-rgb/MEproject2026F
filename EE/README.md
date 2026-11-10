@@ -214,3 +214,17 @@ The cost is $5 and setting the buck once with a meter. Power decision matrix: B 
 
 Plot in LTspice: `V(rail)`, `V(uno5v)`, `V(vin)`, `V(d9)` `V(d10)` `V(d6)` `V(d5)` (zoom into any 20 ms to see
 the four pulses in order), `V(d13)`, `V(d4)`.
+
+## Final power design: Uno on its own 9 V battery
+
+The Uno now runs from its own 9 V battery (barrel jack or VIN); the 12 V adapter feeds only the XL4015
+buck for the servos. All grounds stay joined. `python3.13 backend/ee/power_final.py` simulates it in
+ngspice (netlists `EE/ltspice/power_final_*.cir`, open them in LTspice too) and writes
+`EE/out/power_final_report.txt` + `power_final.png`:
+
+- Uno 5 V: 5.00 V (4.92 V on a nearly flat 7.2 V battery) in a normal run, MG996R stall and power-up.
+- Servo supply ≥ 5.51 V in every case; adapter ≤ 1.69 A (2 A rating).
+- 1000 µF capacitor: no difference at the ms scale; in the worst fast inrush (all four servos within
+  0.6 ms) the supply dips to 4.65 V / rings to 6.6 V without it, 5.11 V / 6.15 V with it. Optional
+  while testing, fit it for the final runs.
+- Battery life ~9 h (59 mA). Schematic: `docs/wiring/schematic.png` (`backend/ee/schematic.py`).

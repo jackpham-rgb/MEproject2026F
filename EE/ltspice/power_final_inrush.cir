@@ -1,0 +1,19 @@
+* Concept A: servo inrush, 1000 uF on the rail: yes
+BBUCK bo 0 V=5.8
+RBO bo bl 0.03
+LBUCK bl bk 47u
+COUT bk coutn 220u IC=5.8
+RCOUT coutn 0 0.15
+RRAIL bk rail 0.05
+CRAIL rail nc 1000u IC=5.8
+RESR nc 0 0.08
+RL_turn bk v_turn 0.08
+I_turn v_turn 0 PULSE(0 2.5 0.001 0.1m 0.1m 8m 20m)
+RL_lift rail v_lift 0.13
+I_lift v_lift 0 PULSE(0 0.7 0.0012000000000000001 0.1m 0.1m 8m 20m)
+RL_wrist rail v_wrist 0.13
+I_wrist v_wrist 0 PULSE(0 0.7 0.0014 0.1m 0.1m 8m 20m)
+RL_grip rail v_grip 0.13
+I_grip v_grip 0 PULSE(0 0.65 0.0016 0.1m 0.1m 8m 20m)
+.tran 10u 20m 0 10u uic
+.end

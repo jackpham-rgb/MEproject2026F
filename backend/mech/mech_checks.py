@@ -539,7 +539,8 @@ check("Power", "peak servo current vs XL4015 rating 5 A", f"{pk_I:.2f} A", "≤ 
 check("Power", "buck dissipation (no heatsink ≤ 1 W)", f"{0.1 * P_elec / 0.9:.2f} W", "≤ 1 W", 0.1 * P_elec / 0.9 <= 1.0)
 hold_I = 0.65 * grip_hold_frac
 check("Power", "SG90 holding heat (5 s per run)", f"{hold_I * 5.8:.2f} W for 5 s", "≤ 2 W", hold_I * 5.8 <= 2.0)
-check("Power", "Uno regulator (12 V in, 59 mA)", f"{(11 - 5) * 0.059:.2f} W", "≤ 1 W (SOT-223)", (11 - 5) * 0.059 <= 1.0)
+check("Power", "Uno regulator (own 9 V battery, 59 mA)", f"{(9.3 - 1.0 - 5) * 0.059:.2f} W", "≤ 1 W (SOT-223)", (9.3 - 1.0 - 5) * 0.059 <= 1.0)
+check("Power", "9 V battery life (Uno + LED, 59 mA, ~550 mAh)", f"{0.55 / 0.059:.0f} h", "≥ 4 h (a day of testing)", 0.55 / 0.059 >= 4)
 E_run = 0.0
 for sv in SERVO:
     t_ = np.array(duty[sv]["t"]); o = np.argsort(t_, kind="stable")
@@ -567,11 +568,11 @@ check("Proto v1", "pad rubber 2.0 mm: release gap to the can", f"{13.3 - 2.0:.1f
 check("Proto v1", "tip-over with NO ballast (ballast is not in the model)", f"{zmp_margin:.1f} mm", "≥ 20 mm", zmp_margin >= 20)
 # LIZVOR adjustable adapter set to 12 V, 2 A
 eta, v_in = 0.88, 12.0
-I_in_run = pk_I * 5.8 / (eta * v_in) + 0.059
-I_in_stall = (2.5 + 0.3) * 5.8 / (eta * v_in) + 0.059     # MG996R stalled (2.5 A EST) + the rest idle
+I_in_run = pk_I * 5.8 / (eta * v_in)                  # the Uno is on its own 9 V battery now
+I_in_stall = (2.5 + 0.3) * 5.8 / (eta * v_in)            # MG996R stalled (2.5 A EST) + the rest idle
 check("Proto v1", "LIZVOR 2 A adapter: current in a normal run", f"{I_in_run:.2f} A", "≤ 1.0 A (50 %)", I_in_run <= 1.0)
 check("Proto v1", "LIZVOR 2 A adapter: MG996R stalled (worst case)", f"{I_in_stall:.2f} A", "≤ 2.0 A", I_in_stall <= 2.0)
-out("   the knob: Uno VIN is fine 7-12 V and dies above 20 V; the servos stay at 5.8 V whatever comes in (buck). Tape it at 12.0 V")
+out("   the knob: the adapter feeds only the buck now (the Uno has its own 9 V battery); the servos stay at 5.8 V whatever comes in. Tape it at 12.0 V")
 # jumper chains instead of servo extensions (gripper: ~270 mm added, 2 jumpers per wire)
 R_wire = 0.213 * 0.40 * 2          # 28 AWG ohm/m x 0.4 m, + and - wires
 R_joint = 0.03 * 4                 # 4 dupont joints in the loop

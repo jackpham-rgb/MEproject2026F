@@ -15,7 +15,6 @@ within 30 days). Prototype v2 then optimizes material and salvages more from hom
 |---|---:|---|---|
 | Arduino Uno R3 + USB cable | 1 | Controller | Kit |
 | SG90 servo | 1 | Gripper (D5) | Kit |
-| Electrolytic capacitor 1000 µF, ≥ 10 V | 1 | Servo rail | Kit |
 | Push button 12 mm | 1 | START (D4) | Kit |
 | LED 5 mm + 220 Ω resistor | 1 | Status (D13) | Kit |
 | Mini breadboard (170 holes) | 1 | Servo rail | Kit |
@@ -23,7 +22,8 @@ within 30 days). Prototype v2 then optimizes material and salvages more from hom
 | #6-32 × ½″ screws / #8-32 × ½″ screws | 8 / 4 | Frame / MG996R | Harbor Freight kit |
 | Servo-bag screws | ~14 | Servo tabs, horns | Come with the servos |
 | PETG filament 1.75 mm | ~0.35 kg | All printed parts | |
-| **LIZVOR adjustable adapter, 3.5–24 V 2 A** | 1 | **Replaces the 12 V adapter** | Set to **12.0 V** before connecting, tape the knob, use the plain 5.5 × 2.1 mm tip (centre +), **not** the polarity-reversing cable |
+| **9 V battery** | 1 | **Powers the Uno only** (~9 h) | Meter it: replace below 7.5 V |
+| **LIZVOR adjustable adapter, 3.5–24 V 2 A** | 1 | **Replaces the 12 V adapter** (servo power only now) | Set to **12.0 V** before connecting, tape the knob, use the plain 5.5 × 2.1 mm tip (centre +), **not** the polarity-reversing cable |
 | **LIZVOR "DC terminal block" tip** | 1 | **Replaces the DC panel jack** | Screw the + / − wires to the buck input and Uno VIN; hot-glue it inside the tray by the panel hole |
 
 ## 2. Must buy: $52.57
@@ -42,6 +42,8 @@ within 30 days). Prototype v2 then optimizes material and salvages more from hom
 
 | Item | Look for at home | What to check | If not found |
 |---|---|---|---|
+| 1000 µF capacitor, ≥ 10 V (≥ 470 µF works) | From another project / an old board (read the side: µF and V) | **Optional while testing**; stripe = −. A 6.3 V one is too close to the 5.8 V rail: don't use it | ≈ $2–5 EST, "1000uF 16V electrolytic" pack, [Amazon](https://www.amazon.com/s?k=1000uF+16V+electrolytic+capacitor) |
+| 9 V snap clip with a 5.5 × 2.1 mm barrel plug | From an old toy / gadget, or solder a clip to an old barrel-plug cable | Centre pin = +; or skip the plug and wire + → VIN, − → GND | ≈ $3–6 EST, [Amazon](https://www.amazon.com/s?k=9V+battery+clip+5.5x2.1mm+barrel+plug) |
 | Servo extension leads (4) | Chains of the kit's M-F jumper wires | Joints only in tied runs, never in a loop; tape each joint. The gripper needs ~270 mm added | Already in the cart: 20 pcs, **$8.99**, [Amazon](https://www.amazon.com/s?k=servo+extension+cable+20+pcs+female+to+male). **Return it** if the jumpers hold during the weekend dry run |
 | Wire ties (~8) | Bread twist ties, small ties from packaging, electrical / masking tape, hot glue | Tie only at the tie points; the 3 loops hang free | ≈ $6 EST, [Amazon](https://www.amazon.com/s?k=small+zip+ties+adhesive+mounts+kit) |
 | Grip pads + can bumper | Bike inner tube, wide rubber band over each pad, non-slip shelf liner, old silicone phone case | 1–2 mm thick; re-check the closed angle with `servo_setup` | ≈ $8 EST, silicone sheet 1/16 in, [Amazon](https://www.amazon.com/s?k=silicone+rubber+sheet+1%2F16+inch) |

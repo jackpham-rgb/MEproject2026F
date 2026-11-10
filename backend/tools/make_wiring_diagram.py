@@ -43,7 +43,7 @@ RED, BLK, ORG, GRN, BLU, YEL, PUR, CYN = "#d7261e", "#1b1b1b", "#f08a00", "#1f9d
 
 # ---------------- title ----------------
 text(30, 42, "ME 2331 Project 2 · Concept A wiring", 26, weight="700")
-text(30, 68, "Arduino Uno + 4 servos. 12 V adapter → Uno VIN, and → XL4015 buck at 5.8 V → servo rail. All grounds are joined.", 15, "#4a5563")
+text(30, 68, "Arduino Uno + 4 servos. Uno on its own 9 V battery; 12 V adapter → XL4015 buck at 5.8 V → servos only. All grounds are joined.", 15, "#4a5563")
 
 # ---------------- DC jack + buck ----------------
 rect(40, 120, 150, 90, "#e9edf2")
@@ -81,7 +81,7 @@ wire([bout_n, (480, 200), (480, 302), (rx0 + 30, 302)], BLK)
 rect(600, 272, 34, 26, "#2a3f6e", "#111", rx=4, sw=1)
 text(617, 289, "C", 12, "#fff", "middle", "700")
 text(270, 254, "C = 1000 µF ≥10 V on the servo rail", 12, "#4a5563")
-text(270, 270, "(− leg to GND)", 12, "#4a5563")
+text(270, 270, "(stripe to GND; optional while testing)", 12, "#4a5563")
 wire([(610, 268), (610, 272)], RED, 3); wire([(624, 298), (624, 302)], BLK, 3)
 
 # ---------------- servos ----------------
@@ -122,13 +122,20 @@ for lbl, (x, y) in apins.items():
 rect(uno_x - 26, uno_y + 60, 40, 46, "#b8bcc2", "#555", rx=3, sw=1)
 text(uno_x + 22, uno_y + 88, "USB", 11, "#d4f1f4")
 
-# Uno power from the jack (VIN) and the common ground
-wire([jack_p, (205, 140), (205, 100), (20, 100), (20, 905), (apins["VIN"][0], 905), apins["VIN"]], RED)
-wire([jack_n, (215, 190), (215, 240), (32, 240), (32, 920), (apins["GND"][0], 920), apins["GND"]], BLK)
+# Uno power: its own 9 V battery (clip with a 5.5 x 2.1 mm barrel plug into the Uno's jack; drawn to VIN / GND)
+bat_x, bat_y = 50, 790
+rect(bat_x, bat_y, 120, 80, "#5b5b5b", "#222", rx=6)
+rect(bat_x + 36, bat_y - 12, 16, 12, "#999", "#222", rx=2, sw=1); rect(bat_x + 70, bat_y - 12, 16, 12, "#999", "#222", rx=2, sw=1)
+text(bat_x + 60, bat_y + 36, "9 V battery", 15, "#ffffff", "middle", "700")
+text(bat_x + 60, bat_y + 58, "Uno only (~9 h)", 12, "#e6e6e6", "middle")
+wire([(bat_x + 44, bat_y - 12), (bat_x + 44, bat_y - 22), (232, bat_y - 22), (232, 935), (apins["VIN"][0], 935), apins["VIN"]], RED)
+wire([(bat_x + 78, bat_y - 12), (bat_x + 78, bat_y - 30), (246, bat_y - 30), (246, 950), (apins["GND"][0], 950), apins["GND"]], BLK)
+text(bat_x + 60, bat_y + 100, "clip → barrel plug in Uno jack", 11, "#4a5563", "middle")
+text(bat_x + 60, bat_y + 115, "(or + → VIN, − → GND)", 11, "#4a5563", "middle")
 wire([(rx1 - 15, 302), (rx1 - 15, 470), (uno_x + uno_w + 40, 470), (uno_x + uno_w + 40, 930),
       (apins["GND"][0] + 8, 930), (apins["GND"][0] + 8, apins["GND"][1])], BLK, 3)
 text(uno_x + uno_w + 48, 560, "common GND", 12, "#1b1b1b")
-text(apins["VIN"][0] - 8, 898, "VIN ← 12 V jack +", 12, RED, "end", "600")
+text(apins["VIN"][0] - 8, 928, "VIN ← 9 V battery +", 12, RED, "end", "600")
 
 # ---------------- start button, LED ----------------
 bx, by = 1010, 600
@@ -152,12 +159,12 @@ wire([(lx + 30, ly + 34), (lx + 30, ly + 70)], "#333", 3)
 wire([(lx + 30, ly + 120), (lx + 30, 930), (bx + 140, 930)], BLK, 3)
 
 # ---------------- USB note ----------------
-rect(50, 640, 210, 120, "#e8f4ea", "#1f9d55", sw=2)
-text(155, 666, "USB + adapter together", 14, "#17663a", "middle", "700")
-text(155, 690, "is fine: above 6.6 V on VIN", 12, "#4a5563", "middle")
-text(155, 708, "the Uno turns USB power off", 12, "#4a5563", "middle")
-text(155, 726, "by itself. Keep the Serial", 12, "#4a5563", "middle")
-text(155, 744, "Monitor open while calibrating.", 12, "#4a5563", "middle")
+rect(50, 470, 210, 120, "#e8f4ea", "#1f9d55", sw=2)
+text(155, 496, "USB + 9 V battery together", 14, "#17663a", "middle", "700")
+text(155, 520, "is fine: above 6.6 V on VIN", 12, "#4a5563", "middle")
+text(155, 538, "the Uno turns USB power off", 12, "#4a5563", "middle")
+text(155, 556, "by itself. Keep the Serial", 12, "#4a5563", "middle")
+text(155, 574, "Monitor open while calibrating.", 12, "#4a5563", "middle")
 
 # legend
 lg = [(RED, "+ power"), (BLK, "ground"), (ORG, "servo signal"), (GRN, "button"), (YEL, "LED")]

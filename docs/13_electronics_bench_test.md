@@ -15,10 +15,13 @@ Diagram: `docs/wiring/wiring_diagram.png`. Have the multimeter ready.
 | 2 | Adapter → terminal-block tip → buck **IN+ / IN−** | Buck display / meter on **OUT+ / OUT−** | Turn the buck pot (many turns) to **5.8 V**. Dot of nail polish on the pot |
 | 3 | Buck OUT → breadboard **+ / −** rails. 1000 µF capacitor across the rails | Stripe on the capacitor = **−** rail | Rail reads 5.8 V |
 | 4 | Unplug. Uno on **USB only**, upload `bench_test` | Uno LED | Blinks 3× |
-| 5 | Adapter **+ → Uno VIN**, **− → Uno GND**. Uno GND → rail **−** (common ground) | Unplug USB, plug the adapter | LED blinks 3× again (running on 12 V) |
+| 5 | **9 V battery** → Uno barrel jack (snap clip with a 5.5 × 2.1 mm plug). Meter on the battery first | Unplug USB, plug the battery | Battery ≥ 8.5 V (fresh ~9.3 V); LED blinks 3× again (running on the battery) |
+| 5b | Uno **GND** → rail **−** (common ground: required) | Meter between Uno GND and the buck OUT− | 0 Ω / beeps |
 | 6 | START button: D4 ↔ GND. LED: D13 → 220 Ω → LED → GND | Press START | LED lights while pressed |
 
-**Never** connect the rail (5.8 V) to the Uno's 5V pin. The Uno gets 12 V on VIN only.
+**Never** connect the rail (5.8 V) to the Uno's 5V pin. The Uno gets its power only from the 9 V battery
+(jack or VIN); the 12 V adapter feeds only the buck. The 1000 µF capacitor is optional while testing:
+skip row 3 if you don't have one yet, and fit it before the final runs.
 
 ## 2. One servo at a time
 
@@ -39,11 +42,12 @@ Each test: smooth, no buzzing, the Uno doesn't reset (no 3× blink in the middle
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| Uno resets (blinks 3×) when a servo moves | Rail sags or no common ground | Check Uno GND ↔ rail −, the 1000 µF capacitor, the MG996R on the buck terminals (not the breadboard) |
+| Uno resets (blinks 3×) when a servo moves | 9 V battery flat, or the servo supply wired to the Uno by mistake | Battery < 7.5 V: replace it. Check nothing from the rail goes to the Uno's 5V or VIN |
+| Servos twitch or don't respond at all | No common ground | Uno GND ↔ rail − (row 5b) |
 | Servo buzzes / jitters | Signal without ground, loose jumper | Re-seat; shorter jumpers; ground first |
 | Servo doesn't move at all | Signal on the wrong pin, dead servo | Swap the plug to a known-good test; try the spare |
 | Wrist stops short of 180° | That MG90S's range | `servo_setup`: try `WRIST_MIN_US` / `WRIST_MAX_US` 450 / 2550; else swap MG90S (buy a spare) |
-| Rail below 5.5 V in test 5 | Weak adapter / long thin wires | Shorter rail wires; check the adapter is at 12.0 V under load |
+| Rail below 5.5 V in test 5 | Weak adapter / long thin wires / no capacitor | Shorter rail wires; check the adapter is at 12.0 V under load; fit the 1000 µF |
 | Buck gets hot | Pot set too high, short | Unplug, re-check OUT = 5.8 V with nothing connected |
 
 ## 4. Then the wiring dry run (decides what to return)

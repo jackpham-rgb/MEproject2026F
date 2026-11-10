@@ -1,0 +1,30 @@
+FINAL POWER DESIGN: Uno on a 9 V battery, servos on 12 V adapter -> XL4015 5.8 V (backend/ee/power_final.py)
+============================================================================================
+Limits: Uno 5 V >= 4.5 V (16 MHz); servos >= 4.8 V (rated) and <= 6.0 V (MG90S/SG90); 12 V adapter <= 2 A
+
+case                               1000uF  battery   Uno 5V min  servo min  micro-servo dip  adapter max
+Normal run                         yes     fresh         5.00 V     5.72 V           5.72 V       0.32 A
+Normal run                         yes     low           4.92 V     5.72 V           5.72 V       0.32 A
+Normal run                         NO      fresh         5.00 V     5.72 V           5.72 V       0.32 A
+Normal run                         NO      low           4.92 V     5.72 V           5.72 V       0.32 A
+MG996R stalled 0.5 s (arm blocked) yes     fresh         5.00 V     5.51 V           5.64 V       1.69 A
+MG996R stalled 0.5 s (arm blocked) yes     low           4.92 V     5.51 V           5.64 V       1.69 A
+MG996R stalled 0.5 s (arm blocked) NO      fresh         5.00 V     5.51 V           5.64 V       1.69 A
+MG996R stalled 0.5 s (arm blocked) NO      low           4.92 V     5.51 V           5.64 V       1.69 A
+Power-up away from home            yes     fresh         5.00 V     5.52 V           5.62 V       1.47 A
+Power-up away from home            yes     low           4.92 V     5.52 V           5.62 V       1.47 A
+Power-up away from home            NO      fresh         5.00 V     5.52 V           5.62 V       1.47 A
+Power-up away from home            NO      low           4.92 V     5.52 V           5.62 V       1.47 A
+
+FAST INRUSH (all four servos start within 0.6 ms, currents rise in 0.1 ms; 10 us resolution, EST buck response):
+   1000 uF yes: micro-servo supply dips to 5.24 V, MG996R supply to 5.11 V, rings up to 6.15 V
+   1000 uF NO : micro-servo supply dips to 4.85 V, MG996R supply to 4.65 V, rings up to 6.61 V
+   (the run above averages the servo currents over ms, so the capacitor makes no difference there; it only
+    matters for these fast spikes)
+
+Battery: the Uno + LED draw 59 mA -> a 9 V alkaline (~550 mAh) lasts ~9 h of power-on time (less as it ages). Replace it when it reads < 7.5 V unloaded (the Uno needs ~7.1 V at the jack).
+The Uno no longer shares a supply with the servos: a stalled MG996R can't reset it. Grounds MUST still be joined
+(Uno GND <-> servo rail GND), or the servo signals have no reference.
+Regulator heat on 9 V: (9.3 - 1.0 - 5.0) V x 59 mA = 0.19 W (fine).
+
+RESULT: ALL PASS

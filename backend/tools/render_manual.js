@@ -185,6 +185,9 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   H += ePage("E1", "Circuit: every connection", mdSection("docs/04_wiring.md", "Wire list", true) +
     `<p><b>Never</b> connect the 5.8 V rail to the Uno's 5V pin: the Uno gets 12 V on VIN only. Servo plug: brown = GND, red = +, orange = signal.</p>`,
     imgAny("docs/wiring/wiring_diagram.png"));
+  H += `<div class="pg"><div class="num">E1b</div><div class="ttl" style="left:62mm">Schematic (standard symbols): same circuit, nets with the same name are connected</div>
+    <div class="img" style="left:14mm;top:26mm;bottom:20mm"><img src="${imgAny("docs/wiring/schematic.png")}"></div>
+    <div class="note">Uno on its own 9 V battery; the 12 V adapter feeds only the buck (servos). Uno GND and servo GND must be joined.</div></div>`;
   H += ePage("E2", "Bench test 1: power, no servos yet", mdSection("docs/13_electronics_bench_test.md", "1. Power"));
   H += ePage("E3", "Bench test 2: one servo at a time (firmware/bench_test)", mdSection("docs/13_electronics_bench_test.md", "2. One servo"));
   H += ePage("E4", "If something is wrong", mdSection("docs/13_electronics_bench_test.md", "3. If something"));
