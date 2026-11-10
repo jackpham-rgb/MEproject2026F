@@ -14,3 +14,4 @@ ME 2331/L Project 2, Concept A can-flipping robot. Push only to the session's `c
   `backend/tools/make_manual.py` assembly check, `backend/cad/wiring.py`) and regenerate the print
   plates (`print_prep.py`, `plates.py`), drawings and manual.
 - When the user asks to "just answer in chat", don't edit files.
+- **No collaboration / attribution lines anywhere**: no `Co-Authored-By`, no `Claude-Session`, no "Generated with Claude Code" in commits or PRs (also set in `.claude/settings.json`).
