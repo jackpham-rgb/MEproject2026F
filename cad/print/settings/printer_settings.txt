@@ -22,6 +22,8 @@ Slicer: PrusaSlicer -> File > Import > Import Config... -> concept_a_PETG_prusas
         Cura / Bambu / Orca: type the values below in by hand (names in brackets).
 
 PRINTER PROBLEMS: docs/15_cr6se_print_troubleshooting.md (symptom -> cause -> fix)
+SAVE TIME + PLASTIC:    docs/16_print_economy.md (draft / standard / detail per part, ~37 h -> ~23 h);
+                        plates with those settings inside: cad/print/plates_eco/*_eco.3mf
 QUICK PROTOTYPE FIRST: docs/14_plan_p_quick_prototype.md (only the claw printed: planP_1_claw, planP_2_finger)
 
 PRINT ORDER (times = PrusaSlicer 2.7 estimates with these settings; each plate test-sliced)

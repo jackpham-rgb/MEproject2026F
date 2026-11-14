@@ -171,7 +171,7 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
     <div class="img" style="left:14mm;top:30mm"><img src="${img("cover.png")}"></div>
     <div class="note">1 person · ~3 h after printing · read each page, then build. <b>Servo angles:</b> load <code>firmware/servo_setup</code> and type the command in the round badge (Serial Monitor, 9600).</div></div>`;
   H += `<div class="pg"><h2>You need</h2><div class="two"><div><table><tr><th>Tool</th></tr>
-    ${["Phillips screwdrivers #1 and #2", "Multimeter", "Hot-glue gun", "Superglue", "Wire stripper", "Small flat screwdriver (buck pot)", "Hacksaw (6 mm rod) + file", "Vise or clamp (bearing press)", "12 mm drill bit, turned by hand"].map(t => `<tr><td>${t}</td></tr>`).join("")}</table></div>
+    ${["Phillips screwdrivers #1 and #2", "Multimeter", "Hot-glue gun", "Superglue", "Wire stripper", "Small flat screwdriver (buck pot)", "Hacksaw (6 mm rod) + file", "Vise or clamp (bearing press)", "12 mm drill bit, turned by hand", "Sandpaper 120 + 240, craft knife, flush cutters"].map(t => `<tr><td>${t}</td></tr>`).join("")}</table></div>
     <div><table><tr><th>Hardware</th><th>Qty</th></tr>
     <tr><td>${screw("#6")} #6-32 × ½″</td><td>8</td></tr><tr><td>${screw("#8")} #8-32 × ½″</td><td>4</td></tr><tr><td>${screw("s")} servo-bag screws</td><td>~14</td></tr>
     <tr><td>6807-2RS bearing</td><td>1</td></tr><tr><td>LM6UU linear bearing</td><td>4</td></tr><tr><td>6 mm rod, cut 2 × 112 mm</td><td>2</td></tr>
@@ -183,7 +183,7 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   H += `<div class="pg"><h1>PART E</h1><div style="font-size:18px;margin-top:3mm">Electronics first: wire it flat on the table and test it while the parts print</div>
     <div class="img" style="left:14mm;top:34mm"><img src="${imgAny("docs/wiring/wiring_diagram.png")}"></div></div>`;
   H += ePage("E1", "Circuit: every connection", mdSection("docs/04_wiring.md", "Wire list", true) +
-    `<p><b>Never</b> connect the 5.8 V rail to the Uno's 5V pin: the Uno gets 12 V on VIN only. Servo plug: brown = GND, red = +, orange = signal.</p>`,
+    `<p><b>Never</b> connect the 5.8 V rail to the Uno's 5V pin: the Uno gets its power only from the 9 V battery. Servo plug: brown = GND, red = +, orange = signal.</p>`,
     imgAny("docs/wiring/wiring_diagram.png"));
   H += `<div class="pg"><div class="num">E1b</div><div class="ttl" style="left:62mm">Schematic (standard symbols): same circuit, nets with the same name are connected</div>
     <div class="img" style="left:14mm;top:26mm;bottom:20mm"><img src="${imgAny("docs/wiring/schematic.png")}"></div>
@@ -193,7 +193,13 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   H += ePage("E3b", "Laptop control panel (viewer/control_panel.html)", mdSection("docs/13_electronics_bench_test.md", "2b. Laptop control panel"));
   H += ePage("E4", "If something is wrong", mdSection("docs/13_electronics_bench_test.md", "3. If something"));
   H += ePage("E5", "Wiring dry run (decides what to return)", mdSection("docs/13_electronics_bench_test.md", "4. Then the wiring dry run") +
-    `<h2 style="margin-top:6mm">Then: PART M, the mechanics</h2><p>Print plates 0–3 (cad/print/plates), then follow steps 1–${steps.length}. Keep the bench-test wiring: it moves into the tray in step ${steps.length - 2}.</p>`);
+    `<h2 style="margin-top:6mm">Then: PART P, printing, and PART M, the mechanics</h2><p>Print the economy plates (cad/print/plates_eco, next pages), fix up the fits, then follow steps 1–${steps.length}. Keep the bench-test wiring: it moves into the tray in step ${steps.length - 2}.</p>`);
+  // ---------------- PART P: economy printing (only the quality each part needs) + fix-up
+  H += ePage("P1", "Print settings: only the quality each part needs", mdSection("docs/16_print_economy.md", "The three profiles", true) +
+    mdSection("docs/16_print_economy.md", "Per part", true) +
+    `<p>Import <code>concept_a_PETG_prusaslicer.ini</code>, open a <code>*_eco.3mf</code> plate (next page): each part's profile is already inside. Coupon first.</p>`);
+  H += ePage("P2", "Plates, then fix the fits (sandpaper, drill, knife)", mdSection("docs/16_print_economy.md", "Plates", true) +
+    mdSection("docs/16_print_economy.md", "Fix-up after printing"));
   for (const s of steps) {
     const hw = {}; for (const [q, n] of s.hw) hw[n] = (hw[n] || 0) + q;
     const box = Object.keys(hw).length ? `<div class="box">${Object.entries(hw).map(([n, q]) => `<div class="hw">${q}×&nbsp;${screw(n)}<small>${n.replace(" screw", "")}</small></div>`).join("")}</div>` : "";
