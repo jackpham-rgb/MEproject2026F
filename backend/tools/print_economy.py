@@ -1,15 +1,17 @@
-"""Economy printing: each part gets only the quality it needs (draft / standard / detail).
+"""Economy printing, set up BY HAND in any slicer (Cura, Creality Print, PrusaSlicer, Orca): no .ini, no edited 3D files.
 
     python3.13 backend/tools/print_economy.py
-      -> cad/print/plates_eco/*.3mf           (same plates, per-part economy settings inside: open and slice)
-      -> cad/print/plates_eco/economy.csv      (per part: profile, time and filament, before vs after)
-      -> docs/16_print_economy.md              (the guide; the assembly manual's PART P page uses the same data)
+      -> docs/16_print_economy.md                 (the guide; the assembly manual's PART P pages use it)
+      -> cad/print/settings/economy_plates.csv     (plate, parts, settings, time, grams)
 
-Every time and gram is a real PrusaSlicer slice of the part's STL with cad/print/settings/
-concept_a_PETG_prusaslicer.ini (the "before") and with the economy overrides (the "after").
+The parts are grouped so that every plate uses ONE profile for the whole plate (layer height, walls,
+infill, speeds, supports): you type one set of numbers per plate, nothing per part. The STLs are the
+unchanged files in cad/print/stl/ (already turned to their best side).
+
+Times and grams are real PrusaSlicer slices of each plate (the project's printer profile is only used
+here to estimate; you don't need it), compared with the old one-setting-for-everything plates.
 """
 import csv
-import json
 import os
 import re
 import subprocess
@@ -22,151 +24,108 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 sys.path.insert(0, os.path.join(ROOT, "backend", "cad"))
 import plates as PL  # noqa: E402
 
-BEFORE = dict(PL.PER_PART)          # the current plates' per-part settings = the "before"
-
 INI = os.path.join(ROOT, "cad", "print", "settings", "concept_a_PETG_prusaslicer.ini")
 STL = os.path.join(ROOT, "cad", "print", "stl")
-OUT = os.path.join(ROOT, "cad", "print", "plates_eco")
 DOC = os.path.join(ROOT, "docs", "16_print_economy.md")
-DENSITY = 1.27                    # PETG g/cm3
-AREA = np.pi * 1.75 ** 2 / 4      # mm2 of 1.75 mm filament
+CSV = os.path.join(ROOT, "cad", "print", "settings", "economy_plates.csv")
+DENSITY, AREA = 1.27, np.pi * 1.75 ** 2 / 4          # PETG g/cm3, mm2 of 1.75 mm filament
 
-# Whole-print speed limits for every profile (the CR-6 SE's stock Bowden hotend melts PETG at ~8 mm3/s)
-GLOBAL = {"max_volumetric_speed": "8", "solid_infill_speed": "40", "top_solid_infill_speed": "30", "gap_fill_speed": "30"}
+# Same on every plate (type these once in your slicer's PETG profile)
+COMMON = [
+    ("Nozzle temperature", "235 °C (first layer 238 °C, never above 240 °C: PTFE-lined hotend)"),
+    ("Bed temperature", "80 °C, thin glue stick on the glass"),
+    ("First layer", "0.24 mm high, 20 mm/s"),
+    ("Line width", "0.42 mm (0.4 mm nozzle)"),
+    ("Cooling fan", "30 %, off for the first 3 layers"),
+    ("Retraction", "5 mm at 40 mm/s (Bowden)"),
+    ("Solid / top infill speed", "40 / 30 mm/s"),
+    ("Travel speed", "150 mm/s"),
+    ("Max flow", "keep under 8 mm³/s (stock CR-6 SE hotend): the speeds below already do"),
+    ("Elephant-foot compensation", "0.15 mm (Cura: initial layer horizontal expansion −0.15)"),
+    ("Seam", "rear / aligned"),
+    ("Skirt", "2 loops (unless the plate says brim)"),
+]
 
-# Profiles = per-object PrusaSlicer settings
 PROFILES = {
-    "DRAFT": dict(label="Draft (fast, coarse)", layer_height="0.28", perimeters="2", top_solid_layers="3", bottom_solid_layers="3",
-                  fill_density="10%", fill_pattern="grid", perimeter_speed="60", external_perimeter_speed="45", infill_speed="90"),
-    "STANDARD": dict(label="Standard", layer_height="0.2", perimeters="3", top_solid_layers="4", bottom_solid_layers="4",
-                     fill_density="20%", fill_pattern="gyroid", perimeter_speed="50", external_perimeter_speed="35", infill_speed="70"),
-    "DETAIL": dict(label="Detail (slow outer walls)", layer_height="0.2", perimeters="4", top_solid_layers="5", bottom_solid_layers="5",
-                   fill_density="100%", fill_pattern="rectilinear", perimeter_speed="35", external_perimeter_speed="25", infill_speed="50",
+    "DRAFT": dict(layer_height="0.28", perimeters="2", top_solid_layers="3", bottom_solid_layers="3", fill_density="10%",
+                  fill_pattern="grid", external_perimeter_speed="45", perimeter_speed="60", infill_speed="90"),
+    "STANDARD": dict(layer_height="0.2", perimeters="3", top_solid_layers="4", bottom_solid_layers="4", fill_density="20%",
+                     fill_pattern="gyroid", external_perimeter_speed="35", perimeter_speed="50", infill_speed="70"),
+    "DETAIL": dict(layer_height="0.2", perimeters="4", top_solid_layers="5", bottom_solid_layers="5", fill_density="100%",
+                   fill_pattern="rectilinear", external_perimeter_speed="25", perimeter_speed="35", infill_speed="50",
                    small_perimeter_speed="15"),
 }
-SUPPORT = {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1"}
+SPEED_GLOBAL = {"solid_infill_speed": "40", "top_solid_infill_speed": "30", "gap_fill_speed": "30", "max_volumetric_speed": "8"}
+SUP = {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1"}
 
-# part -> (profile, overrides, what must be accurate, what can be rough, fix-up after printing)
+# Hand plates: one profile per plate. (name, profile, plate overrides, parts, why)
+PLATES = [
+    ("A  Coupon + lift link", "STANDARD", {"brim_width": "5"}, ["CA-900", "CA-302"],
+     "First: the coupon checks every fit; the tiny link rides along and gets the brim it needs"),
+    ("B  Base + spine + top cap", "DRAFT", {"perimeters": "3", "fill_density": "12%", **SUP}, ["CA-101", "CA-202", "CA-203"],
+     "Big, hidden, lightly loaded. 3 walls so the screw holes and the bearing pocket stay strong"),
+    ("C  Electronics tray", "DRAFT", {}, ["CA-102"],
+     "Nothing precise on it: the fastest settings"),
+    ("D  Turret plate + carriage arm", "STANDARD", dict(SUP), ["CA-201", "CA-301"],
+     "Press fits (bearing hub, rods, LM6UU) and the parts that carry the lift"),
+    ("E  Claw: 2 fingers + gripper frame", "DETAIL", dict(SUP), ["CA-402", "CA-403", "CA-401"],
+     "Gear teeth and the gear spacing: slow outer walls, solid"),
+]
+
+# part: (must be accurate, can be rough, fix-up after printing)
 PARTS = {
-    "CA-101": ("DRAFT", {"perimeters": "3", **SUPPORT},
-               "6807 bearing pocket (47.1 mm), MG996R screw holes",
-               "everything else: it is a box. Layer lines, rough sides, small sag in the pockets",
-               "Bearing tight: sand the pocket wall (120 grit on a finger) until it presses in with thumbs. "
-               "Loose: one layer of tape. Clear support bits out of the servo pocket with pliers"),
-    "CA-102": ("DRAFT", {},
-               "nothing critical: board pegs and 2 screw tabs",
-               "everything",
-               "Pegs too fat for the Uno / buck holes: twist the board on, or shave a peg with a knife. "
-               "Snapped peg: a dab of hot glue holds the board"),
-    "CA-201": ("STANDARD", dict(SUPPORT),
-               "hub into the bearing bore (34.95 mm), 2 rod holes (6.0 mm), horn screw holes",
-               "the plate's top face and edges",
-               "Hub tight in the bearing: sand the hub evenly, turning it. Rod holes tight: drill 6 mm (or a 15/64 in bit) by hand"),
-    "CA-202": ("DRAFT", {"perimeters": "3", "fill_density": "15%"},
-               "lift-servo screw holes, 2 screw holes at each end",
-               "faces and edges",
-               "Servo screws: run each screw in once and back out before final assembly"),
-    "CA-203": ("DRAFT", {"fill_density": "15%"},
-               "2 blind rod holes (6.0 mm)",
-               "everything else",
-               "Rod won't go in: drill 6 mm, 8 mm deep (tape flag on the bit)"),
-    "CA-301": ("STANDARD", dict(SUPPORT),
-               "4 LM6UU pockets (12.15 mm) in line, wrist-servo screws, link pivot hole",
-               "arm faces",
-               "Pockets print on their side, so their top droops: ream with 12 mm drill or sandpaper on a 12 mm dowel / marker until "
-               "the LM6UU presses in; check the carriage slides down both rods by its own weight"),
-    "CA-302": ("STANDARD", {"fill_density": "100%", "fill_pattern": "rectilinear", "brim_width": "5"},
-               "the 2 holes",
-               "-",
-               "Tiny part: peel the brim, open the pivot hole with a 5/32 in (4 mm) drill if the screw binds"),
-    "CA-401": ("STANDARD", {"fill_density": "30%", "external_perimeter_speed": "25", "perimeters": "4"},
-               "gear axle hole and servo position: they set the gear mesh",
-               "flange faces",
-               "Don't open the axle hole more than needed: the gears must mesh without play"),
-    "CA-402": ("DETAIL", dict(SUPPORT),
-               "gear teeth, axle bore 3.9 mm",
-               "pad back face (it gets the silicone sheet)",
-               "Remove supports, then file only the pad area; never the teeth. Bore tight: twist a 5/32 in drill through by hand"),
-    "CA-403": ("DETAIL", dict(SUPPORT),
-               "gear teeth, servo-spline socket",
-               "pad back face",
+    "CA-900": ("it tests the fits", "-", "Check each hole as in the build guide, section 2: it tells you how much to sand the real parts"),
+    "CA-302": ("the 2 holes", "-", "Peel the brim. Pivot screw binds: open the hole with a 5/32 in (4 mm) drill turned by hand"),
+    "CA-101": ("6807 bearing pocket (47.1 mm), MG996R screw holes", "everything else: layer lines, rough sides, sag in the pockets",
+               "Bearing tight: sand the pocket wall (120 grit on a finger) until it presses in with thumbs. Loose: one layer of tape. "
+               "Clear support bits out of the servo pocket with pliers"),
+    "CA-202": ("lift-servo screw holes, screw holes at the ends", "faces and edges",
+               "Run each screw in once and back out before final assembly"),
+    "CA-203": ("2 blind rod holes (6.0 mm)", "everything else", "Rod won't go in: drill 6 mm, 8 mm deep (tape flag on the bit)"),
+    "CA-102": ("nothing critical: board pegs, 2 screw tabs", "everything",
+               "Peg too fat for a board hole: shave it with a knife. Snapped peg: a dab of hot glue holds the board"),
+    "CA-201": ("hub into the bearing (34.95 mm), 2 rod holes (6.0 mm), horn screw holes", "top face and edges",
+               "Hub tight: sand it evenly, turning it. Rod holes tight: drill 6 mm (or 15/64 in) by hand"),
+    "CA-301": ("4 LM6UU pockets (12.15 mm) in line, wrist-servo screws, link pivot", "arm faces",
+               "Pockets print on their side, so the top of each droops: ream with a 12 mm drill or sandpaper on a 12 mm dowel / marker "
+               "until the LM6UU presses in; the carriage must slide down both rods by its own weight"),
+    "CA-402": ("gear teeth, axle bore 3.9 mm", "pad back face (gets the silicone sheet)",
+               "Remove supports, file only the pad area, never the teeth. Bore tight: twist a 5/32 in drill through by hand"),
+    "CA-403": ("gear teeth, servo-spline socket", "pad back face",
                "Spline socket tight: scrape lightly inside with the knife tip, test the SG90 spline after every pass. Never file the teeth"),
-    "CA-900": ("STANDARD", {},
-               "it is the test of the fits: print it with the STANDARD profile",
-               "-",
-               "Coarse (draft) layers can make holes come out slightly tight: expect a bit more sanding / drilling on draft parts"),
-}
-WHY = {
-    "DRAFT": "big, hidden, lightly loaded: coarse layers, 2–3 walls, 10–15 % infill, faster speeds",
-    "STANDARD": "has press fits or carries a load: 0.2 mm, 3 walls, 20 % infill",
-    "DETAIL": "gear teeth: slow outer walls for an accurate tooth shape, solid",
+    "CA-401": ("gear axle hole and servo position: they set the gear mesh", "flange faces",
+               "Don't open the axle hole more than needed: the gears must mesh without play"),
 }
 
 
-def slice_time(paths, extra=None, cwd=None):
-    """Slice with the project ini (+ extra overrides). Returns (hours, grams, ok)."""
+def slice_plate(paths, extra):
+    """Slice the given STLs together (auto-arranged on the bed). Returns (hours, grams)."""
     with tempfile.TemporaryDirectory() as d:
-        cmd = ["prusa-slicer", "--export-gcode", "--load", INI]
-        if extra:
-            ini = os.path.join(d, "extra.ini")
-            with open(ini, "w") as f:
-                f.write("".join(f"{k} = {v}\n" for k, v in extra.items()))
-            cmd += ["--load", ini]
+        ini = os.path.join(d, "x.ini")
+        with open(ini, "w") as f:
+            f.write("".join(f"{k} = {v}\n" for k, v in extra.items()))
         out = os.path.join(d, "o.gcode")
-        cmd += ["-o", out] + paths
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+        r = subprocess.run(["prusa-slicer", "--export-gcode", "--load", INI, "--load", ini, "-o", out] + (["--merge"] if len(paths) > 1 else []) + paths,
+                           capture_output=True, text=True, timeout=900)
         if r.returncode != 0 or not os.path.exists(out):
-            return None, None, (r.stdout + r.stderr)[-400:]
+            raise SystemExit(f"slice failed for {paths}: {(r.stdout + r.stderr)[-400:]}")
         txt = open(out, errors="ignore").read()
     m = re.search(r"estimated printing time \(normal mode\) = (.+)", txt)
-    secs = 0
-    for v, u in re.findall(r"(\d+)([dhms])", m.group(1)):
-        secs += int(v) * {"d": 86400, "h": 3600, "m": 60, "s": 1}[u]
+    secs = sum(int(v) * {"d": 86400, "h": 3600, "m": 60, "s": 1}[u] for v, u in re.findall(r"(\d+)([dhms])", m.group(1)))
     mm = float(re.search(r"filament used \[mm\] = ([\d.]+)", txt).group(1))
-    return secs / 3600, mm * AREA / 1000 * DENSITY, True
-
-
-def part_settings(pn):
-    prof, over, *_ = PARTS[pn]
-    s = {k: v for k, v in PROFILES[prof].items() if k != "label"}
-    s.update(over)
-    return s
+    return secs / 3600, mm * AREA / 1000 * DENSITY
 
 
 def stl_of(pn):
     return os.path.join(STL, next(f for f in os.listdir(STL) if f.startswith(pn)))
 
 
-def build_plates():
-    """Same plates as backend/cad/plates.py, economy per-part settings inside."""
-    os.makedirs(OUT, exist_ok=True)
-    rows = {r["part_no"]: r for r in csv.DictReader(open(os.path.join(PL.PR, "print_table.csv")))}
-    PL.PER_PART = {pn: part_settings(pn) for pn in PARTS}
-    res = []
-    for stem, title, pns, when in PL.PLATES:
-        tris, sizes = {}, {}
-        for pn in pns:
-            t = PL.read_stl(os.path.join(ROOT, rows[pn]["file"]))
-            lo, hi = t.reshape(-1, 3).min(0), t.reshape(-1, 3).max(0)
-            tris[pn], sizes[pn] = t - lo, (hi[0] - lo[0], hi[1] - lo[1])
-        place = PL.pack(sizes)
-        objs = []
-        for pn in pns:
-            x, y, rot = place[pn]
-            t = tris[pn].copy()
-            if rot:
-                t = np.stack([-t[..., 1], t[..., 0], t[..., 2]], axis=-1)
-                t[..., 0] += sizes[pn][1]
-            t[..., 0] += x
-            t[..., 1] += y
-            objs.append((f"{pn} {rows[pn]['part']}", t))
-        path = os.path.join(OUT, stem + "_eco.3mf")
-        PL.write_3mf(path, objs)
-        h, g, ok = slice_time([path], GLOBAL)
-        h0 = sum(float(rows[pn]["est_time_h"]) for pn in pns)
-        res.append((stem, title, pns, h, g, ok))
-        print(f"{stem + '_eco':22s} " + (f"{h:5.1f} h {g:5.0f} g" if h else f"SLICE FAILED: {ok}"))
-    return res
+def fits(pns):
+    sizes = {}
+    for pn in pns:
+        t = PL.read_stl(stl_of(pn)).reshape(-1, 3)
+        sizes[pn] = tuple(np.ptp(t, 0)[:2])
+    return PL.pack(sizes) is not None
 
 
 def fmt_h(h):
@@ -175,88 +134,102 @@ def fmt_h(h):
 
 def main():
     names = {r["part_no"]: r["part"] for r in csv.DictReader(open(os.path.join(PL.PR, "print_table.csv")))}
+    # before: the old plates' settings (one setting for everything + per-part supports / solid fingers / brim from plates.py)
+    before_h = before_g = 0.0
+    for stem, title, pns, when in PL.PLATES[:4]:
+        for pn in pns:
+            o = dict(PL.PER_PART.get(pn, {}))
+            if o.get("fill_density") == "100%":
+                o["fill_pattern"] = "rectilinear"
+            h, g = slice_plate([stl_of(pn)], o)
+            before_h, before_g = before_h + h, before_g + g
     rows = []
-    for pn in PARTS:
-        before = dict(BEFORE.get(pn, {}))
-        if before.get("fill_density") == "100%":
-            before["fill_pattern"] = "rectilinear"                  # gyroid can't do 100 %
-        h0, g0, _ = slice_time([stl_of(pn)], before or None)
-        h1, g1, ok = slice_time([stl_of(pn)], {**GLOBAL, **part_settings(pn)})
-        if h1 is None:
-            raise SystemExit(f"{pn}: slice failed: {ok}")
-        rows.append(dict(pn=pn, name=names[pn], profile=PARTS[pn][0], h0=h0, g0=g0, h1=h1, g1=g1))
-        print(f"{pn} {PARTS[pn][0]:8s} {h0:5.2f} h {g0:5.1f} g  ->  {h1:5.2f} h {g1:5.1f} g")
-    plates = build_plates()
-    os.makedirs(OUT, exist_ok=True)
-    with open(os.path.join(OUT, "economy.csv"), "w", newline="") as f:
+    for name, prof, over, pns, why in PLATES:
+        if not fits(pns):
+            raise SystemExit(f"plate {name}: parts don't fit the 235 x 235 bed")
+        s = {**PROFILES[prof], **SPEED_GLOBAL, **over}
+        if s["fill_density"] == "100%":
+            s["fill_pattern"] = "rectilinear"
+        h, g = slice_plate([stl_of(pn) for pn in pns], s)
+        rows.append(dict(name=name, prof=prof, pns=pns, why=why, s=s, h=h, g=g))
+        print(f"{name:36s} {prof:8s} {h:5.2f} h {g:5.0f} g")
+    T1, G1 = sum(r["h"] for r in rows), sum(r["g"] for r in rows)
+    print(f"before {before_h:.1f} h {before_g:.0f} g -> after {T1:.1f} h {G1:.0f} g")
+    with open(CSV, "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["part_no", "part", "profile", "settings", "before_h", "before_g", "after_h", "after_g", "accurate", "rough_ok", "fix"])
+        w.writerow(["plate", "profile", "parts", "layer_mm", "walls", "infill", "supports", "brim_mm", "hours", "grams"])
         for r in rows:
-            p = PARTS[r["pn"]]
-            w.writerow([r["pn"], r["name"], r["profile"], json.dumps(part_settings(r["pn"])), f"{r['h0']:.2f}", f"{r['g0']:.1f}",
-                        f"{r['h1']:.2f}", f"{r['g1']:.1f}", p[2], p[3], p[4]])
-    write_doc(rows, plates)
-    print("wrote cad/print/plates_eco/ + docs/16_print_economy.md")
+            s = r["s"]
+            w.writerow([r["name"], r["prof"], " ".join(r["pns"]), s["layer_height"], s["perimeters"], s["fill_density"],
+                        "yes" if s.get("support_material") == "1" else "no", s.get("brim_width", "0"), f"{r['h']:.2f}", f"{r['g']:.0f}"])
+    write_doc(rows, names, before_h, before_g)
+    print("wrote docs/16_print_economy.md + cad/print/settings/economy_plates.csv")
 
 
-def write_doc(rows, plates):
-    T0, G0 = sum(r["h0"] for r in rows), sum(r["g0"] for r in rows)
-    T1, G1 = sum(r["h1"] for r in rows), sum(r["g1"] for r in rows)
+def write_doc(rows, names, T0, G0):
+    T1, G1 = sum(r["h"] for r in rows), sum(r["g"] for r in rows)
     L = []
     a = L.append
-    a("# Economy printing: only the quality each part needs\n")
-    a("Not every part needs the same settings. The base is a big hidden box: coarse layers and 10 % infill are fine. "
+    a("# Economy printing: only the quality each part needs (set up by hand)\n")
+    a("Not every part needs the same settings. The base is a big hidden box: coarse layers and low infill are fine. "
       "The finger gears must mesh: they get slow, accurate outer walls. We accept small flaws on the rough parts and fix "
-      "the few fits that matter with sandpaper, a drill or a knife (the fix-up table below).\n")
-    a(f"**Result (sliced in PrusaSlicer, every part): {fmt_h(T0)} → {fmt_h(T1)} of printing "
-      f"(−{100 * (1 - T1 / T0):.0f} %), {G0:.0f} g → {G1:.0f} g of PETG (−{100 * (1 - G1 / G0):.0f} %).** "
-      "Less heating time = less energy.\n")
-    a("## The three profiles\n")
-    a("| Profile | Layer | Walls | Top / bottom | Infill | Speeds (outer / inner / infill, mm/s) | For |")
-    a("|---|---|---|---|---|---|---|")
-    for k, p in PROFILES.items():
-        a(f"| **{k}** | {p['layer_height']} mm | {p['perimeters']} | {p['top_solid_layers']} / {p['bottom_solid_layers']} | "
-          f"{p['fill_density']} {p['fill_pattern']} | {p['external_perimeter_speed']} / {p['perimeter_speed']} / {p['infill_speed']} | {WHY[k]} |")
-    a("\nEverything else stays as in `concept_a_PETG_prusaslicer.ini` (235 °C, bed 80 °C, glue stick, retraction 5 mm). "
-      "Solid infill 40, top 30 mm/s, and a cap of 8 mm³/s (the most PETG the CR-6 SE's stock hotend melts): above that it under-extrudes.\n")
-    a("**Why not a finer layer on the gears?** The fingers print flat, so the tooth shape is drawn by the nozzle in X–Y; "
-      "a thinner layer only adds time. What makes the teeth accurate is a slow outer wall, so DETAIL slows that down.\n")
-    a("## Per part\n")
-    a("| Part | Profile | Changes from the profile | Before | After | Must be accurate | Can be rough |")
-    a("|---|---|---|---|---|---|---|")
+      "the few fits that matter with sandpaper, a drill or a knife (fix-up table at the end).\n")
+    a("**No settings file and no changed 3D files:** import the unchanged STLs from `cad/print/stl/` (already turned to "
+      "their best side: don't rotate them, except flat on the bed) and type the numbers below into your slicer. "
+      "The parts are grouped so that **each plate uses one setting for the whole plate**: nothing to set per part.\n")
+    a(f"**Result (every plate sliced): {fmt_h(T0)} → {fmt_h(T1)} of printing (−{100 * (1 - T1 / T0):.0f} %), "
+      f"{G0:.0f} g → {G1:.0f} g of PETG (−{100 * (1 - G1 / G0):.0f} %).** Less heating time = less energy.\n")
+    a("## Same on every plate\n")
+    a("| Setting | Value |")
+    a("|---|---|")
+    for k, v in COMMON:
+        a(f"| {k} | {v} |")
+    a("")
+    a("## The plates\n")
+    a("| Plate | Parts (STL in cad/print/stl) | Layer | Walls | Top / bottom | Infill | Speeds outer / inner / infill (mm/s) | Supports | Adhesion | Time | PETG |")
+    a("|---|---|---|---|---|---|---|---|---|---|---|")
     for r in rows:
-        p = PARTS[r["pn"]]
-        ch = ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in p[1].items() if not k.startswith("support_material_")) or "—"
-        ch = ch.replace("support material 1", "supports (from the bed)")
-        a(f"| {r['pn']} {r['name']} | **{p[0]}** | {ch} | {fmt_h(r['h0'])}, {r['g0']:.0f} g | **{fmt_h(r['h1'])}, {r['g1']:.0f} g** | {p[2]} | {p[3]} |")
-    a(f"| **Total** | | | **{fmt_h(T0)}, {G0:.0f} g** | **{fmt_h(T1)}, {G1:.0f} g** | | |\n")
-    a("Brim: only the lift link (tiny). Skirt: 2 loops on every plate, as before. Supports: only where the part has a real "
-      "overhang (base, turret plate, carriage arm, the two fingers), from the bed only.\n")
-    a("## Plates (open and slice: the settings are already inside)\n")
-    a("`cad/print/plates_eco/`: the same 4 plates (and the 2 Plan P plates), with each part's profile stored in the .3mf "
-      "(PrusaSlicer: right-click a part to see it). Import `concept_a_PETG_prusaslicer.ini` first, then open the plate.\n")
-    a("| Plate | Parts | Time | PETG |")
-    a("|---|---|---|---|")
-    for stem, title, pns, h, g, ok in plates:
-        a(f"| `{stem}_eco.3mf` | {' '.join(pns)} | {fmt_h(h) if h else 'n/a'} | {g:.0f} g |" if h else f"| `{stem}_eco.3mf` | {' '.join(pns)} | slice failed | |")
-    a("\nOn a plate the slicer prints parts with different layer heights together (0.28 and 0.2 mm parts sync every few layers), "
-      "so the plate time is a bit more than the sum of its parts. Cura: set each part with Per Model Settings using the table above.\n")
+        s = r["s"]
+        parts = ", ".join(f"{pn} {names[pn]}" for pn in r["pns"])
+        sup = "**on**, touching build plate only" if s.get("support_material") == "1" else "off"
+        adh = f"**brim {s['brim_width']} mm**" if s.get("brim_width") else "skirt"
+        pat = {"grid": "grid", "gyroid": "gyroid", "rectilinear": "lines"}[s["fill_pattern"]]
+        a(f"| **{r['name']}** ({r['prof']}) | {parts} | {s['layer_height']} mm | {s['perimeters']} | {s['top_solid_layers']} / "
+          f"{s['bottom_solid_layers']} | {s['fill_density']} {pat} | {s['external_perimeter_speed']} / {s['perimeter_speed']} / "
+          f"{s['infill_speed']} | {sup} | {adh} | {fmt_h(r['h'])} | {r['g']:.0f} g |")
+    a(f"| **Total** | | | | | | | | | **{fmt_h(T1)}** | **{G1:.0f} g** |\n")
+    a("Print in this order (A first). Every plate fits the 235 × 235 mm bed; leave ~15 mm between parts for the supports.\n")
+    a("## Why each plate gets its profile\n")
+    a("| Plate | Why |")
+    a("|---|---|")
+    for r in rows:
+        a(f"| {r['name']} | {r['why']} |")
+    a("")
+    a("**Why not a finer layer on the gears?** The fingers print flat, so the tooth shape is drawn by the nozzle sideways "
+      "(X–Y); a thinner layer only adds time. What makes the teeth accurate is a slow outer wall, so DETAIL slows that down.\n")
+    a("**Slicer names:** walls = Cura \"Wall Line Count\" / Prusa \"Perimeters\"; top / bottom = \"Top / Bottom Layers\" / "
+      "\"Solid layers\"; outer wall speed = \"Outer Wall Speed\" / \"External perimeters\"; supports touching build plate = "
+      "\"Support Placement: Touching Buildplate\" / \"Support on build plate only\".\n")
+    a("## Per part: what must be accurate\n")
+    a("| Part | Must be accurate | Can be rough |")
+    a("|---|---|---|")
+    for r in rows:
+        for pn in r["pns"]:
+            a(f"| {pn} {names[pn]} | {PARTS[pn][0]} | {PARTS[pn][1]} |")
+    a("")
     a("## Fix-up after printing (sandpaper, drill, knife)\n")
     a("Tools: sandpaper 120 + 240 grit, a 6 mm and a 5/32 in (4 mm) drill bit turned by hand, a 12 mm dowel or marker "
       "wrapped in sandpaper, a craft knife, flush cutters / pliers for supports.\n")
     a("| Part | Fix |")
     a("|---|---|")
     for r in rows:
-        a(f"| {r['pn']} {r['name']} | {PARTS[r['pn']][4]} |")
+        for pn in r["pns"]:
+            a(f"| {pn} {names[pn]} | {PARTS[pn][2]} |")
     a("\n**Rules:** sand a press fit a little at a time and test after every few strokes (you can't add plastic back; "
-      "if it gets loose, one layer of tape or a drop of CA glue). Never sand or file gear teeth. A draft part that "
-      "cracks at a screw: the screw was forced: drill the hole one size bigger and use the next screw size or hot glue.\n")
-    a("## Print order\n")
-    a("1. Coupon (`plate0_coupon_eco`, STANDARD): check the fits as in the build guide, section 2.\n"
-      "2. The claw first if you want the most important parts early (`planP_1_claw_eco`, `planP_2_finger_eco`), "
-      "otherwise plates 1 → 3.\n"
-      "3. Fix-up each part as it comes off the bed, and test its fit right away (bearing, LM6UU, rods, servos).\n")
-    a("Regenerate: `python3.13 backend/tools/print_economy.py` (re-slices every part and plate).\n")
+      "if it gets loose, one layer of tape or a drop of CA glue). Never sand or file gear teeth. Coarse draft layers can make "
+      "holes come out a little tight: expect more sanding / drilling on plates B and C. A part that cracks at a screw: the "
+      "screw was forced: drill the hole one size bigger, use the next screw size or hot glue.\n")
+    a("Regenerate (re-slices every plate): `python3.13 backend/tools/print_economy.py`.\n")
     with open(DOC, "w") as f:
         f.write("\n".join(L))
 

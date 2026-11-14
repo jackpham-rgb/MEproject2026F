@@ -1,0 +1,6 @@
+plate,profile,parts,layer_mm,walls,infill,supports,brim_mm,hours,grams
+A  Coupon + lift link,STANDARD,CA-900 CA-302,0.2,3,20%,no,5,0.91,8
+B  Base + spine + top cap,DRAFT,CA-101 CA-202 CA-203,0.28,3,12%,yes,0,8.18,151
+C  Electronics tray,DRAFT,CA-102,0.28,2,10%,no,0,3.02,50
+D  Turret plate + carriage arm,STANDARD,CA-201 CA-301,0.2,3,20%,yes,0,5.52,70
+E  Claw: 2 fingers + gripper frame,DETAIL,CA-402 CA-403 CA-401,0.2,4,100%,yes,0,6.03,67

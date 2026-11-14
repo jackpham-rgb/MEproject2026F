@@ -193,13 +193,12 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   H += ePage("E3b", "Laptop control panel (viewer/control_panel.html)", mdSection("docs/13_electronics_bench_test.md", "2b. Laptop control panel"));
   H += ePage("E4", "If something is wrong", mdSection("docs/13_electronics_bench_test.md", "3. If something"));
   H += ePage("E5", "Wiring dry run (decides what to return)", mdSection("docs/13_electronics_bench_test.md", "4. Then the wiring dry run") +
-    `<h2 style="margin-top:6mm">Then: PART P, printing, and PART M, the mechanics</h2><p>Print the economy plates (cad/print/plates_eco, next pages), fix up the fits, then follow steps 1–${steps.length}. Keep the bench-test wiring: it moves into the tray in step ${steps.length - 2}.</p>`);
+    `<h2 style="margin-top:6mm">Then: PART P, printing, and PART M, the mechanics</h2><p>Print plates A–E with the settings on the next page, fix up the fits, then follow steps 1–${steps.length}. Keep the bench-test wiring: it moves into the tray in step ${steps.length - 2}.</p>`);
   // ---------------- PART P: economy printing (only the quality each part needs) + fix-up
-  H += ePage("P1", "Print settings: only the quality each part needs", mdSection("docs/16_print_economy.md", "The three profiles", true) +
-    mdSection("docs/16_print_economy.md", "Per part", true) +
-    `<p>Import <code>concept_a_PETG_prusaslicer.ini</code>, open a <code>*_eco.3mf</code> plate (next page): each part's profile is already inside. Coupon first.</p>`);
-  H += ePage("P2", "Plates, then fix the fits (sandpaper, drill, knife)", mdSection("docs/16_print_economy.md", "Plates", true) +
-    mdSection("docs/16_print_economy.md", "Fix-up after printing"));
+  H += ePage("P1", "Print settings: type them into your slicer, one setting per plate", mdSection("docs/16_print_economy.md", "Same on every plate", true) +
+    mdSection("docs/16_print_economy.md", "The plates", true) +
+    `<p>Import the STLs from <code>cad/print/stl/</code> (don't rotate them). Print plate A first and check the fits.</p>`);
+  H += ePage("P2", "After printing: fix the fits (sandpaper, drill, knife)", mdSection("docs/16_print_economy.md", "Fix-up after printing"));
   for (const s of steps) {
     const hw = {}; for (const [q, n] of s.hw) hw[n] = (hw[n] || 0) + q;
     const box = Object.keys(hw).length ? `<div class="box">${Object.entries(hw).map(([n, q]) => `<div class="hw">${q}×&nbsp;${screw(n)}<small>${n.replace(" screw", "")}</small></div>`).join("")}</div>` : "";
