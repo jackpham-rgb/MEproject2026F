@@ -62,8 +62,8 @@
   386.88062926227315
  ],
  "after": [
-  23.65611111111111,
-  347.1044518605697
+  23.80777777777778,
+  338.32488510310213
  ],
  "plates": [
   {
@@ -77,7 +77,8 @@
    "topbot": "4 / 4",
    "infill": "20% gyroid",
    "speeds": "35 / 50 / 70",
-   "supports": "OFF",
+   "supports": "OFF (no overhangs)",
+   "support_rows": [],
    "adhesion": "BRIM 5 mm",
    "parts": [
     {
@@ -95,15 +96,49 @@
   {
    "letter": "B",
    "img": "docs/print_plates/plate_B.png",
-   "time": "8 h 11",
-   "grams": 151,
+   "time": "8 h 10",
+   "grams": 150,
    "profile": "DRAFT",
    "layer": "0.28",
    "walls": "3",
    "topbot": "3 / 3",
    "infill": "12% grid",
    "speeds": "45 / 60 / 90",
-   "supports": "ON, touching build plate only",
+   "supports": "ON",
+   "support_rows": [
+    [
+     "Support type",
+     "**Normal** (Cura) / **Grid** style (PrusaSlicer)"
+    ],
+    [
+     "Support pattern",
+     "**Lines** (Prusa: Rectilinear)"
+    ],
+    [
+     "Support density",
+     "**15 %** (Prusa: pattern spacing 2.5 mm)"
+    ],
+    [
+     "Placement",
+     "**touching build plate only** (no supports on the part)"
+    ],
+    [
+     "Overhang angle",
+     "50°"
+    ],
+    [
+     "Top Z distance",
+     "0.25 mm (PETG: easier to peel)"
+    ],
+    [
+     "XY distance",
+     "0.8 mm"
+    ],
+    [
+     "Support interface / roof",
+     "on, 2 layers"
+    ]
+   ],
    "adhesion": "skirt",
    "parts": [
     {
@@ -134,7 +169,8 @@
    "topbot": "3 / 3",
    "infill": "10% grid",
    "speeds": "45 / 60 / 90",
-   "supports": "OFF",
+   "supports": "OFF (no overhangs)",
+   "support_rows": [],
    "adhesion": "skirt",
    "parts": [
     {
@@ -147,7 +183,7 @@
   {
    "letter": "D",
    "img": "docs/print_plates/plate_D.png",
-   "time": "5 h 31",
+   "time": "5 h 30",
    "grams": 70,
    "profile": "STANDARD",
    "layer": "0.2",
@@ -155,7 +191,41 @@
    "topbot": "4 / 4",
    "infill": "20% gyroid",
    "speeds": "35 / 50 / 70",
-   "supports": "ON, touching build plate only",
+   "supports": "ON",
+   "support_rows": [
+    [
+     "Support type",
+     "**Normal** (Cura) / **Grid** style (PrusaSlicer)"
+    ],
+    [
+     "Support pattern",
+     "**Lines** (Prusa: Rectilinear)"
+    ],
+    [
+     "Support density",
+     "**15 %** (Prusa: pattern spacing 2.5 mm)"
+    ],
+    [
+     "Placement",
+     "**touching build plate only** (no supports on the part)"
+    ],
+    [
+     "Overhang angle",
+     "50°"
+    ],
+    [
+     "Top Z distance",
+     "0.25 mm (PETG: easier to peel)"
+    ],
+    [
+     "XY distance",
+     "0.8 mm"
+    ],
+    [
+     "Support interface / roof",
+     "on, 2 layers"
+    ]
+   ],
    "adhesion": "skirt",
    "parts": [
     {
@@ -173,15 +243,45 @@
   {
    "letter": "E",
    "img": "docs/print_plates/plate_E.png",
-   "time": "6 h 02",
-   "grams": 67,
+   "time": "6 h 13",
+   "grams": 59,
    "profile": "DETAIL",
    "layer": "0.2",
    "walls": "4",
    "topbot": "5 / 5",
    "infill": "100% lines",
    "speeds": "25 / 35 / 50",
-   "supports": "ON, touching build plate only",
+   "supports": "ON",
+   "support_rows": [
+    [
+     "Support type",
+     "**Tree** (Cura) / **Organic** (PrusaSlicer)"
+    ],
+    [
+     "Support pattern / density",
+     "automatic (leave default)"
+    ],
+    [
+     "Placement",
+     "**touching build plate only** (no supports on the part)"
+    ],
+    [
+     "Overhang angle",
+     "50°"
+    ],
+    [
+     "Top Z distance",
+     "0.25 mm (PETG: easier to peel)"
+    ],
+    [
+     "XY distance",
+     "0.8 mm"
+    ],
+    [
+     "Support interface / roof",
+     "on, 2 layers"
+    ]
+   ],
    "adhesion": "skirt",
    "parts": [
     {

@@ -63,19 +63,32 @@ PROFILES = {
                    small_perimeter_speed="15"),
 }
 SPEED_GLOBAL = {"solid_infill_speed": "40", "top_solid_infill_speed": "30", "gap_fill_speed": "30", "max_volumetric_speed": "8"}
-SUP = {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1"}
+SUP = {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1",
+       "support_material_threshold": "50", "support_material_contact_distance": "0.25", "support_material_xy_spacing": "0.8",
+       "support_material_interface_layers": "2"}
+# Normal supports, lines, 15 %: cheapest for the flat ledges of the base and turret plate (organic was +35 min on plate D).
+SUP_NORMAL = {**SUP, "support_material_style": "grid", "support_material_pattern": "rectilinear", "support_material_spacing": "2.5"}
+# Tree / organic: only touches the curved pads, peels off cleanly away from the gear teeth, 4 g less per finger, same time.
+SUP_TREE = {**SUP, "support_material_style": "organic"}
+SUP_TEXT = {  # what to type (Cura name / PrusaSlicer name)
+    "grid": [("Support type", "**Normal** (Cura) / **Grid** style (PrusaSlicer)"), ("Support pattern", "**Lines** (Prusa: Rectilinear)"),
+             ("Support density", "**15 %** (Prusa: pattern spacing 2.5 mm)")],
+    "organic": [("Support type", "**Tree** (Cura) / **Organic** (PrusaSlicer)"), ("Support pattern / density", "automatic (leave default)")],
+}
+SUP_COMMON = [("Placement", "**touching build plate only** (no supports on the part)"), ("Overhang angle", "50°"),
+              ("Top Z distance", "0.25 mm (PETG: easier to peel)"), ("XY distance", "0.8 mm"), ("Support interface / roof", "on, 2 layers")]
 
 # Hand plates: one profile per plate. (name, profile, plate overrides, parts, why)
 PLATES = [
     ("A  Coupon + lift link", "STANDARD", {"brim_width": "5"}, ["CA-900", "CA-302"],
      "First: the coupon checks every fit; the tiny link rides along and gets the brim it needs"),
-    ("B  Base + spine + top cap", "DRAFT", {"perimeters": "3", "fill_density": "12%", **SUP}, ["CA-101", "CA-202", "CA-203"],
+    ("B  Base + spine + top cap", "DRAFT", {"perimeters": "3", "fill_density": "12%", **SUP_NORMAL}, ["CA-101", "CA-202", "CA-203"],
      "Big, hidden, lightly loaded. 3 walls so the screw holes and the bearing pocket stay strong"),
     ("C  Electronics tray", "DRAFT", {}, ["CA-102"],
      "Nothing precise on it: the fastest settings"),
-    ("D  Turret plate + carriage arm", "STANDARD", dict(SUP), ["CA-201", "CA-301"],
+    ("D  Turret plate + carriage arm", "STANDARD", dict(SUP_NORMAL), ["CA-201", "CA-301"],
      "Press fits (bearing hub, rods, LM6UU) and the parts that carry the lift"),
-    ("E  Claw: 2 fingers + gripper frame", "DETAIL", dict(SUP), ["CA-402", "CA-403", "CA-401"],
+    ("E  Claw: 2 fingers + gripper frame", "DETAIL", dict(SUP_TREE), ["CA-402", "CA-403", "CA-401"],
      "Gear teeth and the gear spacing: slow outer walls, solid"),
 ]
 
@@ -236,7 +249,10 @@ def main():
         s = {**PROFILES[prof], **SPEED_GLOBAL, **over}
         if s["fill_density"] == "100%":
             s["fill_pattern"] = "rectilinear"
-        h, g = slice_plate([stl_of(pn) for pn in pns], s)
+        try:
+            h, g = slice_plate([stl_of(pn) for pn in pns], s)
+        except SystemExit:          # PrusaSlicer 2.7 bug (false "gcode path conflict" with organic supports): sum the parts
+            h, g = map(sum, zip(*[slice_plate([stl_of(pn)], s) for pn in pns]))
         rows.append(dict(name=name, prof=prof, pns=pns, why=why, s=s, h=h, g=g))
         print(f"{name:36s} {prof:8s} {h:5.2f} h {g:5.0f} g")
     T1, G1 = sum(r["h"] for r in rows), sum(r["g"] for r in rows)
@@ -255,7 +271,8 @@ def main():
             layer=r["s"]["layer_height"], walls=r["s"]["perimeters"], topbot=f"{r['s']['top_solid_layers']} / {r['s']['bottom_solid_layers']}",
             infill=r["s"]["fill_density"] + " " + {"grid": "grid", "gyroid": "gyroid", "rectilinear": "lines"}[r["s"]["fill_pattern"]],
             speeds=f"{r['s']['external_perimeter_speed']} / {r['s']['perimeter_speed']} / {r['s']['infill_speed']}",
-            supports="ON, touching build plate only" if r["s"].get("support_material") == "1" else "OFF",
+            supports="ON" if r["s"].get("support_material") == "1" else "OFF (no overhangs)",
+            support_rows=(SUP_TEXT[r["s"]["support_material_style"]] + SUP_COMMON) if r["s"].get("support_material") == "1" else [],
             adhesion=f"BRIM {r['s']['brim_width']} mm" if r["s"].get("brim_width") else "skirt",
             parts=[dict(img=pi, accurate=PARTS[pn][0], fix=PARTS[pn][2]) for pn, pi in zip(r["pns"], r["part_imgs"])])
             for r in rows]), f, indent=1, ensure_ascii=False)
@@ -289,7 +306,7 @@ def write_doc(rows, names, T0, G0):
     for r in rows:
         s = r["s"]
         parts = ", ".join(f"{pn} {names[pn]}" for pn in r["pns"])
-        sup = "**on**, touching build plate only" if s.get("support_material") == "1" else "off"
+        sup = ("**on**, " + ("Normal, lines 15 %" if s.get("support_material_style") == "grid" else "Tree / organic")) if s.get("support_material") == "1" else "off"
         adh = f"**brim {s['brim_width']} mm**" if s.get("brim_width") else "skirt"
         pat = {"grid": "grid", "gyroid": "gyroid", "rectilinear": "lines"}[s["fill_pattern"]]
         a(f"| **{r['name']}** ({r['prof']}) | {parts} | {s['layer_height']} mm | {s['perimeters']} | {s['top_solid_layers']} / "
@@ -299,6 +316,15 @@ def write_doc(rows, names, T0, G0):
     for r in rows:
         a(f"**Plate {r['name'][0]}**\n\n![Plate {r['name'][0]}](print_plates/plate_{r['name'][0]}.png)\n")
     a("Print in this order (A first). Every plate fits the 235 × 235 mm bed; leave ~15 mm between parts for the supports.\n")
+    a("## Supports (plates B, D, E)\n")
+    a("| Setting | Plates B and D | Plate E (claw) |")
+    a("|---|---|---|")
+    for (k, v1), (_, v2) in zip(SUP_TEXT["grid"][:2], SUP_TEXT["organic"][:2]):
+        a(f"| {k} | {v1} | {v2} |")
+    a(f"| Support density | {SUP_TEXT['grid'][2][1]} | automatic |")
+    for k, v in SUP_COMMON:
+        a(f"| {k} | {v} | {v} |")
+    a("\nInfill pattern is in the plate table (grid / gyroid / lines). Plates A and C need no supports at all.\n")
     a("## Why each plate gets its profile\n")
     a("| Plate | Why |")
     a("|---|---|")

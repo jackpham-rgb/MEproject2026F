@@ -203,13 +203,13 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
       <p style="font-size:13px">Then print plates <b>A → E</b> (next pages). Each page shows what goes on the bed and the settings for that whole plate.
       Total about <b>${Math.round(E.after[0])} h</b> and <b>${Math.round(E.after[1])} g</b> of PETG.</p>`);
     for (const P of E.plates) {
-      const rows = [["Layer height", P.layer + " mm"], ["Walls", P.walls], ["Top / bottom layers", P.topbot], ["Infill", P.infill],
-        ["Speed: outer wall / inner wall / infill", P.speeds + " mm/s"], ["Supports", P.supports], ["Bed adhesion", P.adhesion]];
+      const rows = [["Layer height", P.layer + " mm"], ["Walls", P.walls], ["Top / bottom layers", P.topbot], ["Infill density", P.infill.split(" ")[0]], ["Infill pattern", P.infill.split(" ")[1]],
+        ["Speed: outer wall / inner wall / infill", P.speeds + " mm/s"], ["Supports", P.supports], ...P.support_rows.map(([k, v]) => ["&nbsp;&nbsp;" + k, md(v)]), ["Bed adhesion", P.adhesion]];
       H += `<div class="pg"><div class="num">${P.letter}</div><div class="ttl" style="left:34mm">Plate ${P.letter}: put these parts on the bed like this</div>
         <div style="position:absolute;left:12mm;top:28mm;width:165mm;bottom:12mm;display:flex;align-items:center;justify-content:center">
           <img src="${imgAny(P.img)}" style="max-width:100%;max-height:100%"></div>
         <div style="position:absolute;left:182mm;right:12mm;top:30mm">
-          <table class="md" style="font-size:14px">${rows.map(([k, v]) => `<tr><td class="ck">☐</td><td style="font-size:12px">${k}</td><td style="font-size:16px"><b>${v}</b></td></tr>`).join("")}</table>
+          <table class="md" style="font-size:14px">${rows.map(([k, v]) => `<tr><td class="ck">☐</td><td style="font-size:12px">${k}</td><td style="font-size:${String(v).length > 30 ? 12 : 16}px"><b>${v}</b></td></tr>`).join("")}</table>
           <div style="margin-top:5mm;font-size:16px">≈ <b>${P.time}</b> · <b>${P.grams} g</b></div>
           <div style="margin-top:3mm;font-size:12px;color:#333">Same picture in your slicer: ${P.parts.length} part${P.parts.length > 1 ? "s" : ""}, flat side down as shown, don't rotate them up.</div>
         </div></div>`;

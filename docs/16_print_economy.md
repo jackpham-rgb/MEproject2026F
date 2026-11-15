@@ -6,7 +6,7 @@ The pictures show each plate as it sits on the bed: put the parts on the bed the
 
 **No settings file and no changed 3D files:** import the unchanged STLs from `cad/print/stl/` (already turned to their best side: don't rotate them, except flat on the bed) and type the numbers below into your slicer. The parts are grouped so that **each plate uses one setting for the whole plate**: nothing to set per part.
 
-**Result (every plate sliced): 36 h 59 → 23 h 39 of printing (−36 %), 387 g → 347 g of PETG (−10 %).** Less heating time = less energy.
+**Result (every plate sliced): 36 h 59 → 23 h 48 of printing (−36 %), 387 g → 338 g of PETG (−13 %).** Less heating time = less energy.
 
 ## Same on every plate
 
@@ -32,11 +32,11 @@ The pictures show each plate as it sits on the bed: put the parts on the bed the
 | Plate | Parts (STL in cad/print/stl) | Layer | Walls | Top / bottom | Infill | Speeds outer / inner / infill (mm/s) | Supports | Adhesion | Time | PETG |
 |---|---|---|---|---|---|---|---|---|---|---|
 | **A  Coupon + lift link** (STANDARD) | CA-900 Tolerance coupon, CA-302 Lift link | 0.2 mm | 3 | 4 / 4 | 20% gyroid | 35 / 50 / 70 | off | **brim 5 mm** | 54 min | 8 g |
-| **B  Base + spine + top cap** (DRAFT) | CA-101 Base, CA-202 Spine, CA-203 Top cap | 0.28 mm | 3 | 3 / 3 | 12% grid | 45 / 60 / 90 | **on**, touching build plate only | skirt | 8 h 11 | 151 g |
+| **B  Base + spine + top cap** (DRAFT) | CA-101 Base, CA-202 Spine, CA-203 Top cap | 0.28 mm | 3 | 3 / 3 | 12% grid | 45 / 60 / 90 | **on**, Normal, lines 15 % | skirt | 8 h 10 | 150 g |
 | **C  Electronics tray** (DRAFT) | CA-102 Electronics tray | 0.28 mm | 2 | 3 / 3 | 10% grid | 45 / 60 / 90 | off | skirt | 3 h 01 | 50 g |
-| **D  Turret plate + carriage arm** (STANDARD) | CA-201 Turret plate, CA-301 Carriage + arm | 0.2 mm | 3 | 4 / 4 | 20% gyroid | 35 / 50 / 70 | **on**, touching build plate only | skirt | 5 h 31 | 70 g |
-| **E  Claw: 2 fingers + gripper frame** (DETAIL) | CA-402 Finger, right, CA-403 Finger, left, CA-401 Gripper frame | 0.2 mm | 4 | 5 / 5 | 100% lines | 25 / 35 / 50 | **on**, touching build plate only | skirt | 6 h 02 | 67 g |
-| **Total** | | | | | | | | | **23 h 39** | **347 g** |
+| **D  Turret plate + carriage arm** (STANDARD) | CA-201 Turret plate, CA-301 Carriage + arm | 0.2 mm | 3 | 4 / 4 | 20% gyroid | 35 / 50 / 70 | **on**, Normal, lines 15 % | skirt | 5 h 30 | 70 g |
+| **E  Claw: 2 fingers + gripper frame** (DETAIL) | CA-402 Finger, right, CA-403 Finger, left, CA-401 Gripper frame | 0.2 mm | 4 | 5 / 5 | 100% lines | 25 / 35 / 50 | **on**, Tree / organic | skirt | 6 h 13 | 59 g |
+| **Total** | | | | | | | | | **23 h 48** | **338 g** |
 
 **Plate A**
 
@@ -59,6 +59,21 @@ The pictures show each plate as it sits on the bed: put the parts on the bed the
 ![Plate E](print_plates/plate_E.png)
 
 Print in this order (A first). Every plate fits the 235 × 235 mm bed; leave ~15 mm between parts for the supports.
+
+## Supports (plates B, D, E)
+
+| Setting | Plates B and D | Plate E (claw) |
+|---|---|---|
+| Support type | **Normal** (Cura) / **Grid** style (PrusaSlicer) | **Tree** (Cura) / **Organic** (PrusaSlicer) |
+| Support pattern | **Lines** (Prusa: Rectilinear) | automatic (leave default) |
+| Support density | **15 %** (Prusa: pattern spacing 2.5 mm) | automatic |
+| Placement | **touching build plate only** (no supports on the part) | **touching build plate only** (no supports on the part) |
+| Overhang angle | 50° | 50° |
+| Top Z distance | 0.25 mm (PETG: easier to peel) | 0.25 mm (PETG: easier to peel) |
+| XY distance | 0.8 mm | 0.8 mm |
+| Support interface / roof | on, 2 layers | on, 2 layers |
+
+Infill pattern is in the plate table (grid / gyroid / lines). Plates A and C need no supports at all.
 
 ## Why each plate gets its profile
 
