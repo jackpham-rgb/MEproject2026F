@@ -22,7 +22,8 @@ Slicer: PrusaSlicer -> File > Import > Import Config... -> concept_a_PETG_prusas
         Cura / Bambu / Orca: type the values below in by hand (names in brackets).
 
 PRINTER PROBLEMS: docs/15_cr6se_print_troubleshooting.md (symptom -> cause -> fix)
-ONE FILE PER PLATE:     cad/print/settings/plates/plate_A..E.ini (PrusaSlicer: File > Import > Import Config, Ctrl+L)
+ONE FILE PER PLATE:     cad/print/plates_AE/plate_A..E.3mf (parts placed + all settings inside: just open it)
+                        settings only: cad/print/settings/plates/plate_A..E.ini (Ctrl+L)
 SAVE TIME + PLASTIC:    docs/16_print_economy.md (plates A-E, one setting per plate, typed in by hand, ~37 h -> ~24 h)
 QUICK PROTOTYPE FIRST: docs/14_plan_p_quick_prototype.md (only the claw printed: planP_1_claw, planP_2_finger)
 

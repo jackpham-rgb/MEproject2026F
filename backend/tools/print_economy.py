@@ -120,9 +120,9 @@ PARTS = {
 
 # PrusaSlicer 2.7 quick map: where each setting lives (Expert mode). (setting, where)
 PRUSA_STEPS = [
-    "**Fastest:** File › Import › **Import Config…** (Ctrl+L) › `cad/print/settings/plates/plate_X.ini` for the plate you print. "
-    "It sets everything on its page (printer CR-6 SE, PETG, layers, infill, supports). Then Ctrl+I the plate's STLs and slice. "
-    "Re-import the next plate's .ini before the next plate.",
+    "**Fastest:** File › Open Project (Ctrl+O) › `cad/print/plates_AE/plate_X.3mf`. The parts are already on the bed AND every "
+    "setting on the plate's page is inside (printer CR-6 SE, PETG, layers, infill, supports): answer **Yes** to load its settings, then slice. "
+    "Part already printed? Right-click it in the object list › Delete.",
     "Top right: switch the mode to **Expert** (red). Otherwise half of these fields are hidden.",
     "Printer (once): Configuration › Configuration Wizard › Creality › **CR-6 SE**. Filament: Generic PETG.",
     "Lost? **Ctrl+F** searches every setting by name (type \"support\", \"brim\", \"infill\"…) and jumps to it.",
