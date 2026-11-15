@@ -120,6 +120,9 @@ PARTS = {
 
 # PrusaSlicer 2.7 quick map: where each setting lives (Expert mode). (setting, where)
 PRUSA_STEPS = [
+    "**Fastest:** File › Import › **Import Config…** (Ctrl+L) › `cad/print/settings/plates/plate_X.ini` for the plate you print. "
+    "It sets everything on its page (printer CR-6 SE, PETG, layers, infill, supports). Then Ctrl+I the plate's STLs and slice. "
+    "Re-import the next plate's .ini before the next plate.",
     "Top right: switch the mode to **Expert** (red). Otherwise half of these fields are hidden.",
     "Printer (once): Configuration › Configuration Wizard › Creality › **CR-6 SE**. Filament: Generic PETG.",
     "Lost? **Ctrl+F** searches every setting by name (type \"support\", \"brim\", \"infill\"…) and jumps to it.",
@@ -300,7 +303,7 @@ def main():
     images(rows)
     with open(JSN, "w") as f:
         json.dump(dict(prusa_steps=PRUSA_STEPS, prusa_keys=PRUSA_KEYS, prusa_map=PRUSA_MAP, common=COMMON, before=[before_h, before_g], after=[T1, G1], plates=[dict(
-            letter=r["name"][0], img=r["img"], time=fmt_h(r["h"]), grams=round(r["g"]), profile=r["prof"],
+            letter=r["name"][0], img=r["img"], ini=f"cad/print/settings/plates/plate_{r['name'][0]}.ini", time=fmt_h(r["h"]), grams=round(r["g"]), profile=r["prof"],
             layer=r["s"]["layer_height"], walls=r["s"]["perimeters"], topbot=f"{r['s']['top_solid_layers']} / {r['s']['bottom_solid_layers']}",
             infill=r["s"]["fill_density"] + " " + {"grid": "grid", "gyroid": "gyroid", "rectilinear": "lines"}[r["s"]["fill_pattern"]],
             speeds=f"{r['s']['external_perimeter_speed']} / {r['s']['perimeter_speed']} / {r['s']['infill_speed']}",

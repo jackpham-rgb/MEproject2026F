@@ -217,7 +217,8 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
         <div style="position:absolute;left:182mm;right:12mm;top:30mm">
           <table class="md" style="font-size:14px">${rows.map(([k, v]) => `<tr><td class="ck">☐</td><td style="font-size:12px">${k}</td><td style="font-size:${String(v).length > 30 ? 12 : 16}px"><b>${v}</b></td></tr>`).join("")}</table>
           <div style="margin-top:5mm;font-size:16px">≈ <b>${P.time}</b> · <b>${P.grams} g</b></div>
-          <div style="margin-top:3mm;font-size:12px;color:#333">Same picture in your slicer: ${P.parts.length} part${P.parts.length > 1 ? "s" : ""}, flat side down as shown, don't rotate them up.</div>
+          <div style="margin-top:3mm;font-size:13px">PrusaSlicer: Ctrl+L › <code>${P.ini}</code> sets all of this.</div>
+          <div style="margin-top:2mm;font-size:12px;color:#333">Same picture in your slicer: ${P.parts.length} part${P.parts.length > 1 ? "s" : ""}, flat side down as shown, don't rotate them up.</div>
         </div></div>`;
     }
     const cards = E.plates.flatMap(P => P.parts.map(c => ({ ...c, letter: P.letter })));

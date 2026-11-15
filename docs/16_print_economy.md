@@ -62,11 +62,12 @@ Print in this order (A first). Every plate fits the 235 × 235 mm bed; leave ~15
 
 ## PrusaSlicer: where to find everything
 
-1. Top right: switch the mode to **Expert** (red). Otherwise half of these fields are hidden.
-2. Printer (once): Configuration › Configuration Wizard › Creality › **CR-6 SE**. Filament: Generic PETG.
-3. Lost? **Ctrl+F** searches every setting by name (type "support", "brim", "infill"…) and jumps to it.
-4. Make 3 print presets once: set DRAFT (plates B, C), STANDARD (A, D), DETAIL (E), click the **save icon** next to the preset name and call them "PETG Draft / Standard / Detail". Then each plate = pick the preset in the right panel + the plate's few changes.
-5. Changed fields turn **orange** with an unlocked padlock; click the orange arrow to undo a change.
+1. **Fastest:** File › Import › **Import Config…** (Ctrl+L) › `cad/print/settings/plates/plate_X.ini` for the plate you print. It sets everything on its page (printer CR-6 SE, PETG, layers, infill, supports). Then Ctrl+I the plate's STLs and slice. Re-import the next plate's .ini before the next plate.
+2. Top right: switch the mode to **Expert** (red). Otherwise half of these fields are hidden.
+3. Printer (once): Configuration › Configuration Wizard › Creality › **CR-6 SE**. Filament: Generic PETG.
+4. Lost? **Ctrl+F** searches every setting by name (type "support", "brim", "infill"…) and jumps to it.
+5. Make 3 print presets once: set DRAFT (plates B, C), STANDARD (A, D), DETAIL (E), click the **save icon** next to the preset name and call them "PETG Draft / Standard / Detail". Then each plate = pick the preset in the right panel + the plate's few changes.
+6. Changed fields turn **orange** with an unlocked padlock; click the orange arrow to undo a change.
 
 | Key | Does |
 |---|---|

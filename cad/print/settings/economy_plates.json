@@ -1,5 +1,6 @@
 {
  "prusa_steps": [
+  "**Fastest:** File › Import › **Import Config…** (Ctrl+L) › `cad/print/settings/plates/plate_X.ini` for the plate you print. It sets everything on its page (printer CR-6 SE, PETG, layers, infill, supports). Then Ctrl+I the plate's STLs and slice. Re-import the next plate's .ini before the next plate.",
   "Top right: switch the mode to **Expert** (red). Otherwise half of these fields are hidden.",
   "Printer (once): Configuration › Configuration Wizard › Creality › **CR-6 SE**. Filament: Generic PETG.",
   "Lost? **Ctrl+F** searches every setting by name (type \"support\", \"brim\", \"infill\"…) and jumps to it.",
@@ -184,6 +185,7 @@
   {
    "letter": "A",
    "img": "docs/print_plates/plate_A.png",
+   "ini": "cad/print/settings/plates/plate_A.ini",
    "time": "54 min",
    "grams": 8,
    "profile": "STANDARD",
@@ -211,6 +213,7 @@
   {
    "letter": "B",
    "img": "docs/print_plates/plate_B.png",
+   "ini": "cad/print/settings/plates/plate_B.ini",
    "time": "8 h 10",
    "grams": 150,
    "profile": "DRAFT",
@@ -276,6 +279,7 @@
   {
    "letter": "C",
    "img": "docs/print_plates/plate_C.png",
+   "ini": "cad/print/settings/plates/plate_C.ini",
    "time": "3 h 01",
    "grams": 50,
    "profile": "DRAFT",
@@ -298,6 +302,7 @@
   {
    "letter": "D",
    "img": "docs/print_plates/plate_D.png",
+   "ini": "cad/print/settings/plates/plate_D.ini",
    "time": "5 h 30",
    "grams": 70,
    "profile": "STANDARD",
@@ -358,6 +363,7 @@
   {
    "letter": "E",
    "img": "docs/print_plates/plate_E.png",
+   "ini": "cad/print/settings/plates/plate_E.ini",
    "time": "6 h 13",
    "grams": 59,
    "profile": "DETAIL",
