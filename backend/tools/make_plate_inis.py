@@ -48,11 +48,12 @@ def base_ini():
     return d
 
 
-def main():
-    os.makedirs(OUT, exist_ok=True)
+def main(plates=None, out_dir=OUT):
+    plates = plates or E.PLATES
+    os.makedirs(out_dir, exist_ok=True)
     printer = {k: v for k, v in vendor_printer().items() if k not in ("renamed_from", "printer_model", "printer_notes")}
     base = base_ini()
-    for name, prof, over, pns, why in E.PLATES:
+    for name, prof, over, pns, why in plates:
         letter = name[0]
         s = {**E.PROFILES[prof], **E.SPEED_GLOBAL, **over}
         if s["fill_density"] == "100%":
@@ -64,7 +65,7 @@ def main():
             src = os.path.join(d, "in.ini")
             with open(src, "w") as f:
                 f.write("".join(f"{k} = {v}\n" for k, v in cfg.items()))
-            out = os.path.join(OUT, f"plate_{letter}.ini")
+            out = os.path.join(out_dir, f"plate_{letter}.ini")
             r = subprocess.run(["prusa-slicer", "--load", src, "--save", out], capture_output=True, text=True, timeout=120)
             if r.returncode or not os.path.exists(out):
                 raise SystemExit(f"plate {letter}: {r.stderr[-300:]}")
