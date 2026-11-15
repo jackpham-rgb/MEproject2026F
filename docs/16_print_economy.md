@@ -60,6 +60,46 @@ The pictures show each plate as it sits on the bed: put the parts on the bed the
 
 Print in this order (A first). Every plate fits the 235 × 235 mm bed; leave ~15 mm between parts for the supports.
 
+## PrusaSlicer: where to find everything
+
+1. Top right: switch the mode to **Expert** (red). Otherwise half of these fields are hidden.
+2. Printer (once): Configuration › Configuration Wizard › Creality › **CR-6 SE**. Filament: Generic PETG.
+3. Lost? **Ctrl+F** searches every setting by name (type "support", "brim", "infill"…) and jumps to it.
+4. Make 3 print presets once: set DRAFT (plates B, C), STANDARD (A, D), DETAIL (E), click the **save icon** next to the preset name and call them "PETG Draft / Standard / Detail". Then each plate = pick the preset in the right panel + the plate's few changes.
+5. Changed fields turn **orange** with an unlocked padlock; click the orange arrow to undo a change.
+
+| Key | Does |
+|---|---|
+| **Ctrl+I** | import STL (or drag the files in) |
+| **A** | arrange the parts on the bed |
+| **F** | place on face: click the flat face that goes down |
+| **R / M / S** | rotate / move / scale tool |
+| **Del** | delete selected part |
+| **Ctrl+1 / 2 / 3 / 4** | Plater / Print / Filament / Printer settings tabs |
+| **Ctrl+R** | slice |
+| **Tab** | switch 3D view ↔ Preview (layers, supports, estimated time bottom right) |
+| **Ctrl+G** | export G-code: short name, no spaces (e.g. PLATEB.gcode), to the SD card |
+
+| Setting | Where (PrusaSlicer 2.7, Expert mode) |
+|---|---|
+| Layer height, first layer height | Print Settings › **Layers and perimeters** › Layer height |
+| Walls | Print Settings › Layers and perimeters › Vertical shells › **Perimeters** |
+| Top / bottom layers | Print Settings › Layers and perimeters › Horizontal shells › **Solid layers** Top / Bottom |
+| Seam | Print Settings › Layers and perimeters › Advanced › Seam position: **Rear** / Aligned |
+| Infill density + pattern | Print Settings › **Infill** › Fill density, Fill pattern (Grid, Gyroid, Rectilinear = lines) |
+| Skirt / brim | Print Settings › **Skirt and brim** › Loops (minimum) = 2; Brim type Outer only, Brim width 5 mm (plate A) |
+| Supports on / off | Print Settings › **Support material** › Generate support material ✓, Auto generated supports ✓ |
+| Support style | Support material › Style: **Grid** (B, D) or **Organic** (E) |
+| Placement, overhang angle | Support material › **On build plate only** ✓, Overhang threshold 50° |
+| Z / XY distance, interface | Support material › Top contact Z distance 0.25, XY separation 0.8 mm, Top interface layers 2 |
+| Support pattern, density | Support material › Options for support material › Pattern **Rectilinear**, Pattern spacing **2.5 mm** (≈15 %) |
+| Speeds | Print Settings › **Speed** › Perimeters, Small perimeters, External perimeters, Infill, Solid / Top solid infill, Travel, First layer speed |
+| Line width, elephant foot | Print Settings › **Advanced** › Extrusion width 0.42; Elephant foot compensation 0.15 mm |
+| Nozzle / bed temperature | Filament Settings › **Filament** › Temperature: First layer 238 / 80, Other layers 235 / 80 |
+| Cooling fan | Filament Settings › **Cooling** › Min / max fan speed 30 %, Disable fan for the first 3 layers |
+| Max flow | Filament Settings › **Advanced** › Max volumetric speed 8 mm³/s |
+| Retraction | Printer Settings › **Extruder 1** › Retraction length 5 mm, speed 40 mm/s |
+
 ## Supports (plates B, D, E)
 
 | Setting | Plates B and D | Plate E (claw) |

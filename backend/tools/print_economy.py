@@ -118,6 +118,39 @@ PARTS = {
 }
 
 
+# PrusaSlicer 2.7 quick map: where each setting lives (Expert mode). (setting, where)
+PRUSA_STEPS = [
+    "Top right: switch the mode to **Expert** (red). Otherwise half of these fields are hidden.",
+    "Printer (once): Configuration › Configuration Wizard › Creality › **CR-6 SE**. Filament: Generic PETG.",
+    "Lost? **Ctrl+F** searches every setting by name (type \"support\", \"brim\", \"infill\"…) and jumps to it.",
+    "Make 3 print presets once: set DRAFT (plates B, C), STANDARD (A, D), DETAIL (E), click the **save icon** next to the "
+    "preset name and call them \"PETG Draft / Standard / Detail\". Then each plate = pick the preset in the right panel + the plate's few changes.",
+    "Changed fields turn **orange** with an unlocked padlock; click the orange arrow to undo a change.",
+]
+PRUSA_KEYS = [("Ctrl+I", "import STL (or drag the files in)"), ("A", "arrange the parts on the bed"), ("F", "place on face: click the flat face that goes down"),
+              ("R / M / S", "rotate / move / scale tool"), ("Del", "delete selected part"), ("Ctrl+1 / 2 / 3 / 4", "Plater / Print / Filament / Printer settings tabs"),
+              ("Ctrl+R", "slice"), ("Tab", "switch 3D view ↔ Preview (layers, supports, estimated time bottom right)"),
+              ("Ctrl+G", "export G-code: short name, no spaces (e.g. PLATEB.gcode), to the SD card")]
+PRUSA_MAP = [
+    ("Layer height, first layer height", "Print Settings › **Layers and perimeters** › Layer height"),
+    ("Walls", "Print Settings › Layers and perimeters › Vertical shells › **Perimeters**"),
+    ("Top / bottom layers", "Print Settings › Layers and perimeters › Horizontal shells › **Solid layers** Top / Bottom"),
+    ("Seam", "Print Settings › Layers and perimeters › Advanced › Seam position: **Rear** / Aligned"),
+    ("Infill density + pattern", "Print Settings › **Infill** › Fill density, Fill pattern (Grid, Gyroid, Rectilinear = lines)"),
+    ("Skirt / brim", "Print Settings › **Skirt and brim** › Loops (minimum) = 2; Brim type Outer only, Brim width 5 mm (plate A)"),
+    ("Supports on / off", "Print Settings › **Support material** › Generate support material ✓, Auto generated supports ✓"),
+    ("Support style", "Support material › Style: **Grid** (B, D) or **Organic** (E)"),
+    ("Placement, overhang angle", "Support material › **On build plate only** ✓, Overhang threshold 50°"),
+    ("Z / XY distance, interface", "Support material › Top contact Z distance 0.25, XY separation 0.8 mm, Top interface layers 2"),
+    ("Support pattern, density", "Support material › Options for support material › Pattern **Rectilinear**, Pattern spacing **2.5 mm** (≈15 %)"),
+    ("Speeds", "Print Settings › **Speed** › Perimeters, Small perimeters, External perimeters, Infill, Solid / Top solid infill, Travel, First layer speed"),
+    ("Line width, elephant foot", "Print Settings › **Advanced** › Extrusion width 0.42; Elephant foot compensation 0.15 mm"),
+    ("Nozzle / bed temperature", "Filament Settings › **Filament** › Temperature: First layer 238 / 80, Other layers 235 / 80"),
+    ("Cooling fan", "Filament Settings › **Cooling** › Min / max fan speed 30 %, Disable fan for the first 3 layers"),
+    ("Max flow", "Filament Settings › **Advanced** › Max volumetric speed 8 mm³/s"),
+    ("Retraction", "Printer Settings › **Extruder 1** › Retraction length 5 mm, speed 40 mm/s"),
+]
+
 def slice_plate(paths, extra):
     """Slice the given STLs together (auto-arranged on the bed). Returns (hours, grams)."""
     with tempfile.TemporaryDirectory() as d:
@@ -266,7 +299,7 @@ def main():
                         "yes" if s.get("support_material") == "1" else "no", s.get("brim_width", "0"), f"{r['h']:.2f}", f"{r['g']:.0f}"])
     images(rows)
     with open(JSN, "w") as f:
-        json.dump(dict(common=COMMON, before=[before_h, before_g], after=[T1, G1], plates=[dict(
+        json.dump(dict(prusa_steps=PRUSA_STEPS, prusa_keys=PRUSA_KEYS, prusa_map=PRUSA_MAP, common=COMMON, before=[before_h, before_g], after=[T1, G1], plates=[dict(
             letter=r["name"][0], img=r["img"], time=fmt_h(r["h"]), grams=round(r["g"]), profile=r["prof"],
             layer=r["s"]["layer_height"], walls=r["s"]["perimeters"], topbot=f"{r['s']['top_solid_layers']} / {r['s']['bottom_solid_layers']}",
             infill=r["s"]["fill_density"] + " " + {"grid": "grid", "gyroid": "gyroid", "rectilinear": "lines"}[r["s"]["fill_pattern"]],
@@ -316,6 +349,18 @@ def write_doc(rows, names, T0, G0):
     for r in rows:
         a(f"**Plate {r['name'][0]}**\n\n![Plate {r['name'][0]}](print_plates/plate_{r['name'][0]}.png)\n")
     a("Print in this order (A first). Every plate fits the 235 × 235 mm bed; leave ~15 mm between parts for the supports.\n")
+    a("## PrusaSlicer: where to find everything\n")
+    for i, t in enumerate(PRUSA_STEPS, 1):
+        a(f"{i}. {t}")
+    a("\n| Key | Does |")
+    a("|---|---|")
+    for k, v in PRUSA_KEYS:
+        a(f"| **{k}** | {v} |")
+    a("\n| Setting | Where (PrusaSlicer 2.7, Expert mode) |")
+    a("|---|---|")
+    for k, v in PRUSA_MAP:
+        a(f"| {k} | {v} |")
+    a("")
     a("## Supports (plates B, D, E)\n")
     a("| Setting | Plates B and D | Plate E (claw) |")
     a("|---|---|---|")

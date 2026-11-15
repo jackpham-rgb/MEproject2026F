@@ -198,6 +198,12 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   {
     const E = JSON.parse(fs.readFileSync(path.join(ROOT, "cad/print/settings/economy_plates.json"), "utf8"));
     const md = t => inline(t);
+    H += ePage("P0", "PrusaSlicer: where to find everything (quick map)",
+      `<div style="display:grid;grid-template-columns:0.9fr 1.25fr;gap:6mm">
+        <div>${E.prusa_steps.map((t, i) => `<div class="li" style="font-size:12px"><b>${i + 1}.</b> ${md(t)}</div>`).join("")}
+          <table class="md" style="margin-top:3mm">${E.prusa_keys.map(([k, v]) => `<tr><td style="width:30mm"><b>${k}</b></td><td>${md(v)}</td></tr>`).join("")}</table></div>
+        <table class="md"><tr><th>Setting</th><th>Where</th></tr>${E.prusa_map.map(([k, v]) => `<tr><td style="width:36mm">${md(k)}</td><td>${md(v)}</td></tr>`).join("")}</table>
+      </div>`);
     H += ePage("P1", "Printing: set these once (same for every plate)",
       `<table class="md">${E.common.map(([k, v]) => `<tr><td class="ck">☐</td><td style="width:55mm"><b>${md(k)}</b></td><td>${md(v)}</td></tr>`).join("")}</table>
       <p style="font-size:13px">Then print plates <b>A → E</b> (next pages). Each page shows what goes on the bed and the settings for that whole plate.
