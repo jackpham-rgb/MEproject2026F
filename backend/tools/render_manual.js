@@ -212,8 +212,10 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
       const rows = [["Layer height", P.layer + " mm"], ["Walls", P.walls], ["Top / bottom layers", P.topbot], ["Infill density", P.infill.split(" ")[0]], ["Infill pattern", P.infill.split(" ")[1]],
         ["Speed: outer wall / inner wall / infill", P.speeds + " mm/s"], ["Supports", P.supports], ...P.support_rows.map(([k, v]) => ["&nbsp;&nbsp;" + k, md(v)]), ["Bed adhesion", P.adhesion]];
       H += `<div class="pg"><div class="num">${P.letter}</div><div class="ttl" style="left:34mm">Plate ${P.letter}: put these parts on the bed like this</div>
-        <div style="position:absolute;left:12mm;top:28mm;width:165mm;bottom:12mm;display:flex;align-items:center;justify-content:center">
+        <div style="position:absolute;left:12mm;top:26mm;width:165mm;height:118mm;display:flex;align-items:center;justify-content:center">
           <img src="${imgAny(P.img)}" style="max-width:100%;max-height:100%"></div>
+        <div style="position:absolute;left:14mm;width:160mm;top:146mm;font-size:12px"><b>Files to add (Ctrl+I), from <code>cad/print/stl/</code>:</b>
+          <div style="display:grid;grid-template-columns:repeat(3,48mm);gap:4mm;margin-top:1.5mm">${P.parts.map(c => `<div style="text-align:center;font-size:11px"><img src="${imgAny(c.img)}" style="height:30mm;max-width:100%;border:1px solid #ccc"><br><code>${c.file}</code></div>`).join("")}</div></div>
         <div style="position:absolute;left:182mm;right:12mm;top:30mm">
           <table class="md" style="font-size:14px">${rows.map(([k, v]) => `<tr><td class="ck">☐</td><td style="font-size:12px">${k}</td><td style="font-size:${String(v).length > 30 ? 12 : 16}px"><b>${v}</b></td></tr>`).join("")}</table>
           <div style="margin-top:5mm;font-size:16px">≈ <b>${P.time}</b> · <b>${P.grams} g</b></div>

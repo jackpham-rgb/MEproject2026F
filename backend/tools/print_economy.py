@@ -310,7 +310,7 @@ def main():
             supports="ON" if r["s"].get("support_material") == "1" else "OFF (no overhangs)",
             support_rows=(SUP_TEXT[r["s"]["support_material_style"]] + SUP_COMMON) if r["s"].get("support_material") == "1" else [],
             adhesion=f"BRIM {r['s']['brim_width']} mm" if r["s"].get("brim_width") else "skirt",
-            parts=[dict(img=pi, accurate=PARTS[pn][0], fix=PARTS[pn][2]) for pn, pi in zip(r["pns"], r["part_imgs"])])
+            parts=[dict(img=pi, file=os.path.basename(stl_of(pn)), accurate=PARTS[pn][0], fix=PARTS[pn][2]) for pn, pi in zip(r["pns"], r["part_imgs"])])
             for r in rows]), f, indent=1, ensure_ascii=False)
     write_doc(rows, names, before_h, before_g)
     print("wrote docs/16_print_economy.md + cad/print/settings/economy_plates.csv")

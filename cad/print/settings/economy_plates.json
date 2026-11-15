@@ -200,11 +200,13 @@
    "parts": [
     {
      "img": "docs/print_plates/part_CA-900.png",
+     "file": "CA-900_tolerance_coupon.stl",
      "accurate": "it tests the fits",
      "fix": "Check each hole as in the build guide, section 2: it tells you how much to sand the real parts"
     },
     {
      "img": "docs/print_plates/part_CA-302.png",
+     "file": "CA-302_lift_link.stl",
      "accurate": "the 2 holes",
      "fix": "Peel the brim. Pivot screw binds: open the hole with a 5/32 in (4 mm) drill turned by hand"
     }
@@ -261,16 +263,19 @@
    "parts": [
     {
      "img": "docs/print_plates/part_CA-101.png",
+     "file": "CA-101_base.stl",
      "accurate": "6807 bearing pocket (47.1 mm), MG996R screw holes",
      "fix": "Bearing tight: sand the pocket wall (120 grit on a finger) until it presses in with thumbs. Loose: one layer of tape. Clear support bits out of the servo pocket with pliers"
     },
     {
      "img": "docs/print_plates/part_CA-202.png",
+     "file": "CA-202_spine.stl",
      "accurate": "lift-servo screw holes, screw holes at the ends",
      "fix": "Run each screw in once and back out before final assembly"
     },
     {
      "img": "docs/print_plates/part_CA-203.png",
+     "file": "CA-203_top_cap.stl",
      "accurate": "2 blind rod holes (6.0 mm)",
      "fix": "Rod won't go in: drill 6 mm, 8 mm deep (tape flag on the bit)"
     }
@@ -294,6 +299,7 @@
    "parts": [
     {
      "img": "docs/print_plates/part_CA-102.png",
+     "file": "CA-102_electronics_tray.stl",
      "accurate": "nothing critical: board pegs, 2 screw tabs",
      "fix": "Peg too fat for a board hole: shave it with a knife. Snapped peg: a dab of hot glue holds the board"
     }
@@ -350,11 +356,13 @@
    "parts": [
     {
      "img": "docs/print_plates/part_CA-201.png",
+     "file": "CA-201_turret_plate.stl",
      "accurate": "hub into the bearing (34.95 mm), 2 rod holes (6.0 mm), horn screw holes",
      "fix": "Hub tight: sand it evenly, turning it. Rod holes tight: drill 6 mm (or 15/64 in) by hand"
     },
     {
      "img": "docs/print_plates/part_CA-301.png",
+     "file": "CA-301_carriage_arm.stl",
      "accurate": "4 LM6UU pockets (12.15 mm) in line, wrist-servo screws, link pivot",
      "fix": "Pockets print on their side, so the top of each droops: ream with a 12 mm drill or sandpaper on a 12 mm dowel / marker until the LM6UU presses in; the carriage must slide down both rods by its own weight"
     }
@@ -407,16 +415,19 @@
    "parts": [
     {
      "img": "docs/print_plates/part_CA-402.png",
+     "file": "CA-402_finger_R.stl",
      "accurate": "gear teeth, axle bore 3.9 mm",
      "fix": "Remove supports, file only the pad area, never the teeth. Bore tight: twist a 5/32 in drill through by hand"
     },
     {
      "img": "docs/print_plates/part_CA-403.png",
+     "file": "CA-403_finger_L.stl",
      "accurate": "gear teeth, servo-spline socket",
      "fix": "Spline socket tight: scrape lightly inside with the knife tip, test the SG90 spline after every pass. Never file the teeth"
     },
     {
      "img": "docs/print_plates/part_CA-401.png",
+     "file": "CA-401_gripper_frame.stl",
      "accurate": "gear axle hole and servo position: they set the gear mesh",
      "fix": "Don't open the axle hole more than needed: the gears must mesh without play"
     }
