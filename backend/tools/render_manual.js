@@ -218,8 +218,8 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
     for (let k = 0; k < cards.length; k += 6) {
       H += `<div class="pg"><div class="num">P2</div><div class="ttl" style="left:44mm">After printing: make the fits fit (sandpaper, drill, knife)${k ? " (continued)" : ""}</div>
         <div style="position:absolute;left:14mm;right:14mm;top:30mm;bottom:10mm;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:4mm">
-        ${cards.slice(k, k + 6).map(c => `<div style="border:1px solid #000;border-radius:2mm;padding:2mm;display:grid;grid-template-columns:52mm 1fr;gap:3mm;font-size:13px;overflow:hidden">
-          <div><img src="${imgAny(c.img)}" style="width:100%"><div style="font-size:10px;color:#555">plate ${c.letter}</div></div>
+        ${cards.slice(k, k + 6).map(c => `<div style="border:1px solid #000;border-radius:2mm;padding:2mm;display:grid;grid-template-columns:38mm 1fr;gap:3mm;font-size:12.5px;line-height:1.3;overflow:hidden">
+          <div><img src="${imgAny(c.img)}" style="width:100%"><div style="font-size:11px;color:#555">plate ${c.letter}</div></div>
           <div><div><b>Must fit:</b> ${md(c.accurate)}</div><div style="margin-top:1.5mm">☐ ${md(c.fix)}</div></div></div>`).join("")}
         </div></div>`;
     }
