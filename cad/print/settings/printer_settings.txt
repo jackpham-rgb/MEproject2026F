@@ -1,7 +1,7 @@
 CONCEPT A: 3D PRINTER SETTINGS (PETG, 0.4 mm nozzle)
 =====================================================
 PRINTER: Creality CR-6 SE (235 x 235 x 250 mm bed, Bowden extruder, nozzle-probe auto-levelling,
-carborundum glass bed). The plates are laid out for 220 x 220, so they fit with room to spare.
+textured PEI sheet). The plates are laid out for 220 x 220, so they fit with room to spare.
 
 CR-6 SE SPECIFICS
   Slicer profile            Cura: Add printer > Creality > "Creality CR-6 SE" (its start code uses the
@@ -9,9 +9,9 @@ CR-6 SE SPECIFICS
   Nozzle temperature        235 C, first layer 238 C. Keep it <= 240 C: the stock hotend has a PTFE
                             tube down to the nozzle and PTFE breaks down above ~240 C
   Retraction (Bowden)       5 mm at 40 mm/s. Stringing: try 6 mm; never above 7 mm
-  Bed                       carborundum glass at 80 C. PETG grips it hard: thin glue stick as a
-                            release layer so the parts don't pull chips out of the glass. Remove parts
-                            after the bed has cooled to room temperature
+  Bed                       textured PEI at 80 C, NO glue: clean with dish soap + water (or isopropyl).
+                            Z-offset a little higher than for PLA (don't squish PETG into PEI). Let the
+                            bed cool, take the sheet off and flex it: parts pop off
   Levelling                 touch screen > Level, with a CLEAN nozzle (no plastic on the tip: the
                             nozzle itself is the probe). Then adjust Z-offset on the first layer
   Card                      short file names, no spaces (P0COUPON.gcode ...): the screen cuts long names
@@ -45,7 +45,7 @@ MATERIAL: PETG 1.75 mm
   Bed temperature           80 C (first layer 80 C)          [build plate temperature]
   Cooling fan               30 % (max 50 % on small layers), off for the first 3 layers
   Retraction                bowden (Ender-3): 5 mm at 40 mm/s; direct drive: 1 mm at 35 mm/s
-  Bed surface               glue stick on smooth PEI or glass (PETG can weld to bare PEI)
+  Bed surface               textured PEI, no glue (smooth PEI or glass would need glue stick)
   Dry the filament          if it pops / strings a lot: 65 C for 4 h
 
 QUALITY

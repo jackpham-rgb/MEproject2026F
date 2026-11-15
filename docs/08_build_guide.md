@@ -56,7 +56,7 @@ Already have (check before you start):
 
 Single parts: `cad/print/stl/` (already turned to the best side). Orientation preview: `cad/print/print_orientations.png`. Printer: Creality CR-6 SE, 235 × 235 mm bed.
 
-**PETG settings (start here, tune for your printer):** nozzle 0.4 mm at 235 °C, bed 80 °C, layer 0.2 mm, 3 walls (1.2 mm), 4 top / 4 bottom layers, 30 % gyroid infill, cooling fan 30–50 %, elephant-foot compensation 0.15 mm (holes on the bed side), print speed ~60 mm/s. Use glue stick on smooth PEI so PETG doesn't weld to the bed.
+**PETG settings (start here, tune for your printer):** nozzle 0.4 mm at 235 °C, bed 80 °C, layer 0.2 mm, 3 walls (1.2 mm), 4 top / 4 bottom layers, 30 % gyroid infill, cooling fan 30–50 %, elephant-foot compensation 0.15 mm (holes on the bed side), print speed ~60 mm/s. Textured PEI, no glue: keep it clean and don't over-squish the first layer. Faster plates by hand: `docs/16_print_economy.md`.
 
 | Order | Part no. | Part | Qty | Lay it on the bed with | Size on bed (mm) | Supports | PETG (g) | ≈ hours |
 |---:|---|---|---:|---|---|---|---:|---:|

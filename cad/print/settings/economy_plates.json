@@ -1,0 +1,205 @@
+{
+ "common": [
+  [
+   "Nozzle temperature",
+   "235 °C (first layer 238 °C, never above 240 °C: PTFE-lined hotend)"
+  ],
+  [
+   "Bed",
+   "Textured PEI sheet, 80 °C. **No glue.** Clean it with dish soap + water (or isopropyl) and don't touch the print area"
+  ],
+  [
+   "Z-offset",
+   "a little higher than for PLA: PETG must not be squished into PEI (it can stick too hard)"
+  ],
+  [
+   "Removing parts",
+   "let the bed cool to room temperature, take the sheet off and flex it: parts pop off"
+  ],
+  [
+   "First layer",
+   "0.24 mm high, 20 mm/s"
+  ],
+  [
+   "Line width",
+   "0.42 mm (0.4 mm nozzle)"
+  ],
+  [
+   "Cooling fan",
+   "30 %, off for the first 3 layers"
+  ],
+  [
+   "Retraction",
+   "5 mm at 40 mm/s (Bowden)"
+  ],
+  [
+   "Solid / top infill speed",
+   "40 / 30 mm/s"
+  ],
+  [
+   "Travel speed",
+   "150 mm/s"
+  ],
+  [
+   "Max flow",
+   "keep under 8 mm³/s (stock CR-6 SE hotend): the speeds below already do"
+  ],
+  [
+   "Elephant-foot compensation",
+   "0.15 mm (Cura: initial layer horizontal expansion −0.15)"
+  ],
+  [
+   "Seam",
+   "rear / aligned"
+  ],
+  [
+   "Skirt",
+   "2 loops (unless the plate says brim)"
+  ]
+ ],
+ "before": [
+  36.99055555555555,
+  386.88062926227315
+ ],
+ "after": [
+  23.65611111111111,
+  347.1044518605697
+ ],
+ "plates": [
+  {
+   "letter": "A",
+   "img": "docs/print_plates/plate_A.png",
+   "time": "54 min",
+   "grams": 8,
+   "profile": "STANDARD",
+   "layer": "0.2",
+   "walls": "3",
+   "topbot": "4 / 4",
+   "infill": "20% gyroid",
+   "speeds": "35 / 50 / 70",
+   "supports": "OFF",
+   "adhesion": "BRIM 5 mm",
+   "parts": [
+    {
+     "img": "docs/print_plates/part_CA-900.png",
+     "accurate": "it tests the fits",
+     "fix": "Check each hole as in the build guide, section 2: it tells you how much to sand the real parts"
+    },
+    {
+     "img": "docs/print_plates/part_CA-302.png",
+     "accurate": "the 2 holes",
+     "fix": "Peel the brim. Pivot screw binds: open the hole with a 5/32 in (4 mm) drill turned by hand"
+    }
+   ]
+  },
+  {
+   "letter": "B",
+   "img": "docs/print_plates/plate_B.png",
+   "time": "8 h 11",
+   "grams": 151,
+   "profile": "DRAFT",
+   "layer": "0.28",
+   "walls": "3",
+   "topbot": "3 / 3",
+   "infill": "12% grid",
+   "speeds": "45 / 60 / 90",
+   "supports": "ON, touching build plate only",
+   "adhesion": "skirt",
+   "parts": [
+    {
+     "img": "docs/print_plates/part_CA-101.png",
+     "accurate": "6807 bearing pocket (47.1 mm), MG996R screw holes",
+     "fix": "Bearing tight: sand the pocket wall (120 grit on a finger) until it presses in with thumbs. Loose: one layer of tape. Clear support bits out of the servo pocket with pliers"
+    },
+    {
+     "img": "docs/print_plates/part_CA-202.png",
+     "accurate": "lift-servo screw holes, screw holes at the ends",
+     "fix": "Run each screw in once and back out before final assembly"
+    },
+    {
+     "img": "docs/print_plates/part_CA-203.png",
+     "accurate": "2 blind rod holes (6.0 mm)",
+     "fix": "Rod won't go in: drill 6 mm, 8 mm deep (tape flag on the bit)"
+    }
+   ]
+  },
+  {
+   "letter": "C",
+   "img": "docs/print_plates/plate_C.png",
+   "time": "3 h 01",
+   "grams": 50,
+   "profile": "DRAFT",
+   "layer": "0.28",
+   "walls": "2",
+   "topbot": "3 / 3",
+   "infill": "10% grid",
+   "speeds": "45 / 60 / 90",
+   "supports": "OFF",
+   "adhesion": "skirt",
+   "parts": [
+    {
+     "img": "docs/print_plates/part_CA-102.png",
+     "accurate": "nothing critical: board pegs, 2 screw tabs",
+     "fix": "Peg too fat for a board hole: shave it with a knife. Snapped peg: a dab of hot glue holds the board"
+    }
+   ]
+  },
+  {
+   "letter": "D",
+   "img": "docs/print_plates/plate_D.png",
+   "time": "5 h 31",
+   "grams": 70,
+   "profile": "STANDARD",
+   "layer": "0.2",
+   "walls": "3",
+   "topbot": "4 / 4",
+   "infill": "20% gyroid",
+   "speeds": "35 / 50 / 70",
+   "supports": "ON, touching build plate only",
+   "adhesion": "skirt",
+   "parts": [
+    {
+     "img": "docs/print_plates/part_CA-201.png",
+     "accurate": "hub into the bearing (34.95 mm), 2 rod holes (6.0 mm), horn screw holes",
+     "fix": "Hub tight: sand it evenly, turning it. Rod holes tight: drill 6 mm (or 15/64 in) by hand"
+    },
+    {
+     "img": "docs/print_plates/part_CA-301.png",
+     "accurate": "4 LM6UU pockets (12.15 mm) in line, wrist-servo screws, link pivot",
+     "fix": "Pockets print on their side, so the top of each droops: ream with a 12 mm drill or sandpaper on a 12 mm dowel / marker until the LM6UU presses in; the carriage must slide down both rods by its own weight"
+    }
+   ]
+  },
+  {
+   "letter": "E",
+   "img": "docs/print_plates/plate_E.png",
+   "time": "6 h 02",
+   "grams": 67,
+   "profile": "DETAIL",
+   "layer": "0.2",
+   "walls": "4",
+   "topbot": "5 / 5",
+   "infill": "100% lines",
+   "speeds": "25 / 35 / 50",
+   "supports": "ON, touching build plate only",
+   "adhesion": "skirt",
+   "parts": [
+    {
+     "img": "docs/print_plates/part_CA-402.png",
+     "accurate": "gear teeth, axle bore 3.9 mm",
+     "fix": "Remove supports, file only the pad area, never the teeth. Bore tight: twist a 5/32 in drill through by hand"
+    },
+    {
+     "img": "docs/print_plates/part_CA-403.png",
+     "accurate": "gear teeth, servo-spline socket",
+     "fix": "Spline socket tight: scrape lightly inside with the knife tip, test the SG90 spline after every pass. Never file the teeth"
+    },
+    {
+     "img": "docs/print_plates/part_CA-401.png",
+     "accurate": "gear axle hole and servo position: they set the gear mesh",
+     "fix": "Don't open the axle hole more than needed: the gears must mesh without play"
+    }
+   ]
+  }
+ ]
+}

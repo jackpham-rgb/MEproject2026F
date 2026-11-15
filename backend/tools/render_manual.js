@@ -195,10 +195,40 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   H += ePage("E5", "Wiring dry run (decides what to return)", mdSection("docs/13_electronics_bench_test.md", "4. Then the wiring dry run") +
     `<h2 style="margin-top:6mm">Then: PART P, printing, and PART M, the mechanics</h2><p>Print plates A–E with the settings on the next page, fix up the fits, then follow steps 1–${steps.length}. Keep the bench-test wiring: it moves into the tray in step ${steps.length - 2}.</p>`);
   // ---------------- PART P: economy printing (only the quality each part needs) + fix-up
-  H += ePage("P1", "Print settings: type them into your slicer, one setting per plate", mdSection("docs/16_print_economy.md", "Same on every plate", true) +
-    mdSection("docs/16_print_economy.md", "The plates", true) +
-    `<p>Import the STLs from <code>cad/print/stl/</code> (don't rotate them). Print plate A first and check the fits.</p>`);
-  H += ePage("P2", "After printing: fix the fits (sandpaper, drill, knife)", mdSection("docs/16_print_economy.md", "Fix-up after printing"));
+  {
+    const E = JSON.parse(fs.readFileSync(path.join(ROOT, "cad/print/settings/economy_plates.json"), "utf8"));
+    const md = t => inline(t);
+    H += ePage("P1", "Printing: set these once (same for every plate)",
+      `<table class="md">${E.common.map(([k, v]) => `<tr><td class="ck">☐</td><td style="width:55mm"><b>${md(k)}</b></td><td>${md(v)}</td></tr>`).join("")}</table>
+      <p style="font-size:13px">Then print plates <b>A → E</b> (next pages). Each page shows what goes on the bed and the settings for that whole plate.
+      Total about <b>${Math.round(E.after[0])} h</b> and <b>${Math.round(E.after[1])} g</b> of PETG.</p>`);
+    for (const P of E.plates) {
+      const rows = [["Layer height", P.layer + " mm"], ["Walls", P.walls], ["Top / bottom layers", P.topbot], ["Infill", P.infill],
+        ["Speed: outer wall / inner wall / infill", P.speeds + " mm/s"], ["Supports", P.supports], ["Bed adhesion", P.adhesion]];
+      H += `<div class="pg"><div class="num">${P.letter}</div><div class="ttl" style="left:34mm">Plate ${P.letter}: put these parts on the bed like this</div>
+        <div style="position:absolute;left:12mm;top:28mm;width:165mm;bottom:12mm;display:flex;align-items:center;justify-content:center">
+          <img src="${imgAny(P.img)}" style="max-width:100%;max-height:100%"></div>
+        <div style="position:absolute;left:182mm;right:12mm;top:30mm">
+          <table class="md" style="font-size:14px">${rows.map(([k, v]) => `<tr><td class="ck">☐</td><td style="font-size:12px">${k}</td><td style="font-size:16px"><b>${v}</b></td></tr>`).join("")}</table>
+          <div style="margin-top:5mm;font-size:16px">≈ <b>${P.time}</b> · <b>${P.grams} g</b></div>
+          <div style="margin-top:3mm;font-size:12px;color:#333">Same picture in your slicer: ${P.parts.length} part${P.parts.length > 1 ? "s" : ""}, flat side down as shown, don't rotate them up.</div>
+        </div></div>`;
+    }
+    const cards = E.plates.flatMap(P => P.parts.map(c => ({ ...c, letter: P.letter })));
+    for (let k = 0; k < cards.length; k += 6) {
+      H += `<div class="pg"><div class="num">P2</div><div class="ttl" style="left:44mm">After printing: make the fits fit (sandpaper, drill, knife)${k ? " (continued)" : ""}</div>
+        <div style="position:absolute;left:14mm;right:14mm;top:30mm;bottom:10mm;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:4mm">
+        ${cards.slice(k, k + 6).map(c => `<div style="border:1px solid #000;border-radius:2mm;padding:2mm;display:grid;grid-template-columns:52mm 1fr;gap:3mm;font-size:13px;overflow:hidden">
+          <div><img src="${imgAny(c.img)}" style="width:100%"><div style="font-size:10px;color:#555">plate ${c.letter}</div></div>
+          <div><div><b>Must fit:</b> ${md(c.accurate)}</div><div style="margin-top:1.5mm">☐ ${md(c.fix)}</div></div></div>`).join("")}
+        </div></div>`;
+    }
+    H += ePage("P3", "Fix-up rules", `<p style="font-size:14px">Tools: sandpaper 120 + 240 grit, 6 mm and 5/32 in (4 mm) drill bits turned by hand, a 12 mm dowel or marker wrapped in sandpaper, craft knife, flush cutters.</p>
+      <div class="li" style="font-size:14px">• Sand a press fit a little at a time, test after every few strokes. Too loose: one layer of tape or a drop of superglue.</div>
+      <div class="li" style="font-size:14px">• <b>Never sand or file gear teeth.</b></div>
+      <div class="li" style="font-size:14px">• Plates B and C (coarse layers): holes can come out a little tight: drill or sand them.</div>
+      <div class="li" style="font-size:14px">• A part cracks at a screw: the screw was forced: drill one size bigger, use the next screw or hot glue.</div>`);
+  }
   for (const s of steps) {
     const hw = {}; for (const [q, n] of s.hw) hw[n] = (hw[n] || 0) + q;
     const box = Object.keys(hw).length ? `<div class="box">${Object.entries(hw).map(([n, q]) => `<div class="hw">${q}×&nbsp;${screw(n)}<small>${n.replace(" screw", "")}</small></div>`).join("")}</div>` : "";

@@ -2,6 +2,8 @@
 
 Not every part needs the same settings. The base is a big hidden box: coarse layers and low infill are fine. The finger gears must mesh: they get slow, accurate outer walls. We accept small flaws on the rough parts and fix the few fits that matter with sandpaper, a drill or a knife (fix-up table at the end).
 
+The pictures show each plate as it sits on the bed: put the parts on the bed the same way.
+
 **No settings file and no changed 3D files:** import the unchanged STLs from `cad/print/stl/` (already turned to their best side: don't rotate them, except flat on the bed) and type the numbers below into your slicer. The parts are grouped so that **each plate uses one setting for the whole plate**: nothing to set per part.
 
 **Result (every plate sliced): 36 h 59 → 23 h 39 of printing (−36 %), 387 g → 347 g of PETG (−10 %).** Less heating time = less energy.
@@ -11,7 +13,9 @@ Not every part needs the same settings. The base is a big hidden box: coarse lay
 | Setting | Value |
 |---|---|
 | Nozzle temperature | 235 °C (first layer 238 °C, never above 240 °C: PTFE-lined hotend) |
-| Bed temperature | 80 °C, thin glue stick on the glass |
+| Bed | Textured PEI sheet, 80 °C. **No glue.** Clean it with dish soap + water (or isopropyl) and don't touch the print area |
+| Z-offset | a little higher than for PLA: PETG must not be squished into PEI (it can stick too hard) |
+| Removing parts | let the bed cool to room temperature, take the sheet off and flex it: parts pop off |
 | First layer | 0.24 mm high, 20 mm/s |
 | Line width | 0.42 mm (0.4 mm nozzle) |
 | Cooling fan | 30 %, off for the first 3 layers |
@@ -33,6 +37,26 @@ Not every part needs the same settings. The base is a big hidden box: coarse lay
 | **D  Turret plate + carriage arm** (STANDARD) | CA-201 Turret plate, CA-301 Carriage + arm | 0.2 mm | 3 | 4 / 4 | 20% gyroid | 35 / 50 / 70 | **on**, touching build plate only | skirt | 5 h 31 | 70 g |
 | **E  Claw: 2 fingers + gripper frame** (DETAIL) | CA-402 Finger, right, CA-403 Finger, left, CA-401 Gripper frame | 0.2 mm | 4 | 5 / 5 | 100% lines | 25 / 35 / 50 | **on**, touching build plate only | skirt | 6 h 02 | 67 g |
 | **Total** | | | | | | | | | **23 h 39** | **347 g** |
+
+**Plate A**
+
+![Plate A](print_plates/plate_A.png)
+
+**Plate B**
+
+![Plate B](print_plates/plate_B.png)
+
+**Plate C**
+
+![Plate C](print_plates/plate_C.png)
+
+**Plate D**
+
+![Plate D](print_plates/plate_D.png)
+
+**Plate E**
+
+![Plate E](print_plates/plate_E.png)
 
 Print in this order (A first). Every plate fits the 235 × 235 mm bed; leave ~15 mm between parts for the supports.
 

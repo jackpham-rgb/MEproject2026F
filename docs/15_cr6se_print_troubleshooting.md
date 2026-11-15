@@ -1,7 +1,7 @@
 # Creality CR-6 SE: finding and fixing print problems (PETG)
 
 For our settings (`cad/print/settings/printer_settings.txt`): PETG, 235 °C nozzle, 80 °C bed, 0.2 mm
-layers, Bowden extruder, carborundum glass bed, auto-levelling with the nozzle as the probe.
+layers, Bowden extruder, textured PEI sheet, auto-levelling with the nozzle as the probe.
 
 **Rule for an unreliable printer:** print small first (the tolerance coupon, then the Plan P claw),
 **watch the whole first layer**, and check again after 30 minutes. Most failures show up in the first
@@ -10,9 +10,9 @@ layer or the first half hour.
 ## Before every print (2 minutes)
 
 - ☐ Nozzle tip **clean** (no plastic blob): the CR-6 SE measures the bed **with the nozzle**, so a blob = a bad level
-- ☐ Glass clean (dish soap + water or isopropyl), thin **glue stick** layer for PETG
+- ☐ Textured PEI clean (dish soap + water or isopropyl), **no glue**, no fingerprints on the print area
 - ☐ Filament dry (no popping or crackling on the last print), spool turns freely, no tangles
-- ☐ Bed at 80 °C for 5 min before starting (the glass needs to heat through)
+- ☐ Bed at 80 °C for 5 min before starting (the sheet needs to heat through)
 - ☐ Auto-level (Level on the screen) after moving the printer or changing the nozzle
 - ☐ Watch the first layer: lines slightly squished and touching each other, not round, not see-through
 
@@ -26,8 +26,8 @@ layer or the first half hour.
 | First layer **see-through / rough / ridged**, nozzle scrapes | Nozzle too low | Z-offset up 0.02–0.05 mm |
 | Good on one side, bad on the other | Bed not level, or the **two Z screws out of sync** (CR-6 SE has 2 Z motors) | Power off, turn one Z screw by hand until the gantry is the same height both sides (measure with a ruler), then re-level |
 | Auto-level fails / gives odd numbers | Plastic on the nozzle, or the nozzle-probe (strain gauge) disturbed | Heat to 235 °C, wipe the tip with a brass brush or cloth, let it cool to < 60 °C, level again. Don't touch the hotend during levelling |
-| **Corners lift / warp** (base, tray) | PETG shrinks as it cools; draft; bed too cool at the edges | Glue stick, bed 80 °C (try 85), no fan for the first 3 layers, keep the room draft-free (box or blanket around the printer), add a 5 mm **brim** to that part |
-| Part **won't come off**, pulls a chip of glass | PETG bonds to glass when too hot or squished | Always glue stick (release layer), Z-offset a little higher, let the bed cool to room temperature before removing |
+| **Corners lift / warp** (base, tray) | PETG shrinks as it cools; draft; bed too cool at the edges | Clean PEI (soap + water), bed 80 °C (try 85), no fan for the first 3 layers, keep the room draft-free (box or blanket around the printer), add a 5 mm **brim** to that part |
+| Part **won't come off**, or tears the PEI | PETG bonds to PEI when squished too much | Z-offset a little higher (less squish), let the bed cool to room temperature, take the sheet off and flex it. Never pry with a blade |
 | **Elephant foot**: bottom edge wider, holes on the bed side tight | First layer squished | Already set: 0.15 mm compensation. If still there, Z-offset up 0.02 mm |
 
 ### During the print

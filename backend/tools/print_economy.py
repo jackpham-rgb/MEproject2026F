@@ -12,12 +12,15 @@ Times and grams are real PrusaSlicer slices of each plate (the project's printer
 here to estimate; you don't need it), compared with the old one-setting-for-everything plates.
 """
 import csv
+import json
 import os
 import re
 import subprocess
 import sys
 import tempfile
 
+import matplotlib
+matplotlib.use("Agg")
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -28,12 +31,16 @@ INI = os.path.join(ROOT, "cad", "print", "settings", "concept_a_PETG_prusaslicer
 STL = os.path.join(ROOT, "cad", "print", "stl")
 DOC = os.path.join(ROOT, "docs", "16_print_economy.md")
 CSV = os.path.join(ROOT, "cad", "print", "settings", "economy_plates.csv")
+JSN = os.path.join(ROOT, "cad", "print", "settings", "economy_plates.json")   # read by render_manual.js
+IMG = os.path.join(ROOT, "docs", "print_plates")                             # plate + part pictures
 DENSITY, AREA = 1.27, np.pi * 1.75 ** 2 / 4          # PETG g/cm3, mm2 of 1.75 mm filament
 
 # Same on every plate (type these once in your slicer's PETG profile)
 COMMON = [
     ("Nozzle temperature", "235 °C (first layer 238 °C, never above 240 °C: PTFE-lined hotend)"),
-    ("Bed temperature", "80 °C, thin glue stick on the glass"),
+    ("Bed", "Textured PEI sheet, 80 °C. **No glue.** Clean it with dish soap + water (or isopropyl) and don't touch the print area"),
+    ("Z-offset", "a little higher than for PLA: PETG must not be squished into PEI (it can stick too hard)"),
+    ("Removing parts", "let the bed cool to room temperature, take the sheet off and flex it: parts pop off"),
     ("First layer", "0.24 mm high, 20 mm/s"),
     ("Line width", "0.42 mm (0.4 mm nozzle)"),
     ("Cooling fan", "30 %, off for the first 3 layers"),
@@ -116,6 +123,85 @@ def slice_plate(paths, extra):
     return secs / 3600, mm * AREA / 1000 * DENSITY
 
 
+def render(objs, path, bed=None, size=(7, 5.4), elev=40, azim=-60):
+    """Orthographic picture, painter's algorithm (back to front). objs: [(tris, colour)] in bed coordinates."""
+    import matplotlib.pyplot as plt
+    from matplotlib.collections import PolyCollection
+    e, a = np.radians(elev), np.radians(azim)
+    view = np.array([np.cos(e) * np.cos(a), np.cos(e) * np.sin(a), np.sin(e)])          # towards the camera
+    right = np.array([-np.sin(a), np.cos(a), 0.0])
+    up = np.cross(view, right)
+    light = np.array([-0.3, -0.5, 0.95]); light /= np.linalg.norm(light)
+    polys, cols, depth = [], [], []
+    for tris, c in objs:
+        n = np.cross(tris[:, 1] - tris[:, 0], tris[:, 2] - tris[:, 0])
+        n /= np.linalg.norm(n, axis=1, keepdims=True) + 1e-12
+        vis = n @ view > 0                                                               # back faces away
+        t = tris[vis]
+        k = 0.42 + 0.58 * np.clip(n[vis] @ light, 0, 1)
+        rgb = np.array(matplotlib.colors.to_rgb(c))
+        polys.append(np.stack([t @ right, t @ up], axis=-1))
+        cols.append(np.clip(rgb[None] * k[:, None] + 0.06, 0, 1))
+        depth.append(t.mean(1) @ view)
+    P, C, D = np.concatenate(polys), np.concatenate(cols), np.concatenate(depth)
+    order = np.argsort(D)
+    fig, ax = plt.subplots(figsize=size, dpi=140)
+    if bed:
+        corners = np.array([[0, 0, 0], [bed[0], 0, 0], [bed[0], bed[1], 0], [0, bed[1], 0]], float)
+        ax.add_patch(plt.Polygon(np.stack([corners @ right, corners @ up], -1), fc="#ece6d6", ec="#9c937c", lw=1, zorder=0))
+        for g in np.arange(0, bed[0] + 1, 47):
+            for p0, p1 in (([g, 0, 0], [g, bed[1], 0]), ([0, g, 0], [bed[0], g, 0])):
+                q = np.array([p0, p1], float)
+                ax.plot(q @ right, q @ up, color="#d8d0bb", lw=0.6, zorder=1)
+        allp = np.concatenate([P.reshape(-1, 2), np.stack([corners @ right, corners @ up], -1)])
+    else:
+        allp = P.reshape(-1, 2)
+    ax.add_collection(PolyCollection(P[order], facecolors=C[order], edgecolors=C[order], linewidths=0.2, zorder=3))
+    lo, hi = allp.min(0), allp.max(0)
+    pad = 0.04 * (hi - lo).max()
+    ax.set_xlim(lo[0] - pad, hi[0] + pad); ax.set_ylim(lo[1] - pad, hi[1] + pad)
+    ax.set_aspect("equal"); ax.axis("off")
+    fig.subplots_adjust(0, 0, 1, 1)
+    fig.savefig(path, facecolor="white")
+    plt.close(fig)
+
+
+COLOURS = ["#2f6fdb", "#e07b22", "#2a9d5b", "#b84fc4", "#c43a3a"]
+
+
+def plate_layout(pns):
+    tris, sizes = {}, {}
+    for pn in pns:
+        t = PL.read_stl(stl_of(pn))
+        lo, hi = t.reshape(-1, 3).min(0), t.reshape(-1, 3).max(0)
+        tris[pn], sizes[pn] = t - lo, (hi[0] - lo[0], hi[1] - lo[1])
+    place = PL.pack(sizes)
+    out = []
+    for pn in pns:
+        x, y, rot = place[pn]
+        t = tris[pn].copy()
+        if rot:
+            t = np.stack([-t[..., 1], t[..., 0], t[..., 2]], axis=-1)
+            t[..., 0] += sizes[pn][1]
+        t[..., 0] += x
+        t[..., 1] += y
+        out.append(t)
+    return out
+
+
+def images(rows):
+    os.makedirs(IMG, exist_ok=True)
+    for r in rows:
+        lay = plate_layout(r["pns"])
+        r["img"] = f"docs/print_plates/plate_{r['name'][0]}.png"
+        render([(t, COLOURS[i % len(COLOURS)]) for i, t in enumerate(lay)], os.path.join(ROOT, r["img"]), bed=PL.BED)
+        r["part_imgs"] = []
+        for i, pn in enumerate(r["pns"]):
+            pi = f"docs/print_plates/part_{pn}.png"
+            render([(lay[i], COLOURS[i % len(COLOURS)])], os.path.join(ROOT, pi), size=(3.2, 2.6))
+            r["part_imgs"].append(pi)
+
+
 def stl_of(pn):
     return os.path.join(STL, next(f for f in os.listdir(STL) if f.startswith(pn)))
 
@@ -162,6 +248,17 @@ def main():
             s = r["s"]
             w.writerow([r["name"], r["prof"], " ".join(r["pns"]), s["layer_height"], s["perimeters"], s["fill_density"],
                         "yes" if s.get("support_material") == "1" else "no", s.get("brim_width", "0"), f"{r['h']:.2f}", f"{r['g']:.0f}"])
+    images(rows)
+    with open(JSN, "w") as f:
+        json.dump(dict(common=COMMON, before=[before_h, before_g], after=[T1, G1], plates=[dict(
+            letter=r["name"][0], img=r["img"], time=fmt_h(r["h"]), grams=round(r["g"]), profile=r["prof"],
+            layer=r["s"]["layer_height"], walls=r["s"]["perimeters"], topbot=f"{r['s']['top_solid_layers']} / {r['s']['bottom_solid_layers']}",
+            infill=r["s"]["fill_density"] + " " + {"grid": "grid", "gyroid": "gyroid", "rectilinear": "lines"}[r["s"]["fill_pattern"]],
+            speeds=f"{r['s']['external_perimeter_speed']} / {r['s']['perimeter_speed']} / {r['s']['infill_speed']}",
+            supports="ON, touching build plate only" if r["s"].get("support_material") == "1" else "OFF",
+            adhesion=f"BRIM {r['s']['brim_width']} mm" if r["s"].get("brim_width") else "skirt",
+            parts=[dict(img=pi, accurate=PARTS[pn][0], fix=PARTS[pn][2]) for pn, pi in zip(r["pns"], r["part_imgs"])])
+            for r in rows]), f, indent=1, ensure_ascii=False)
     write_doc(rows, names, before_h, before_g)
     print("wrote docs/16_print_economy.md + cad/print/settings/economy_plates.csv")
 
@@ -174,6 +271,7 @@ def write_doc(rows, names, T0, G0):
     a("Not every part needs the same settings. The base is a big hidden box: coarse layers and low infill are fine. "
       "The finger gears must mesh: they get slow, accurate outer walls. We accept small flaws on the rough parts and fix "
       "the few fits that matter with sandpaper, a drill or a knife (fix-up table at the end).\n")
+    a("The pictures show each plate as it sits on the bed: put the parts on the bed the same way.\n")
     a("**No settings file and no changed 3D files:** import the unchanged STLs from `cad/print/stl/` (already turned to "
       "their best side: don't rotate them, except flat on the bed) and type the numbers below into your slicer. "
       "The parts are grouped so that **each plate uses one setting for the whole plate**: nothing to set per part.\n")
@@ -198,6 +296,8 @@ def write_doc(rows, names, T0, G0):
           f"{s['bottom_solid_layers']} | {s['fill_density']} {pat} | {s['external_perimeter_speed']} / {s['perimeter_speed']} / "
           f"{s['infill_speed']} | {sup} | {adh} | {fmt_h(r['h'])} | {r['g']:.0f} g |")
     a(f"| **Total** | | | | | | | | | **{fmt_h(T1)}** | **{G1:.0f} g** |\n")
+    for r in rows:
+        a(f"**Plate {r['name'][0]}**\n\n![Plate {r['name'][0]}](print_plates/plate_{r['name'][0]}.png)\n")
     a("Print in this order (A first). Every plate fits the 235 × 235 mm bed; leave ~15 mm between parts for the supports.\n")
     a("## Why each plate gets its profile\n")
     a("| Plate | Why |")
