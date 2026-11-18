@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Requirements Compliance</title>
+<meta name="description" content="ME 2331/L Project 2, Concept A: every point of the assignment, how the design meets it, and the proof.">
+<style>
+:root{--ground:#eef1f4;--panel:#fff;--ink:#1a1e24;--muted:#5b6572;--line:#d5dbe2;--accent:#2f6fdb;
+  --ok:#1f7a45;--ok-bg:#e3f4ea;--sim:#2f5fb3;--sim-bg:#e5edfb;--wait:#8a5a00;--wait-bg:#fbf0d9;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#111418;--panel:#191d23;--ink:#e6eaef;--muted:#9aa4b1;--line:#2b313a;--accent:#6b9cf0;
+  --ok:#6fd39b;--ok-bg:#16301f;--sim:#8fb2f5;--sim-bg:#1a2740;--wait:#f0c060;--wait-bg:#33280f;color-scheme:dark}}
+:root[data-theme="dark"]{--ground:#111418;--panel:#191d23;--ink:#e6eaef;--muted:#9aa4b1;--line:#2b313a;--accent:#6b9cf0;
+  --ok:#6fd39b;--ok-bg:#16301f;--sim:#8fb2f5;--sim-bg:#1a2740;--wait:#f0c060;--wait-bg:#33280f;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 16px 64px}
+a{color:var(--accent)}
+h1{font-size:28px;margin:0 0 6px;line-height:1.2}
+h2{font-size:20px;margin:40px 0 4px}
+h2+p.lead{margin-top:0}
+p.lead{color:var(--muted);margin:0 0 18px;max-width:760px}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.top a{font-size:14px}
+.quote{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:14px 16px;margin:14px 0 8px}
+.quote b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 0;font-size:13px;color:var(--muted)}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.ok{color:var(--ok);background:var(--ok-bg)} .sim{color:var(--sim);background:var(--sim-bg)} .wait{color:var(--wait);background:var(--wait-bg)}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:18px 0 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
+.stat b{display:block;font-size:24px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted)}
+.req{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin:14px 0;overflow:hidden}
+.req header{display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-bottom:1px solid var(--line)}
+.req header .id{font-weight:700;font-size:13px;background:var(--ground);border:1px solid var(--line);border-radius:6px;padding:2px 7px;flex:none}
+.req header .txt{flex:1;min-width:0}
+.req header .txt q{font-style:italic}
+.req header .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:none;max-width:40%}
+.body{display:grid;grid-template-columns:1.25fr 1fr;gap:0}
+.body > div{padding:14px 16px;min-width:0}
+.body > div + div{border-left:1px solid var(--line)}
+.body h3{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.body ul{margin:0 0 10px;padding-left:18px}
+.body li{margin:2px 0}
+.num{font-variant-numeric:tabular-nums;font-weight:600}
+figure{margin:0}
+figure img{display:block;width:100%;border-radius:6px;border:1px solid var(--line);background:#fff}
+figcaption{font-size:12.5px;color:var(--muted);margin-top:4px}
+.imgs2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.imgs3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ev{font-size:13px;color:var(--muted)}
+.ev code{font-size:12.5px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;overflow-wrap:anywhere}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.tablewrap{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow-x:auto;margin:12px 0}
+.note{background:var(--wait-bg);color:var(--ink);border-radius:8px;padding:12px 14px;margin:14px 0;font-size:14px}
+.note b{color:var(--wait)}
+@media (max-width:760px){
+  .body{grid-template-columns:1fr}
+  .body > div + div{border-left:0;border-top:1px solid var(--line)}
+  .req header{flex-wrap:wrap}
+  .req header .chips{max-width:none;justify-content:flex-start}
+  .imgs3{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body><div class="wrap">
+
+<div class="top"><h1>Concept A meets the assignment</h1><a href="../index.html">← all viewers</a></div>
+<p class="lead">ME 2331/L Project 2. Every point of the assignment, one at a time, with how the design meets it, the numbers that prove it, and a picture that shows it.
+Everything here comes from the project files (CAD checks, engineering checks, circuit simulation, firmware tests); links point to the source.</p>
+
+<div class="quote"><b>The assignment, test objective</b>
+An empty soda can (2.4 in diameter, 4.7 in tall, 0.53 oz) starts free-standing, right-side up, at a fixed spot on the table. The robot must invert the can (flip it upside down)
+and move it to a new spot roughly 90° around from the start, at about a 5 in radius, relative to the robot. If successful, the can ends up free-standing, upside down, at the target spot.</div>
+
+<div class="legend">
+  <span><span class="chip ok">Done</span> exists or proven in CAD / code</span>
+  <span><span class="chip sim">Analysis / simulation</span> proven by calculation, CAD motion check or simulated Uno</span>
+  <span><span class="chip wait">Hardware test pending</span> needs the printed robot on the table (Part B)</span>
+</div>
+
+<div class="summary">
+  <div class="stat"><b>289</b><span>poses checked in CAD, no collisions</span></div>
+  <div class="stat"><b>54 / 54</b><span>engineering checks pass</span></div>
+  <div class="stat"><b>12 / 12</b><span>power cases pass (ngspice)</span></div>
+  <div class="stat"><b>35</b><span>firmware + panel tests pass</span></div>
+  <div class="stat"><b>127.0 mm</b><span>can lands at 5.0 in, 90° away</span></div>
+</div>
+
+<!-- ======================================================= TEST OBJECTIVE -->
+<h2>1. The test objective, point by point</h2>
+<p class="lead">The sequence: <b>grip → lift 0.6 in → wrist flips 180° → turntable turns 90° → lower → release</b>, 7.4 s, started by one button press.</p>
+
+<section class="req">
+<header><span class="id">T1</span><div class="txt"><q>An empty soda can (2.4 in diameter, 4.7 in tall, 0.53 oz)</q></div>
+<div class="chips"><span class="chip ok">Done</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul>
+<li>The CAD carries a test can, and every check runs with it: <span class="num">66.2 mm × 122.2 mm, 15 g</span> (a real 12 oz Coke can, measured).</li>
+<li>That is a little wider than the handout's 2.4 in (61 mm), which is the harder case for the gripper's opening, and the same weight (15 g = 0.53 oz).</li>
+<li>A thinner can only needs a new <b>GRIP CLOSED</b> angle: the laptop panel's calibration table sets it without touching the code.</li>
+</ul>
+<h3>Proof</h3>
+<ul>
+<li>Grip: squeeze <span class="num">0.8 N</span> per arm = <span class="num">5.4×</span> the force to not slip, <span class="num">10×</span> below the force that dents the can.</li>
+<li>The SG90 can't crush the can even stalled: <span class="num">1.78 N</span> per arm max &lt; 8 N.</li>
+</ul>
+<p class="ev">Evidence: <code>cad/check/mech_report.txt</code> (Can rows), <code>docs/02_design_analysis.md</code> § grip.</p>
+</div><div>
+<figure><img src="../docs/manual/part_finger_R.png" alt="Gripper finger with the curved can pad and gear"><figcaption>Finger: curved pad sized for the can, gear teeth so both fingers close together.</figcaption></figure>
+</div></div></section>
+
+<section class="req">
+<header><span class="id">T2</span><div class="txt"><q>starts free-standing, right-side up, at a fixed spot on the table</q></div>
+<div class="chips"><span class="chip ok">Done</span><span class="chip wait">Hardware test pending</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul>
+<li>The fixed spot is where the open claw sits at HOME: turntable <span class="num">135°</span>, can centre <span class="num">127 mm</span> from the turntable axis. Tape START there.</li>
+<li>The can is placed against the can bumper inside the open claw; GRIP closes on it where it stands. No sensor needed: the spot is fixed by the assignment.</li>
+</ul>
+<h3>Proof</h3>
+<ul>
+<li>CAD: at the end of GRIP the pads touch the can (<span class="num">0.00 mm</span>), at HOME they clear it, so the can is never pushed before it is held.</li>
+<li>Firmware: START is refused away from HOME, so a run always begins at the start spot (firmware test passes).</li>
+</ul>
+<p class="ev">Evidence: <code>cad/check/check_report.txt</code>, <code>backend/tools/firmware_test/run.sh</code>.</p>
+</div><div>
+<figure><img src="../docs/report_img/cad_home.png" alt="CAD render at home, can upright at the start spot"><figcaption>HOME: can upright at the start spot, claw open around it.</figcaption></figure>
+</div></div></section>
+
+<section class="req">
+<header><span class="id">T3</span><div class="txt"><q>The robot must invert the can (flip it upside down)</q></div>
+<div class="chips"><span class="chip sim">CAD / analysis</span><span class="chip wait">Hardware test pending</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul>
+<li>A wrist servo (MG90S) rolls the claw <span class="num">180°</span> about the line from the robot to the can's centre, so the can turns over in place.</li>
+<li>Before the flip the lift raises the can <span class="num">0.6 in</span>. Without it the can's bottom edge would dig <span class="num">0.33 in</span> into the table mid-flip (the corner is farther from the centre than the half-height). With the lift it clears by <span class="num">+0.27 in</span>.</li>
+<li>Every move eases in and out (zero speed at both ends), so the 15 g can doesn't shake loose.</li>
+</ul>
+<h3>Proof</h3>
+<ul>
+<li>CAD after the run: can <b>INVERTED</b>, tilt <span class="num">0.0°</span>.</li>
+<li>Wrist: <span class="num">31.9 %</span> of its torque, <span class="num">37.5 %</span> of its speed (both ≤ the 50 % / 70 % limits).</li>
+<li>Pulse range widened to 500–2500 µs so an MG90S really reaches 180°; the bench test marks the horn to confirm it.</li>
+</ul>
+<p class="ev">Evidence: <code>docs/02_design_analysis.md</code> § 1, <code>cad/check/mech_report.txt</code>, bench test row 2 in <code>docs/13_electronics_bench_test.md</code>.</p>
+</div><div>
+<div class="imgs2">
+<figure><img src="../docs/wiring/motion/3_FLIP.gif" alt="Animation of the wrist flipping the can"><figcaption>FLIP, on the detail CAD.</figcaption></figure>
+<figure><img src="gifs/conceptA_claw_turntable_no_lift_hits_table.gif" alt="Animation showing the can hitting the table when flipped without lifting"><figcaption>Why the lift: no lift = the can hits the table.</figcaption></figure>
+</div>
+</div></div></section>
+
+<section class="req">
+<header><span class="id">T4</span><div class="txt"><q>move it to a new spot roughly 90° around from the start … relative to the robot</q></div>
+<div class="chips"><span class="chip sim">CAD / analysis</span><span class="chip wait">Hardware test pending</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul>
+<li>The whole arm sits on a turntable (MG996R on a 6807 ball bearing) whose axis <b>is the robot's centre</b>. It turns from <span class="num">135°</span> to <span class="num">45°</span>: exactly 90° around the robot, visibly.</li>
+<li>The turn takes <span class="num">2.5 s</span> with eased start and stop, so the arm doesn't swing.</li>
+</ul>
+<h3>Proof</h3>
+<ul>
+<li>CAD: can lands at <span class="num">(127.0, 0.0) mm</span>, target <span class="num">(127.0, 0.0) mm</span>.</li>
+<li>Error budget: a <span class="num">2°</span> turntable error moves the can only <span class="num">0.17 in</span>; trimmed in the calibration table.</li>
+<li>Turntable uses <span class="num">0.4 %</span> of the MG996R's torque (the bearing carries the weight) and <span class="num">19 %</span> of its speed.</li>
+</ul>
+<p class="ev">Evidence: <code>cad/check/check_report.txt</code>, <code>cad/check/mech_report.txt</code>.</p>
+</div><div>
+<figure><img src="../docs/wiring/motion/4_TURN.gif" alt="Animation of the turntable turning the arm 90 degrees"><figcaption>TURN: 90° about the robot's own axis.</figcaption></figure>
+</div></div></section>
+
+<section class="req">
+<header><span class="id">T5</span><div class="txt"><q>at about a 5 in radius</q></div>
+<div class="chips"><span class="chip ok">Done</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul>
+<li>The can is held at a fixed <span class="num">127.0 mm = 5.0 in</span> from the turntable axis. Nothing in the motion changes that distance: the lift is vertical, the wrist rolls about the radial line, the turntable only rotates.</li>
+<li>So the radius is the same at the start, during the move and at the target, built into the geometry, not set by code.</li>
+</ul>
+<h3>Proof</h3>
+<ul><li>CAD: start <span class="num">127.0 mm</span>, end <span class="num">127.0 mm</span> from the axis.</li></ul>
+<p class="ev">Evidence: <code>backend/cad/model.py</code> (<code>can_r_pos = 127.0</code>), <code>cad/check/check_report.txt</code>.</p>
+</div><div>
+<figure><img src="../docs/wiring/motion/turn_end.png" alt="Top view at the end of the turn"><figcaption>End of TURN (see-through): the can is still held 5 in from the turntable axis, now 90° on.</figcaption></figure>
+</div></div></section>
+
+<section class="req">
+<header><span class="id">T6</span><div class="txt"><q>the can ends up free-standing, upside down, at the target spot</q></div>
+<div class="chips"><span class="chip sim">CAD / analysis</span><span class="chip wait">Hardware test pending</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul>
+<li>The can is <b>set down, not dropped</b>: the lift lowers the same 0.6 in it rose, and because the can flipped about its own centre, its (old) top lands exactly on the table.</li>
+<li>Release opens the claw only about 25°, just enough to let go, so the pads don't knock the standing can.</li>
+<li>Then the arm lifts away before turning home, and only homes after the can is removed.</li>
+</ul>
+<h3>Proof</h3>
+<ul>
+<li>CAD: can bottom at <span class="num">z = 0.00 mm</span>, speed <span class="num">0 mm/s</span> at contact; pads <span class="num">0.54 mm</span> clear of the can after RELEASE.</li>
+<li>An inverted can only tips past <span class="num">24.3°</span>; the wrist tolerance is ~3°, an 8× margin.</li>
+</ul>
+<p class="ev">Evidence: <code>cad/check/check_report.txt</code>, <code>cad/check/mech_report.txt</code> (Can rows).</p>
+</div><div>
+<div class="imgs2">
+<figure><img src="../docs/wiring/motion/5_LOWER.gif" alt="Animation of the can being lowered onto the table"><figcaption>LOWER: set down upside down.</figcaption></figure>
+<figure><img src="../docs/report_img/cad_target.png" alt="CAD render at the target, can upside down"><figcaption>Target: free-standing, inverted.</figcaption></figure>
+</div>
+</div></div></section>
+
+<!-- ======================================================= REQUIREMENTS -->
+<h2>2. The five requirements</h2>
+<p class="lead">From the assignment's requirement list.</p>
+
+<section class="req">
+<header><span class="id">R1</span><div class="txt"><q>The robot must complete the test objective described below.</q></div>
+<div class="chips"><span class="chip sim">CAD + simulated Uno</span><span class="chip wait">Hardware test pending</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul><li>T1–T6 above, as one automatic sequence: GRIP → LIFT → FLIP → TURN → LOWER → RELEASE, then DONE.</li></ul>
+<h3>Proof</h3>
+<ul>
+<li>Motion check: the real firmware poses on the detail CAD, <span class="num">289 poses × 34 parts</span>, solid booleans: <b>no collisions</b>, nothing touches the table except the can.</li>
+<li>The same firmware compiled for a PC with a fake Arduino: <span class="num">20 / 20</span> tests, sequence <span class="num">7.41 s</span>.</li>
+<li>The laptop panel against that live firmware: <span class="num">15 / 15</span> tests.</li>
+</ul>
+<p class="ev">Evidence: <code>cad/check/check_report.txt</code>, <code>backend/tools/firmware_test/</code>. To finish: the live run (Part B).</p>
+</div><div>
+<figure><img src="../docs/wiring/motion/all_moves.gif" alt="Animation of the whole sequence"><figcaption>The whole run on the detail CAD, wires included.</figcaption></figure>
+</div></div></section>
+
+<section class="req">
+<header><span class="id">R2</span><div class="txt"><q>It must use an Arduino Uno or a similar microcontroller.</q></div>
+<div class="chips"><span class="chip ok">Done</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul><li>Arduino Uno R3. Four servos on D9 (turntable), D10 (lift), D6 (wrist), D5 (grip); START button D4; status LED D13.</li></ul>
+<h3>Proof</h3>
+<ul>
+<li>Compiles exactly as the Arduino IDE does: <span class="num">9,534 bytes = 29.1 %</span> of the Uno's flash.</li>
+<li>Uploaded and running on the team's Uno; every servo moved from the panel during bench testing.</li>
+</ul>
+<p class="ev">Evidence: <code>firmware/concept_a/concept_a.ino</code>, <code>backend/tools/arduino_build_check.py</code>.</p>
+</div><div>
+<figure><img src="../docs/wiring/schematic.png" alt="Circuit schematic"><figcaption>Schematic: Uno, 4 servos, button, LED, power.</figcaption></figure>
+</div></div></section>
+
+<section class="req">
+<header><span class="id">R3</span><div class="txt"><q>The microcontroller must drive the test objective, not a remote or manual override.</q></div>
+<div class="chips"><span class="chip ok">Done</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul>
+<li>The whole sequence lives in the Uno's firmware. The Uno runs on its own 9 V battery: <b>no laptop, no cable, no remote</b> during the run.</li>
+<li>The laptop control panel is a <b>bench and calibration tool</b> only. For the demo: unplug USB, press the robot's own START button.</li>
+<li>Every angle and timing is a constant in the firmware; the Uno decides every move.</li>
+</ul>
+<h3>Proof</h3>
+<ul><li>Power: the Uno holds <span class="num">5.00 V</span> on the battery in every simulated case, even with a servo stalled, so nothing outside can be needed to keep it running.</li></ul>
+<p class="ev">Evidence: <code>EE/out/power_final_report.txt</code>, firmware state machine.</p>
+</div><div>
+<figure><img src="../EE/out/power_final.png" alt="Simulated supply voltages during a run"><figcaption>ngspice: Uno and servo voltages through a run and a servo stall.</figcaption></figure>
+</div></div></section>
+
+<section class="req">
+<header><span class="id">R4</span><div class="txt"><q>The robot must fit and operate on a normal tabletop.</q></div>
+<div class="chips"><span class="chip ok">Done</span><span class="chip sim">Analysis</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul>
+<li>Footprint <span class="num">167 × 331 mm</span> (6.6 × 13 in) including the electronics tray and the can's travel, <span class="num">168 mm</span> (6.6 in) tall, <span class="num">573 g</span>.</li>
+<li>Power: a 12 V wall adapter for the servos and a 9 V battery for the Uno. Nothing needs to be clamped down.</li>
+</ul>
+<h3>Proof</h3>
+<ul>
+<li>Doesn't tip: the robot's balance point stays <span class="num">37 mm</span> inside its footprint in every move (limit 20 mm).</li>
+<li>Doesn't slide: inertial force = <span class="num">0.39 %</span> of foot friction; turntable reaction = <span class="num">0.83 %</span>.</li>
+</ul>
+<p class="ev">Evidence: drawing <code>docs/drawings/CA-000_assembly.pdf</code>, <code>cad/check/mech_report.txt</code> (Stability).</p>
+</div><div>
+<figure><img src="../docs/drawings/CA-000_assembly.png" alt="Assembly drawing with overall dimensions"><figcaption>Assembly drawing CA-000, overall dimensions.</figcaption></figure>
+</div></div></section>
+
+<section class="req">
+<header><span class="id">R5</span><div class="txt"><q>No direct human intervention during the run.</q></div>
+<div class="chips"><span class="chip sim">Simulated Uno</span><span class="chip wait">Hardware test pending</span></div></header>
+<div class="body"><div>
+<h3>How the design meets it</h3>
+<ul>
+<li>One press of START; the Uno does every step by itself and stops at DONE (LED on).</li>
+<li>No step waits for a person, and nothing is touched between start and DONE.</li>
+<li>Pressing again after the can is taken away sends the robot home for the next run.</li>
+</ul>
+<h3>Proof</h3>
+<ul><li>Simulated Uno: START at HOME → all six steps → DONE with no other input (firmware tests pass).</li></ul>
+<p class="ev">Evidence: <code>backend/tools/firmware_test/host_test.cpp</code>.</p>
+</div><div>
+<div class="tablewrap" style="margin:0"><table>
+<tr><th>Step</th><th>Time</th></tr>
+<tr><td>GRIP</td><td class="num">0.8 s</td></tr><tr><td>LIFT 0.6 in</td><td class="num">1.0 s</td></tr>
+<tr><td>FLIP 180°</td><td class="num">1.5 s</td></tr><tr><td>TURN 90°</td><td class="num">2.5 s</td></tr>
+<tr><td>LOWER</td><td class="num">1.0 s</td></tr><tr><td>RELEASE</td><td class="num">0.6 s</td></tr>
+<tr><td><b>Total, no human</b></td><td class="num"><b>7.4 s</b></td></tr>
+</table></div>
+</div></div></section>
+
+<!-- ======================================================= DELIVERABLES -->
+<h2>3. Deliverables</h2>
+<p class="lead">What each part of the grade asks for, and where it is.</p>
+
+<div class="tablewrap"><table>
+<tr><th>Asked for</th><th>Where it is</th><th>Status</th></tr>
+<tr><td colspan="3"><b>Part A: Preliminary Design Review (70 pts, Oct 29)</b></td></tr>
+<tr><td>3+ design concepts</td><td>4 concepts (claw + turntable, cradle + drag, multi-joint arm, mirror flip), animated: <a href="concepts.html">concepts viewer</a>, <code>docs/01_concepts_and_decision_matrix.md</code></td><td><span class="chip ok">Done</span></td></tr>
+<tr><td>Decision matrix to pick one</td><td>Weighted matrix: A <b>3.85</b>, B 3.30, D 3.00, C 2.75 → Concept A. <code>docs/decision_matrix_and_bom.xlsx</code></td><td><span class="chip ok">Done</span></td></tr>
+<tr><td>Preliminary CAD of the selected concept</td><td><a href="concept_a_detail.html">Detail CAD viewer</a>, <code>cad/step/concept_a_assembly.step</code></td><td><span class="chip ok">Done</span></td></tr>
+<tr><td>All load-bearing function resolved, no "somehow"</td><td>54 engineering checks: servo torque and speed, lift jam, gear mesh, part strength, bearing loads, tip-over, can grip vs dent. <code>cad/check/mech_report.txt</code></td><td><span class="chip ok">54 / 54 pass</span></td></tr>
+<tr><td>10–15 min PDR slide deck, presented live</td><td>Slide-by-slide outline with timing: <code>docs/07_pdr_outline.md</code> (the deck file itself isn't stored in this repo)</td><td><span class="chip ok">Outline done</span></td></tr>
+<tr><td colspan="3"><b>Part B: Demonstration and Test (50 pts, Dec 8)</b></td></tr>
+<tr><td>Live functional test at a lab session</td><td>Ready path: electronics bench test → print plates B–E → assembly manual → calibration → test runs. <code>docs/12_assembly_manual.pdf</code></td><td><span class="chip wait">In progress</span></td></tr>
+<tr><td colspan="3"><b>Part C: Design Package (80 pts, Dec 11)</b></td></tr>
+<tr><td>Detailed CAD</td><td><code>cad/step/concept_a_assembly.step</code> + 35 part STEP files in <code>cad/step/parts/</code> (open in SolidWorks / Fusion)</td><td><span class="chip ok">Done</span></td></tr>
+<tr><td>2D dimensioned drawings per part / assembly</td><td>13 drawings (CA-000 … CA-900): <code>docs/drawings/all_drawings.pdf</code></td><td><span class="chip ok">Done</span></td></tr>
+<tr><td>Top-level BOM (designed + purchased)</td><td>35 lines with source, cost, mass and why: <code>docs/bom.csv</code>, <code>docs/05_bom.md</code></td><td><span class="chip ok">Done</span></td></tr>
+<tr><td>Engineering report: design description + RTM</td><td><code>docs/Engineering_Report_ConceptA.docx</code> sections 4 and 9; RTM also in <code>docs/06_rvtm.md</code></td><td><span class="chip ok">Draft done</span></td></tr>
+<tr><td>Photo or CAD render</td><td>CAD renders in the report; photo after the build</td><td><span class="chip ok">Render done</span></td></tr>
+<tr><td>Wiring diagram</td><td><code>docs/wiring/wiring_diagram.png</code>, schematic, <a href="wiring_360.html">3D wire routing</a></td><td><span class="chip ok">Done</span></td></tr>
+<tr><td>Discussion of the code</td><td>Report section 7: state machine, eased moves, calibration; firmware in <code>firmware/concept_a/</code></td><td><span class="chip ok">Done</span></td></tr>
+<tr><td>Test results in the report</td><td>Report section 10, filled in after Part B</td><td><span class="chip wait">After the demo</span></td></tr>
+</table></div>
+
+<h2>4. What is still to prove on hardware</h2>
+<div class="note"><b>Honest status.</b> Everything above is proven in CAD, by calculation, or on a simulated Uno. The electronics and all four servos already work on the bench.
+These need the printed robot: the wrist reaching a full 180° on the final servo, the turntable landing within ±2° after calibration, grip and crush on a real can,
+the printed fits (bearing, LM6UU, rods), the rail voltage with a meter, and the full run on the table (aim: 3 successful runs out of 5 before the demo).</div>
+
+<div class="imgs3">
+<figure><img src="../docs/wiring/wiring_diagram.png" alt="Wiring diagram"><figcaption>Wiring diagram</figcaption></figure>
+<figure><img src="../docs/wiring/wiring_3d_iso_clean.png" alt="Wire routing in 3D"><figcaption>Wire routing in 3D</figcaption></figure>
+<figure><img src="../docs/report_img/cad_flip.png" alt="CAD render mid-flip"><figcaption>CAD, mid-flip</figcaption></figure>
+</div>
+
+</div></body></html>
