@@ -56,10 +56,10 @@ moderate infill [5]. So:
 
 ## Claw redesign (in this reprint)
 
-The SG90's own round horn now sits flat on the left finger's gear, fixed with 2 servo-bag screws into 1.7 mm
+The SG90's own round horn, trimmed to Ø12 mm, now sits flat on the left finger's gear, fixed with 2 servo-bag screws into 1.7 mm
 pilots 5 mm from the gear centre; the servo's spline goes into the horn hub from above, like the earlier
 prototype gripper. The horn carries the torque, so the bare spline no longer has to grip printed plastic.
-The top plate has a Ø22 opening for the horn, and the servo sits 4.8 mm higher. Checked: collision sweep,
+The top plate has a Ø14 opening for the horn, and the servo sits 4.8 mm higher. (A full Ø20 horn would hit the servo post and reach the can bumper: checked.) Checked: collision sweep,
 engineering checks (horn-screw pilot bearing at SG90 stall) and the assembly order (`cad/check/`).
 
 ## Sources

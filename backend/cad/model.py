@@ -50,8 +50,9 @@ P = dict(
     pad_z=(46.0, 86.0),        # 40 mm pads centred near can mid-height (61.1)
     pad_t=5.5, pad_half_angle=28.0, grip_open_angle=75.0,
     # gripper drive (like the earlier prototype): the SG90's round horn sits flat on the left finger's gear,
-    # 2 servo-bag screws through the horn into the gear; the spline goes into the horn's hub from above
-    ghorn_r=10.0, ghorn_disc=1.5, ghorn_hub_r=3.6, ghorn_hub_h=3.0, ghorn_screw_r=5.0, ghorn_gap=0.3,
+    # 2 servo-bag screws through the horn into the gear; the spline goes into the horn's hub from above.
+    # The horn is TRIMMED to Ø12 (flush cutters): a full Ø20 horn would hit the servo post and reach the can bumper
+    ghorn_r=6.0, ghorn_disc=1.5, ghorn_hub_r=3.6, ghorn_hub_h=3.0, ghorn_screw_r=5.0, ghorn_gap=0.3,
     print_density=1.27, print_fill=0.60,                             # PETG, ~3 walls + 30 % infill
 )
 P["can_y"] = P["can_r_pos"]
@@ -514,7 +515,7 @@ def build_parts():
     hz0 = fz1 + p["ghorn_gap"]
     ghorn = cyl(-pvx, pvy, p["ghorn_r"], hz0, hz0 + p["ghorn_disc"]).union(
         cyl(-pvx, pvy, p["ghorn_hub_r"], hz0 + p["ghorn_disc"], hz0 + p["ghorn_disc"] + p["ghorn_hub_h"]))
-    add("gripper_horn", "finger_L", ghorn, "buy", mass=1.0, note="SG90 round horn (in the servo bag), screwed to the left gear")
+    add("gripper_horn", "finger_L", ghorn, "buy", mass=1.0, note="SG90 round horn (in the servo bag) trimmed to Ø12, screwed to the left gear")
 
     # ---------------- tolerance test coupon (print first; not part of the assembly) ----------------
     cp = box(0, 70, 0, 22, 0, 8)

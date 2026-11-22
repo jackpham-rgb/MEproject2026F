@@ -719,8 +719,9 @@
   },
   {
    "n": 19,
-   "title": "Gripper servo",
+   "title": "Horn on the left gear, then the gripper servo",
    "new": [
+    "gripper_horn",
     "gripper_servo_SG90"
    ],
    "dir": [
@@ -736,7 +737,7 @@
      "servo-bag screw"
     ],
     [
-     1,
+     2,
      "servo-bag screw"
     ]
    ],
@@ -744,7 +745,7 @@
     "SG90",
     "20\u00b0"
    ],
-   "note": "Spline down into the left finger's socket (it is the horn)",
+   "note": "Horn flat on the left gear, 2 screws; then the servo's spline down into the horn hub",
    "az": -60,
    "el": 55,
    "show": [
@@ -771,6 +772,7 @@
     "finger_L",
     "finger_R",
     "axle_R",
+    "gripper_horn",
     "gripper_servo_SG90"
    ],
    "ok": true
@@ -817,6 +819,7 @@
     "finger_L",
     "finger_R",
     "axle_R",
+    "gripper_horn",
     "gripper_servo_SG90",
     "can_bumper"
    ],
@@ -938,6 +941,7 @@
     "finger_L",
     "finger_R",
     "axle_R",
+    "gripper_horn",
     "gripper_servo_SG90",
     "can_bumper",
     "arduino_uno",

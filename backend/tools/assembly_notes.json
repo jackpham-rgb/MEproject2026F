@@ -35,7 +35,7 @@
   "dc_jack": "DC jack / terminal tip",
   "ballast": "~100 g washers (ballast)",
   "test_can": "Coke can",
-  "gripper_horn": "SG90 round horn (on the left gear)"
+  "gripper_horn": "SG90 round horn, trimmed to Ø12 mm"
  },
  "screw_names": {
   "#6": "#6-32 x 1/2\" pan head",
@@ -129,8 +129,8 @@
   },
   "19": {
    "level": "try",
-   "fit": "<b>Horn flat on the gear.</b> Use the 2 horn holes closest to 5 mm from the centre (or drill 1.5 mm through the horn using the gear's pilots as the guide). The spline must slide into the horn hub without force.",
-   "how": "1) Open both fingers the same amount. Lay the SG90 round horn flat on the left finger's gear, hub UP, and drive 2 servo-bag screws through it into the gear's 2 pilots. 2) Gripper servo at 20° first (laptop panel). 3) Lower the servo so its spline goes into the horn hub, then 2 servo-bag screws through its tabs into the frame's posts. The finger can't drop off: it sits 0.5 mm above the bottom plate and the spline is 2.5 mm deep in the hub. Same idea as the earlier prototype gripper."
+   "fit": "<b>Horn trimmed to Ø12 mm, flat on the gear.</b> Cut the SG90 round horn down to Ø12 mm (flush cutters, then sand), keeping its 2 holes 5 mm from the centre (or drill 1.5 mm through the horn using the gear's pilots as the guide). A full-size horn hits the servo post. The spline must slide into the hub without force.",
+   "how": "1) Open both fingers the same amount. Lay the trimmed SG90 round horn (Ø12) flat on the left finger's gear, hub UP, and drive 2 servo-bag screws through it into the gear's 2 pilots. 2) Gripper servo at 20° first (laptop panel). 3) Lower the servo so its spline goes into the horn hub, then 2 servo-bag screws through its tabs into the frame's posts. The finger can't drop off: it sits 0.5 mm above the bottom plate and the spline is 2.5 mm deep in the hub. Same idea as the earlier prototype gripper."
   },
   "20": {
    "glue": "Superglue the rubber pad to the frame where the can's side touches.",
