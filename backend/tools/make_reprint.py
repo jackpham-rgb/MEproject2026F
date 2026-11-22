@@ -29,9 +29,10 @@ EASY_SUP = {"support_material": "1", "support_material_auto": "1", "support_mate
             "support_material_bottom_contact_distance": "0.25", "support_material_interface_layers": "2",
             "support_material_bottom_interface_layers": "0", "support_material_xy_spacing": "60%",
             "support_material_threshold": "50"}
-FAST = {"perimeter_speed": "50", "external_perimeter_speed": "35", "infill_speed": "80", "solid_infill_speed": "50",
-        "top_solid_infill_speed": "35", "support_material_speed": "60", "gap_fill_speed": "35", "travel_speed": "150",
+FAST = {"perimeter_speed": "50", "external_perimeter_speed": "35", "infill_speed": "80", "solid_infill_speed": "60",
+        "top_solid_infill_speed": "40", "support_material_speed": "60", "gap_fill_speed": "35", "travel_speed": "150",
         "only_retract_when_crossing_perimeters": "1", "thick_bridges": "1"}
+FAST_DRAFT = {**FAST, "perimeter_speed": "60", "external_perimeter_speed": "45", "infill_speed": "90"}   # 0.28 mm: keep the draft speeds
 
 # (name, profile, plate settings, parts, why). The leading digit names the file (reprint_N).
 PLATES = [
@@ -45,7 +46,7 @@ PLATES = [
      ["CA-402", "CA-403", "CA-401"],
      "Gear teeth: slow outer wall, 5 walls (teeth are solid wall), 30 % gyroid inside instead of 100 %"),
     ("3  Base", "DRAFT",
-     {**FAST, **EASY_SUP, "perimeters": "3", "fill_density": "12%", "fill_pattern": "cubic"},
+     {**FAST_DRAFT, **EASY_SUP, "perimeters": "3", "fill_density": "12%", "fill_pattern": "cubic"},
      ["CA-101"],
      "6807 pocket: its size is set in X-Y by TOL, so coarse 0.28 mm layers are fine; 3 walls round the pocket"),
 ]

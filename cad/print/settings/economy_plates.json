@@ -1,6 +1,6 @@
 {
  "prusa_steps": [
-  "**Fastest:** File › Open Project (Ctrl+O) › `cad/print/plates_AE/plate_X.3mf`. The parts are already on the bed AND every setting on the plate's page is inside (printer CR-6 SE, PETG, layers, infill, supports): answer **Yes** to load its settings, then slice. Part already printed? Right-click it in the object list › Delete.",
+  "**Fastest:** File › Open Project (Ctrl+O) › `cad/print/plates/plate_X.3mf`. The parts are already on the bed AND every setting on the plate's page is inside (printer CR-6 SE, PETG, layers, infill, supports): answer **Yes** to load its settings, then slice. Part already printed? Right-click it in the object list › Delete.",
   "Top right: switch the mode to **Expert** (red). Otherwise half of these fields are hidden.",
   "Printer (once): Configuration › Configuration Wizard › Creality › **CR-6 SE**. Filament: Generic PETG.",
   "Lost? **Ctrl+F** searches every setting by name (type \"support\", \"brim\", \"infill\"…) and jumps to it.",
@@ -174,12 +174,12 @@
   ]
  ],
  "before": [
-  36.99055555555555,
-  386.88062926227315
+  36.96666666666667,
+  386.7252362672408
  ],
  "after": [
-  23.80777777777778,
-  338.32488510310213
+  23.843333333333334,
+  338.7077011073768
  ],
  "plates": [
   {
@@ -372,8 +372,8 @@
    "letter": "E",
    "img": "docs/print_plates/plate_E.png",
    "ini": "cad/print/settings/plates/plate_E.ini",
-   "time": "6 h 13",
-   "grams": 59,
+   "time": "6 h 15",
+   "grams": 60,
    "profile": "DETAIL",
    "layer": "0.2",
    "walls": "4",

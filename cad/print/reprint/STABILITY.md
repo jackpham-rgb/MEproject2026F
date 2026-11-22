@@ -1,0 +1,98 @@
+# Bed stability of the reprint parts
+
+Contact = flat area touching the bed. Tip ratio = height / √contact (above ~2.5 a part can rock or get knocked
+over by the nozzle). Overhang = flat area printed in the air (needs support). The chosen side is the one in the STL.
+
+## CA-201 Turret plate
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 387 | 19 | 1.0 | 3702 | 2 of 2 | **used** |
+| +Z (upside down, top face down) | 251 | 19 | 1.2 | 3837 | 2 of 2 |  |
+| +X face down | 0 | 80 | 80.0 | 103 | 0 of 2 |  |
+| -X face down | 0 | 80 | 80.0 | 103 | 0 of 2 |  |
+| +Y face down | 401 | 62 | 3.1 | 200 | 0 of 2 |  |
+| -Y face down | 0 | 62 | 61.5 | 272 | 0 of 2 |  |
+
+## CA-203 Top cap
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 2296 | 6 | 0.1 | 57 | 2 of 2 |  |
+| +Z (upside down, top face down) | 2352 | 6 | 0.1 | 0 | 2 of 2 | **used** |
+| +X face down | 264 | 54 | 3.3 | 0 | 0 of 2 |  |
+| -X face down | 264 | 54 | 3.3 | 0 | 0 of 2 |  |
+| +Y face down | 324 | 44 | 2.4 | 0 | 0 of 2 |  |
+| -Y face down | 324 | 44 | 2.4 | 0 | 0 of 2 |  |
+
+## CA-302 Lift link
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 21 | 16 | 3.6 | 0 | 0 of 0 |  |
+| +Z (upside down, top face down) | 21 | 16 | 3.6 | 0 | 0 of 0 |  |
+| +X face down | 98 | 3 | 0.3 | 0 | 0 of 0 | **used** |
+| -X face down | 98 | 3 | 0.3 | 0 | 0 of 0 |  |
+| +Y face down | 49 | 7 | 1.0 | 0 | 0 of 0 |  |
+| -Y face down | 49 | 7 | 1.0 | 0 | 0 of 0 |  |
+
+## CA-301 Carriage + arm
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 88 | 100 | 10.6 | 1416 | 4 of 4 |  |
+| +Z (upside down, top face down) | 20 | 100 | 22.3 | 1478 | 4 of 4 |  |
+| +X face down | 1240 | 52 | 1.5 | 540 | 0 of 4 |  |
+| -X face down | 1240 | 52 | 1.5 | 540 | 0 of 4 |  |
+| +Y face down | 620 | 44 | 1.8 | 3053 | 0 of 4 |  |
+| -Y face down | 3224 | 44 | 0.8 | 449 | 0 of 4 | **used** |
+
+## CA-402 Finger, right
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 251 | 40 | 2.5 | 449 | 1 of 1 | **used** |
+| +Z (upside down, top face down) | 251 | 40 | 2.5 | 449 | 1 of 1 |  |
+| +X face down | 0 | 42 | 42.1 | 1209 | 0 of 1 |  |
+| -X face down | 3 | 42 | 24.1 | 121 | 0 of 1 |  |
+| +Y face down | 30 | 79 | 14.4 | 134 | 0 of 1 |  |
+| -Y face down | 3 | 79 | 45.0 | 144 | 0 of 1 |  |
+
+## CA-403 Finger, left
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 251 | 40 | 2.5 | 461 | 0 of 0 | **used** |
+| +Z (upside down, top face down) | 251 | 40 | 2.5 | 461 | 0 of 0 |  |
+| +X face down | 0 | 42 | 41.9 | 126 | 0 of 0 |  |
+| -X face down | 0 | 42 | 41.9 | 1207 | 0 of 0 |  |
+| +Y face down | 30 | 78 | 14.3 | 138 | 0 of 0 |  |
+| -Y face down | 0 | 78 | 78.5 | 149 | 0 of 0 |  |
+
+## CA-401 Gripper frame
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 84 | 43 | 4.7 | 3668 | 0 of 0 |  |
+| +Z (upside down, top face down) | 43 | 43 | 6.6 | 3709 | 0 of 0 |  |
+| +X face down | 211 | 62 | 4.3 | 300 | 0 of 0 |  |
+| -X face down | 211 | 62 | 4.3 | 300 | 0 of 0 |  |
+| +Y face down | 403 | 33 | 1.6 | 763 | 0 of 0 |  |
+| -Y face down | 1091 | 33 | 1.0 | 75 | 0 of 0 | **used** |
+
+## CA-101 Base
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 1559 | 52 | 1.3 | 10150 | 1 of 1 |  |
+| +Z (upside down, top face down) | 10739 | 52 | 0.5 | 970 | 1 of 1 | **used** |
+| +X face down | 890 | 152 | 5.1 | 4742 | 0 of 1 |  |
+| -X face down | 5159 | 152 | 2.1 | 985 | 0 of 1 |  |
+| +Y face down | 0 | 112 | 112.0 | 6580 | 0 of 1 |  |
+| -Y face down | 7346 | 112 | 1.3 | 169 | 0 of 1 |  |
+
+## Brims added
+
+- CA-302_lift_link: contact 98 mm², tip 0.3 → 5 mm brim
+- CA-402_finger_R: contact 251 mm², tip 2.5 → 5 mm brim
+- CA-403_finger_L: contact 251 mm², tip 2.5 → 5 mm brim

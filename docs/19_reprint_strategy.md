@@ -54,6 +54,18 @@ moderate infill [5]. So:
 | "Combine infill every N layers" | helps only below 0.16 mm layers on a 0.4 mm nozzle (max ~0.32 mm infill) [6], so not used at 0.2 mm |
 | Only retract when crossing perimeters, thick bridges | fewer retractions and stronger bridges |
 
+**Real numbers (PrusaSlicer, CR-6 SE profile):** reprint_1 ~7 h 20, reprint_2 ~6 h 40 (51 g instead of 67 g at 100 %
+infill), reprint_3 ~7 h 15. The biggest remaining limit is the printer's acceleration: the stock CR-6 SE profile uses
+500 mm/s²; 1000 mm/s² would save ~8 % (the base: 7 h 15 → 6 h 40). Try it only after the tune-up (docs/18): send
+`M201 X1000 Y1000` + `M500`, print the XYZ cube, and keep it if the cube still measures 20.00 mm with no ringing.
+
+## Bed stability
+
+`cad/print/reprint/STABILITY.md` lists, for every reprint part and every side it could lie on, the contact area,
+height, tip ratio (height / √contact) and overhang. The side used is the most stable one that keeps the press-fit
+holes vertical. A part with less than 300 mm² on the bed or a tip ratio above 2.5 gets a 5 mm brim
+(lift link, both fingers).
+
 ## Claw redesign (in this reprint)
 
 The SG90's own round horn, trimmed to Ø12 mm, now sits flat on the left finger's gear, fixed with 2 servo-bag screws into 1.7 mm
