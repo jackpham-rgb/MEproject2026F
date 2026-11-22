@@ -190,7 +190,7 @@
   },
   {
    "n": 7,
-   "title": "Rods",
+   "title": "Carriage onto the rods (on the table)",
    "new": [
     "rod_L",
     "rod_R"
@@ -204,15 +204,11 @@
    "dist": 120,
    "hw": [],
    "badge": null,
-   "note": "Press into the blind holes of the turret plate",
+   "note": "Slide both rods down through the 4 bearings. Tilt it: the carriage must slide by its own weight",
    "az": -60,
-   "el": 25,
+   "el": 20,
    "show": [
-    "base",
-    "bearing_6807",
-    "turntable_servo_MG996R",
-    "turntable_horn",
-    "turret_plate",
+    "carriage_arm",
     "LM6UU_L1",
     "LM6UU_R1",
     "LM6UU_L2",
@@ -224,8 +220,10 @@
   },
   {
    "n": 8,
-   "title": "Carriage onto the rods",
+   "title": "Rods + carriage into the turret plate",
    "new": [
+    "rod_L",
+    "rod_R",
     "carriage_arm",
     "LM6UU_L1",
     "LM6UU_R1",
@@ -237,34 +235,13 @@
     0,
     1
    ],
-   "per_part_dir": {
-    "LM6UU_L1": [
-     0,
-     0,
-     -1
-    ],
-    "LM6UU_R1": [
-     0,
-     0,
-     -1
-    ],
-    "LM6UU_L2": [
-     0,
-     0,
-     1
-    ],
-    "LM6UU_R2": [
-     0,
-     0,
-     1
-    ]
-   },
-   "dist": 110,
+   "per_part_dir": {},
+   "dist": 80,
    "hw": [],
    "badge": null,
-   "note": "It must slide down under its own weight",
+   "note": "Press both rod ends into the blind holes, straight down, carriage on the rods",
    "az": -60,
-   "el": 20,
+   "el": 25,
    "show": [
     "base",
     "bearing_6807",

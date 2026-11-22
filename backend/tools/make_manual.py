@@ -35,10 +35,11 @@ STEPS = [
      "Hub into the bearing; rod bosses point at the START can. Turns 90° freely", (-60, 35), None),
     ("Linear bearings into the carriage", ["LM6UU_L1", "LM6UU_R1", "LM6UU_L2", "LM6UU_R2"], None, 30, [], None,
      "2 from below, 2 from above, flush with the faces", (-40, 20), ["carriage_arm"]),
-    ("Rods", ["rod_L", "rod_R"], UP, 120, [], None,
-     "Press into the blind holes of the turret plate", (-60, 25), None),
-    ("Carriage onto the rods", ["carriage_arm", "LM6UU_L1", "LM6UU_R1", "LM6UU_L2", "LM6UU_R2"], UP, 110, [], None,
-     "It must slide down under its own weight", (-60, 20), None),
+    ("Carriage onto the rods (on the table)", ["rod_L", "rod_R"], UP, 120, [], None,
+     "Slide both rods down through the 4 bearings. Tilt it: the carriage must slide by its own weight", (-60, 20),
+     ["carriage_arm", "LM6UU_L1", "LM6UU_R1", "LM6UU_L2", "LM6UU_R2"]),
+    ("Rods + carriage into the turret plate", ["rod_L", "rod_R", "carriage_arm", "LM6UU_L1", "LM6UU_R1", "LM6UU_L2", "LM6UU_R2"], UP, 80, [], None,
+     "Press both rod ends into the blind holes, straight down, carriage on the rods", (-60, 25), None),
     ("Spine", ["spine"], UP, 80, [(2, S6)], None,
      "Onto the turret plate behind the rods, screws from above", (-130, 25), None),
     ("Top cap", ["top_cap"], UP, 40, [(2, S6)], None,
@@ -90,10 +91,10 @@ def main():
     installed, out, rep, ok = ["base"], [], ["ASSEMBLY CHECK: every part slides to its place along its arrow (backend/tools/make_manual.py)",
                                        f"solid booleans every 3 mm of travel; overlap > {VOL_TOL} mm³ with an assembled part = blocked", ""], True
     for i, (title, new, dirn, dist, hw, badge, note, (az, el), only) in enumerate(STEPS, 1):
-        moving = [n for n in new if n not in installed]
+        moving = list(new) if title.startswith("Rods + carriage") else [n for n in new if n not in installed]   # the sub-assembly moves as one
         blocked = []
         for n in moving:
-            d = PER_PART_DIR.get(n, dirn) if dirn is not None or n in PER_PART_DIR else None
+            d = dirn if dirn is not None else PER_PART_DIR.get(n)
             if d is None:
                 continue
             others = [o for o in (only if only else installed) if o not in new]
@@ -119,7 +120,7 @@ def main():
         for n in new:
             if n not in installed:
                 installed.append(n)
-        out.append(dict(n=i, title=title, new=new, dir=dirn, per_part_dir={n: PER_PART_DIR[n] for n in new if n in PER_PART_DIR},
+        out.append(dict(n=i, title=title, new=new, dir=dirn, per_part_dir={n: PER_PART_DIR[n] for n in new if n in PER_PART_DIR and dirn is None},
                         dist=dist, hw=hw, badge=badge, note=note, az=az, el=el,
                         show=(only + new) if only else list(installed), ok=not blocked))
         print(rep[-1], flush=True)

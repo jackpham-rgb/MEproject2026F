@@ -63,29 +63,30 @@
   },
   "5": {
    "fit": "<b>Ø34.95 mm press fit.</b> Hub into the bearing's inner ring. Too tight: sand the hub evenly while turning it. The plate must turn freely after.",
-   "how": "The hub drops into the bearing's inner ring and covers the horn (the horn sits inside the hub). Turn the horn until its 4 holes line up with the 4 holes in the plate, then drive 4 servo-bag screws DOWN through the plate into the horn. No glue: the 4 screws carry the turning force, the bearing carries the weight (the plate's shoulder rests on the inner ring) and the hub keeps it centred. The plate looks small next to the bearing because the bearing does the holding. If your horn has no holes on that circle: use the plate as a drill guide, 1.5 mm pilots through the horn. Superglue only if the hub is loose in the bearing.",
+   "how": "The hub drops into the bearing's inner ring and covers the horn (the horn sits inside the hub). Turn the horn until its 4 holes line up with the 4 holes in the plate, then drive 4 servo-bag screws DOWN through the plate into the horn. Tip: open the plate's 4 holes to 3/32″ (2.4 mm) first, so the screws bite only the horn and pull the plate down onto it. No glue: the 4 screws carry the turning force, the bearing carries the weight (the plate's shoulder rests on the inner ring) and the hub keeps it centred. The plate looks small next to the bearing because the bearing does the holding. If your horn has no holes on that circle: use the plate as a drill guide, 1.5 mm pilots through the horn. Superglue only if the hub is loose in the bearing.",
    "level": "precise"
   },
   "6": {
    "fit": "<b>Ø12.15 mm press fit ×4, in line.</b> Pockets print on their side: ream with a 12 mm drill or sandpaper on a dowel until each LM6UU presses in.",
-   "how": "2 from below, 2 from above, flush with the faces. Press with a flat block. No glue (a drop of superglue only if one is loose).",
+   "how": "Do this on the table, carriage on its own: 2 bearings from below, 2 from above, flush with the faces. Press with a flat block. No glue (a drop of superglue only if one is loose).",
    "level": "precise"
   },
   "7": {
-   "fit": "<b>Ø6.0 mm press fit.</b> Rods into the blind holes, straight up. Too tight: drill 6 mm by hand. Rods must be parallel.",
-   "how": "Push each rod to the bottom of its hole. No screws, no glue: the top cap traps them in step 10.",
-   "level": "precise"
+   "level": "precise",
+   "fit": "<b>Slide test.</b> Rods through all 4 bearings; tilt the rods: the carriage must slide down by its own weight, no tight spot. Sticks: ream the tight pocket a little.",
+   "how": "Still on the table: slide both 6 mm rods down through the carriage's 4 bearings, so the carriage rides on the rods. Leave the same length of rod sticking out under the carriage on both sides."
   },
   "8": {
-   "fit": "<b>Slide test.</b> The carriage must slide down both rods under its own weight. Sticks: ream the tight pocket, re-check the rods are parallel.",
-   "level": "precise"
+   "level": "precise",
+   "fit": "<b>Ø6.0 mm press fit.</b> Rod ends into the turret plate's blind holes, straight down to the bottom. Too tight: open the holes with a 6 mm (or 15/64″) bit turned by hand.",
+   "how": "Hold the rods (carriage on them) upright and press both rod ends into the turret plate's 2 blind holes at the same time. No screws, no glue: the top cap traps the rods in step 10."
   },
   "9": {
    "how": "2 x #6-32 from ABOVE through the spine's foot into the turret plate (self-threading).",
    "level": "easy"
   },
   "10": {
-   "fit": "<b>Ø6.0 mm, both rods.</b> Tight: drill 6 mm, 8 mm deep. After the screws: the carriage must still slide freely.",
+   "fit": "<b>Try-fit Ø6.0 mm, both rods.</b> Cap over the rod tops: tight → drill 6 mm (15/64″) by hand, 8 mm deep. Then the 2 screws. After: the carriage must still slide freely.",
    "how": "2 x #6-32 from ABOVE through the cap into the top of the spine.",
    "level": "try"
   },
@@ -99,9 +100,9 @@
    "level": "try"
   },
   "13": {
-   "fit": "<b>20 mm horn arm.</b> Measure hole-to-centre: 20 mm (the lift height depends on it).",
-   "how": "Lift servo at 30° first. Horn on the spline + centre screw; a servo-bag screw through the horn's 20 mm hole into the link.",
-   "level": "try"
+   "level": "try",
+   "fit": "<b>This joint must turn.</b> Drill the link's small hole to <b>3/32″ (2.4 mm)</b> so the link turns on the screw; the screw threads into the horn hole only. 20 mm from the horn centre to that hole.",
+   "how": "Lift servo at 30° first. Horn on the spline + its centre screw. Then a servo-bag screw from the OUTSIDE: through the link (opened to 2.4 mm), into the horn's hole at 20 mm. The screw head holds the link on; the link pivots on the screw."
   },
   "14": {
    "how": "Body through the arm's bracket from the front, 2 servo-bag screws through the tabs.",
@@ -112,7 +113,7 @@
    "level": "easy"
   },
   "16": {
-   "how": "4 servo-bag screws through the frame's flange into the horn. Plates level, opening facing out.",
+   "how": "4 servo-bag screws through the frame's flange into the horn (open the flange holes to 3/32″ / 2.4 mm first, so the screws pull the frame onto the horn). Plates level, opening facing out.",
    "level": "easy"
   },
   "17": {
@@ -126,8 +127,8 @@
    "level": "try"
   },
   "19": {
-   "fit": "<b>Spline socket.</b> Snug on the SG90 spline, no wobble. Tight: scrape lightly inside with a knife tip, test after each pass.",
-   "how": "Gripper servo at 20° first. Spline down into the left finger's socket (the finger is the horn), 2 servo-bag screws through the tabs into the posts.",
+   "fit": "<b>Spline to finger: use the horn, like the earlier gripper.</b> The finger's socket is a plain Ø6 hole, so the bare SG90 spline won't grip it. Cut the arms off an SG90 round horn so only its splined hub is left, drill the socket to the hub's diameter (measure it, about 7 mm / 9/32″), superglue the hub in, let it cure, then push the spline into the hub. The hub's teeth carry the force.",
+   "how": "Gripper servo at 20° first. Spline down into the horn hub glued in the left finger, then 2 servo-bag screws through the servo tabs into the frame's posts.",
    "level": "try"
   },
   "20": {
@@ -174,5 +175,6 @@
   "Cut the rubber pad 9 x 13.5 mm (step 20)",
   "Print the electronics tray first (plate C, draft) and do steps 21-22",
   "Servos into their brackets as soon as each printed part arrives (steps 2, 11, 14)"
- ]
+ ],
+ "tol_note": "The fits are being re-measured: the first prints did not fit even with sanding. Use the tolerance re-check sheet (docs/17_tolerance_recheck.md) and send the measured sizes."
 }

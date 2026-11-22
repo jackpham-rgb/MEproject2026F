@@ -7,8 +7,8 @@ solid booleans every 3 mm of travel; overlap > 1.0 mm³ with an assembled part =
  4. Servo horn                           PASS
  5. Turret plate                         PASS
  6. Linear bearings into the carriage    PASS
- 7. Rods                                 PASS
- 8. Carriage onto the rods               PASS
+ 7. Carriage onto the rods (on the table) PASS
+ 8. Rods + carriage into the turret plate PASS
  9. Spine                                PASS
 10. Top cap                              PASS
 11. Lift servo                           PASS

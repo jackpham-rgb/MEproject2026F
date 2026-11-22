@@ -283,7 +283,7 @@ def build():
     th0 = math.radians(p["lift_theta0"])
     pin = (lty + p["lift_crank"] * math.cos(th0), ltz + p["lift_crank"] * math.sin(th0))
     S.append(("lift_crank", "M3", (ltx - 2.5, lty, ltz), (1, 0, 0), 6))
-    S.append(("lift_crank", "sb", (ltx, pin[0], pin[1]), (-1, 0, 0), 6))
+    S.append(("lift_crank", "sb", (ltx - 5.5, pin[0], pin[1]), (1, 0, 0), 6))      # from outside: through the link (2.4 mm) into the horn
     for hz in (gz - (MICRO_HOLES_X - 13.75), gz - (MICRO_HOLES_X + 13.75)):
         S.append(("wrist_servo", "sb", (0, wy - 28.5 + 15.9 + 2.5, hz), (0, -1, 0), 8))
     S.append(("wrist_horn", "M3", (0, wy - 0.6, gz), (0, -1, 0), 5))
@@ -296,6 +296,21 @@ def build():
         S.append(("gripper_servo_SG90", "sb", (hx, pvy, tab_z + 2.5), (0, 0, -1), 8))
     for x in (-50, 50):
         S.append(("electronics_tray", "#6", (x, -half + p["base_wall"] + 4, 0.0), (0, 0, 1), 12.7))
+    HOLE = {  # what the screw passes through / bites, with the drill bit to use by hand if it is tight
+        "turntable_servo_MG996R": "servo tab Ø4.6 → base pilot Ø3.5 · tight: 9/64″ (3.6 mm) bit",
+        "turntable_horn": "horn centre screw (servo bag)",
+        "turret_plate": "plate Ø1.7 → open to 3/32″ (2.4 mm) · bites the horn",
+        "spine": "spine clear Ø3.9 (5/32″) → plate pilot Ø2.9 (7/64″)",
+        "top_cap": "cap clear Ø3.9 (5/32″) → spine pilot Ø2.9 (7/64″)",
+        "lift_servo_MG90S": "servo tab → bracket pilot Ø1.7 (1/16″)",
+        "lift_link": "link Ø3.9 running (5/32″) → carriage pilot Ø2.9 (7/64″)",
+        "lift_crank": "link hole → drill 3/32″ (2.4 mm), turns · bites the horn",
+        "wrist_servo": "servo tab → bracket pilot Ø1.7 (1/16″)",
+        "wrist_horn": "horn centre screw (servo bag)",
+        "gripper_frame": "flange Ø1.7 → open to 3/32″ (2.4 mm) · bites the horn",
+        "gripper_servo_SG90": "servo tab → post pilot Ø1.7 (1/16″)",
+        "electronics_tray": "tray clear Ø3.9 (5/32″) → base pilot Ø2.9 (7/64″)",
+    }
     screws = []
     for i, (owner, kind, head, ax, L) in enumerate(S):
         sh, col = screw_local(kind, L)
@@ -304,7 +319,7 @@ def build():
             continue
         nm = f"screw_{i:02d}"
         add(nm, "screw", moved(sh, trsf_axes(head, perp_of(ax), ax)), col)
-        screws.append(dict(name=nm, owner=owner, kind=kind, head=[round(v, 2) for v in head], axis=list(ax), length=L))
+        screws.append(dict(name=nm, owner=owner, kind=kind, head=[round(v, 2) for v in head], axis=list(ax), length=L, hole=HOLE.get(owner, "")))
 
     # ---- glue + ballast
     glue = []
@@ -325,11 +340,23 @@ def build():
     py1 = p["plate_y1"]
     add("glue_bumper", "glue", box(-2.5, 2.5, py1 - 0.05, py1 + 0.35, p["plate_bot"][0] + 1, pt[1] - 1), C["glue"])
     glue.append(dict(name="glue_bumper", owner="can_bumper", at=[0, py1, gz]))
-    return meshes, screws, glue
+    cz1 = p["car_z1"]
+    callouts = {
+        1: [((23.5, 0, H), "pocket Ø47.1 · press fit: sand the wall")],
+        5: [((17.5, 0, H - 4), "hub Ø34.95 · press fit: sand the hub")],
+        6: [((-rx - 6, ry, cz0 + 9), "pocket Ø12.15 · 12 mm bit / sandpaper on a dowel")],
+        8: [((-rx, ry, tz1 + 6), "blind hole Ø6.0 · 6 mm or 15/64″ bit")],
+        10: [((rx, ry, p["rod_top"]), "blind hole Ø6.0 · 6 mm or 15/64″ bit, 8 mm deep")],
+        12: [((-7, 12, cz1 + 2), "Ø3.9 running · 5/32″ bit")],
+        13: [((-7, pin[0], pin[1]), "drill to 3/32″ (2.4 mm) · must turn")],
+        18: [((pvx, pvy, pt[1]), "Ø3.9 running · 5/32″ bit")],
+        19: [((-pvx, pvy, pt[1]), "socket Ø6.0 → drill to horn-hub size, glue hub in")],
+    }
+    return meshes, screws, glue, callouts
 
 
 def main():
-    meshes, screws, glue = build()
+    meshes, screws, glue, callouts = build()
     steps = json.load(open(os.path.join(HERE, "build", "manual_steps.json")))["steps"]
     out_meshes = []
     for m in meshes:
@@ -355,7 +382,8 @@ def main():
         st.append(dict(n=n, title=s["title"], new=s["new"] + extra, show=sorted(show),
                        dir=s["dir"], per_part_dir=s["per_part_dir"], dist=s["dist"], hw=s["hw"], badge=s["badge"], note=s["note"],
                        screws=[x["name"] for x in sc], glue=[g["name"] for g in gl], fit=note.get("fit", ""), how=note.get("how", ""),
-                       glue_text=note.get("glue", ""), level=note.get("level", "easy")))
+                       glue_text=note.get("glue", ""), level=note.get("level", "easy"),
+                       callouts=[dict(at=[round(v, 2) for v in a], text=t) for a, t in callouts.get(n, [])]))
     data = dict(meshes=out_meshes, screws=screws, glue=glue, steps=st, printed=sorted({m["owner"] for m in meshes if m["kind"] == "printed"}),
                 names=NOTES["names"], screw_names=NOTES["screw_names"], levels=NOTES["levels"], while_waiting=NOTES["while_waiting"])
     os.makedirs(os.path.dirname(OUT), exist_ok=True)

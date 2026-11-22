@@ -37,6 +37,7 @@ const PARTS = ${JSON.stringify(parts)};
 const PRINTED = ${JSON.stringify(PRINTED_PARTS)};
 const renderer = new THREE.WebGLRenderer({antialias:true, preserveDrawingBuffer:true});
 renderer.setPixelRatio(2); document.body.appendChild(renderer.domElement);
+const outC = document.createElement("canvas"); outC.id = "out"; outC.style.cssText = "position:absolute;left:0;top:0"; document.body.appendChild(outC);
 let W = 1200, H = 860; renderer.setSize(W, H);
 renderer.setClearColor(0xffffff, 1);
 const geoCache = {};
@@ -45,7 +46,7 @@ function geo(n){ if (geoCache[n]) return geoCache[n];
     g.setAttribute("position", new THREE.Float32BufferAttribute(p.v, 3)); g.setIndex(p.f); g = g.toNonIndexed(); g.computeVertexNormals();
     return [g, new THREE.EdgesGeometry(g, p.kind === "printed" || p.kind === "can" ? 24 : 35), p.color, p.kind]; }); }
 // draw(shown, fresh, offsets{name:[dx,dy,dz]}, arrows[[from,to]], az, el, size)
-window.draw = (shown, fresh, offs, arrows, az, el, w, h, focus, paths) => {
+window.draw = (shown, fresh, offs, arrows, az, el, w, h, focus, paths, callouts) => {
   W = w || 1200; H = h || 860; renderer.setSize(W, H);
   const scene = new THREE.Scene(); const root = new THREE.Group(); root.rotation.x = -Math.PI/2; scene.add(root);
   scene.add(new THREE.HemisphereLight(0xffffff, 0xb0b0b0, 0.95)); const d = new THREE.DirectionalLight(0xffffff, 0.35); d.position.set(200, 400, 300); scene.add(d);
@@ -103,6 +104,22 @@ window.draw = (shown, fresh, offs, arrows, az, el, w, h, focus, paths) => {
   if (hw / hh > W / H) hh = hw * H / W; else hw = hh * W / H;
   cam.left = cx - hw; cam.right = cx + hw; cam.top = cy + hh; cam.bottom = cy - hh; cam.updateProjectionMatrix();
   renderer.render(scene, cam);
+  // 2D layer on top: hole callouts (box + leader line), composited into #out for the screenshot
+  const src = renderer.domElement, out = document.getElementById("out");
+  out.width = src.width; out.height = src.height; out.style.width = W + "px"; out.style.height = H + "px";
+  const g2 = out.getContext("2d"); g2.drawImage(src, 0, 0); const k = src.width / W;
+  (callouts || []).forEach((c, i) => {
+    const p = new THREE.Vector3(...c.at).applyMatrix4(root.matrixWorld).project(cam);
+    const x = (p.x * 0.5 + 0.5) * W * k, y = (-p.y * 0.5 + 0.5) * H * k, side = i % 2 ? 1 : -1;
+    g2.font = "bold " + (27 * k) + "px Helvetica, Arial, sans-serif";
+    const tw = g2.measureText(c.text).width, bw = tw + 24 * k, bh = 44 * k;
+    let bx = x + side * 120 * k - (side < 0 ? bw : 0); bx = Math.max(4 * k, Math.min(W * k - bw - 4 * k, bx));
+    const by = Math.max(4 * k, Math.min(H * k - bh - 4 * k, y - 150 * k + Math.floor(i / 2) * 60 * k));
+    g2.strokeStyle = "#c40000"; g2.lineWidth = 4 * k; g2.beginPath(); g2.moveTo(x, y); g2.lineTo(bx + (side < 0 ? bw : 0), by + bh / 2); g2.stroke();
+    g2.fillStyle = "#c40000"; g2.beginPath(); g2.arc(x, y, 8 * k, 0, 7); g2.fill();
+    g2.fillStyle = "#fff"; g2.fillRect(bx, by, bw, bh); g2.strokeRect(bx, by, bw, bh);
+    g2.fillStyle = "#000"; g2.fillText(c.text, bx + 12 * k, by + 31 * k);
+  });
 };
 window.ready = true;
 </script></body></html>`;
@@ -117,7 +134,7 @@ function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
   const b = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist", "--allow-file-access-from-files"] });
   const p = await b.newPage({ viewport: { width: 1200, height: 860 } });
   await p.goto("file://" + tmp); await p.waitForFunction("window.ready === true");
-  const shot = async (file, w, h) => { const c = await p.$("canvas"); await c.screenshot({ path: path.join(OUT, file) }); };
+  const shot = async (file, w, h) => { const c = await p.$("#out"); await c.screenshot({ path: path.join(OUT, file) }); };
   // cover: the whole robot with the can
   await p.evaluate(([s]) => window.draw(s, s, {}, [], -125, 22), [[...ALL, "test_can"]]); await shot("cover.png");
   // every step
@@ -141,8 +158,10 @@ function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
     const A = ASTEP[s.n], paths = [];
     for (const nm of A.screws) { const sc = SCREW[nm]; offs[nm] = sc.axis.map(c => -c * 18);
       paths.push([sc.head.map((v, k) => v - sc.axis[k] * 34), sc.head.map((v, k) => v + sc.axis[k] * sc.length)]); }
+    const callouts = [...A.callouts]; const seenH = new Set();
+    for (const nm of A.screws) { const sc = SCREW[nm]; if (sc.hole && !seenH.has(sc.hole)) { seenH.add(sc.hole); callouts.push({ at: sc.head, text: sc.hole }); } }
     const fresh = [...s.new, ...A.screws, ...A.glue, ...(s.n === 3 ? ["ballast"] : [])];
-    await p.evaluate(([sh, nw, o, a, az, el, f, pa]) => window.draw(sh, nw, o, a, az, el, 1200, 860, f, pa), [A.show, fresh, offs, arr, az, el, ZOOM[s.n] ? [...s.new, ...A.screws] : null, paths]);
+    await p.evaluate(([sh, nw, o, a, az, el, f, pa, co]) => window.draw(sh, nw, o, a, az, el, 1200, 860, f, pa, co), [A.show, fresh, offs, arr, az, el, ZOOM[s.n] ? [...s.new, ...A.screws] : null, paths, callouts]);
     await shot(`step_${String(s.n).padStart(2, "0")}.png`);
   }
   // parts page: every printed part on its own

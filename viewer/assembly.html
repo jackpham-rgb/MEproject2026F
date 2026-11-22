@@ -39,6 +39,7 @@ label.tb input{margin:0}
 #nav button{font-size:15px;padding:9px 16px}
 #labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .lab{position:absolute;transform:translate(-50%,-120%);background:rgba(20,24,29,.86);color:#fff;font:600 12px system-ui,sans-serif;padding:3px 7px;border-radius:5px;white-space:nowrap}
+.lab.hole{background:#fff;color:#111;border:2px solid #c40000;transform:translate(-50%,-50%);font-size:12px;white-space:normal;max-width:220px;text-align:center}
 .lab.pr{background:#1f58b8}.lab.bo{background:#b35f00}.lab.sc{background:#444}.lab.gl{background:#8a7200}
 #info{background:var(--panel);border-left:1px solid var(--line);overflow-y:auto;padding:16px}
 #info .big{font-size:44px;font-weight:800;line-height:1;margin-right:10px}
@@ -268,6 +269,21 @@ function labels() {
   for (const [k, arr] of Object.entries(byKind)) { const sc = arr[0], h = new THREE.Vector3(...sc.head).addScaledVector(new THREE.Vector3(...sc.axis), -36);
     put(h, `${arr.length}× ${D.screw_names[k]}`, "sc"); }
   if (s.glue.length) { const g = D.glue.find(x => x.name === s.glue[0]); put(new THREE.Vector3(...g.at), "glue here", "gl"); }
+  // hole callouts: a box with a leader line to the hole, size + drill bit
+  const cs = [...(s.callouts || [])];
+  const seenH = new Set();
+  for (const n of s.screws) { const sc = screwBy[n]; if (sc.hole && !seenH.has(sc.hole)) { seenH.add(sc.hole); cs.push({ at: sc.head, text: sc.hole }); } }
+  if (!cs.length) return;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("width", W); svg.setAttribute("height", H);
+  svg.style.cssText = "position:absolute;left:0;top:0"; labBox.appendChild(svg);
+  cs.forEach((c, i) => { const p = new THREE.Vector3(...c.at).project(camera); if (p.z > 1) return;
+    const x = (p.x * 0.5 + 0.5) * W, y = (-p.y * 0.5 + 0.5) * H, side = i % 2 ? 1 : -1;
+    const bx = Math.max(90, Math.min(W - 90, x + side * Math.min(150, W * 0.22))), by = Math.max(18, Math.min(H - 18, y + 60 + Math.floor(i / 2) * 36));
+    const ln = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    Object.entries({ x1: x, y1: y, x2: bx, y2: by, stroke: "#c40000", "stroke-width": 2 }).forEach(([k, v]) => ln.setAttribute(k, v)); svg.appendChild(ln);
+    const dt = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    Object.entries({ cx: x, cy: y, r: 3.5, fill: "#c40000" }).forEach(([k, v]) => dt.setAttribute(k, v)); svg.appendChild(dt);
+    const d = document.createElement("div"); d.className = "lab hole"; d.textContent = c.text; d.style.left = bx + "px"; d.style.top = by + "px"; labBox.appendChild(d); });
 }
 
 // ---------------- info panel
