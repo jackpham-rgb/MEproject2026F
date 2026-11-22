@@ -10,7 +10,11 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const OUT = path.join(ROOT, "docs/manual"); fs.mkdirSync(OUT, { recursive: true });
 const mesh = JSON.parse(fs.readFileSync(path.join(ROOT, "backend/cad/build/viewer_mesh.json"), "utf8"));
 const steps = JSON.parse(fs.readFileSync(path.join(ROOT, "backend/cad/build/manual_steps.json"), "utf8")).steps;
-const parts = {}; for (const g of Object.values(mesh.groups)) for (const p of g) parts[p.name] = p;
+// realistic meshes per owner (backend/cad/visual.py): printed parts = the CAD, bought parts as they look, screws, glue
+const ASM = JSON.parse(fs.readFileSync(path.join(ROOT, "viewer/data/assembly.json"), "utf8"));
+const parts = {}; for (const m of ASM.meshes) (parts[m.owner] = parts[m.owner] || []).push(m);
+const ASTEP = Object.fromEntries(ASM.steps.map(s => [s.n, s]));
+const SCREW = Object.fromEntries(ASM.screws.map(s => [s.name, s]));
 const LIB = path.join(ROOT, "viewer/lib");
 // printed (blue in every drawing) vs bought (orange)
 const PRINTED_PARTS = ["base", "electronics_tray", "turret_plate", "spine", "top_cap", "carriage_arm", "lift_link", "gripper_frame", "finger_R", "finger_L"];
@@ -23,19 +27,9 @@ const BOUGHT_NAME = { bearing_6807: "6807 ball bearing", turntable_servo_MG996R:
 // steps where a fit needs care (tolerance): what, the size, how to test / fix
 const BOUGHT_SHOW = ["bearing_6807", "LM6UU_L1", "rod_L", "turntable_servo_MG996R", "lift_servo_MG90S", "gripper_servo_SG90", "turntable_horn",
   "axle_R", "can_bumper", "arduino_uno", "buck_XL4015", "mini_breadboard", "capacitor_1000uF", "start_button", "status_led"];
-const FIT = {
-  1: "<b>Ø47.1 mm press fit.</b> Bearing into the base pocket. Too tight: sand the pocket wall a little at a time. Loose: 1 layer of tape.",
-  5: "<b>Ø34.95 mm press fit.</b> Hub into the bearing. Too tight: sand the hub evenly while turning it. The plate must turn freely after.",
-  6: "<b>Ø12.15 mm press fit ×4, in line.</b> Pockets print on their side: ream with a 12 mm drill or sandpaper on a dowel until each LM6UU presses in.",
-  7: "<b>Ø6.0 mm press fit.</b> Rods into the blind holes, straight up. Too tight: drill 6 mm by hand. Rods must be parallel.",
-  8: "<b>Slide test.</b> The carriage must slide down both rods under its own weight. Sticks: ream the tight pocket, re-check the rods are parallel.",
-  10: "<b>Ø6.0 mm, both rods.</b> Tight: drill 6 mm, 8 mm deep. After the screws: the carriage must still slide freely.",
-  12: "<b>Ø3.9 mm running fit.</b> The link must swing freely on the screw. Binds: open the hole with a 5/32 in drill turned by hand.",
-  13: "<b>20 mm horn arm.</b> Measure hole-to-centre: 20 mm (the lift height depends on it).",
-  17: "<b>Gear mesh.</b> Teeth engage with a little play and no binding over the full swing. <u>Never sand or file gear teeth.</u>",
-  18: "<b>Ø3.9 mm running fit.</b> The finger must swing freely on the axle. Tight: twist a 5/32 in drill through by hand.",
-  19: "<b>Spline socket.</b> Snug on the SG90 spline, no wobble. Tight: scrape lightly inside with a knife tip, test after each pass.",
-};
+const NOTES = JSON.parse(fs.readFileSync(path.join(ROOT, "backend/tools/assembly_notes.json"), "utf8"));
+const FIT = Object.fromEntries(Object.entries(NOTES.steps).filter(([, v]) => v.fit).map(([k, v]) => [k, v.fit]));
+const LEVEL = Object.fromEntries(Object.entries(NOTES.steps).map(([k, v]) => [k, v.level || "easy"]));
 
 const DRAW = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff}</style></head><body>
 <script src="file://${LIB}/three.min.js"></script><script>
@@ -46,23 +40,39 @@ renderer.setPixelRatio(2); document.body.appendChild(renderer.domElement);
 let W = 1200, H = 860; renderer.setSize(W, H);
 renderer.setClearColor(0xffffff, 1);
 const geoCache = {};
-function geo(n){ if (geoCache[n]) return geoCache[n]; const p = PARTS[n]; let g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.Float32BufferAttribute(p.v, 3)); g.setIndex(p.f); g = g.toNonIndexed(); g.computeVertexNormals();
-  const e = new THREE.EdgesGeometry(g, 24); return geoCache[n] = [g, e]; }
+function geo(n){ if (geoCache[n]) return geoCache[n];
+  return geoCache[n] = PARTS[n].map(p => { let g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute(p.v, 3)); g.setIndex(p.f); g = g.toNonIndexed(); g.computeVertexNormals();
+    return [g, new THREE.EdgesGeometry(g, p.kind === "printed" || p.kind === "can" ? 24 : 35), p.color, p.kind]; }); }
 // draw(shown, fresh, offsets{name:[dx,dy,dz]}, arrows[[from,to]], az, el, size)
-window.draw = (shown, fresh, offs, arrows, az, el, w, h, focus) => {
+window.draw = (shown, fresh, offs, arrows, az, el, w, h, focus, paths) => {
   W = w || 1200; H = h || 860; renderer.setSize(W, H);
   const scene = new THREE.Scene(); const root = new THREE.Group(); root.rotation.x = -Math.PI/2; scene.add(root);
   scene.add(new THREE.HemisphereLight(0xffffff, 0xb0b0b0, 0.95)); const d = new THREE.DirectionalLight(0xffffff, 0.35); d.position.set(200, 400, 300); scene.add(d);
   const box = new THREE.Box3();
-  for (const n of shown) {
-    const [g, e] = geo(n); const isNew = fresh.includes(n);
-    const pr = PRINTED.includes(n), can = n === "test_can";
-    const col = can ? (isNew ? 0xe04040 : 0xf3c4c4) : pr ? (isNew ? 0x2f72e0 : 0xcadcf6) : (isNew ? 0xf29a2e : 0xe6e6e6);
-    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({color: col, polygonOffset:true, polygonOffsetFactor:1, polygonOffsetUnits:1}));
-    const l = new THREE.LineSegments(e, new THREE.LineBasicMaterial({color: isNew ? 0x000000 : 0x3a3a3a}));
+  for (const n of shown) { if (!PARTS[n]) continue;
+   const isNew = fresh.includes(n);
+   for (const [g, e, hex, kind] of geo(n)) {
+    let c = new THREE.Color(hex);
+    if (kind === "printed") c = new THREE.Color(isNew ? 0x2f72e0 : 0xcadcf6);
+    else if (kind === "can") c = new THREE.Color(isNew ? 0xe04040 : 0xf3c4c4);
+    else if (!isNew && kind !== "glue") c.lerp(new THREE.Color(0xffffff), 0.6);
+    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({color: c, polygonOffset:true, polygonOffsetFactor:1, polygonOffsetUnits:1}));
+    const ecol = kind === "printed" || kind === "can" ? (isNew ? 0x000000 : 0x3a3a3a) : kind === "bought" ? (isNew ? 0xff6a00 : 0xb0b0b0) : kind === "screw" ? (isNew ? 0x202020 : 0xaaaaaa) : 0x9a7a00;
+    const l = new THREE.LineSegments(e, new THREE.LineBasicMaterial({color: ecol}));
     const o = offs[n] || [0,0,0]; m.position.set(...o); l.position.set(...o); root.add(m); root.add(l);
     g.computeBoundingBox(); const b = g.boundingBox.clone(); b.translate(new THREE.Vector3(...o)); box.union(b);
+   }
+  }
+  for (const [a, b] of (paths || [])) {                       // screw paths: red dashed line through the hole
+    const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), dir = B.clone().sub(A), L = dir.length(); dir.normalize();
+    const mat = new THREE.MeshBasicMaterial({ color: 0xe00000, depthTest: false });
+    for (let t = 0; t < L; t += 4.2) {                         // thick red dashes (WebGL lines are 1 px)
+      const seg = Math.min(2.6, L - t), cy = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, seg, 8), mat);
+      cy.position.copy(A.clone().addScaledVector(dir, t + seg / 2)); cy.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+      cy.renderOrder = 5; root.add(cy);
+    }
+    box.expandByPoint(A);
   }
   for (const [a, b] of arrows) {
     const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), dir = B.clone().sub(A), L = dir.length();
@@ -73,7 +83,7 @@ window.draw = (shown, fresh, offs, arrows, az, el, w, h, focus) => {
   // orthographic camera fitted to the drawing (or to the new parts + their arrows, when zoomed)
   if (focus && focus.length) {
     const fb = new THREE.Box3();
-    for (const n of focus) { const [g] = geo(n); g.computeBoundingBox(); const b = g.boundingBox.clone(); b.translate(new THREE.Vector3(...(offs[n] || [0,0,0]))); fb.union(b); }
+    for (const n of focus) { if (!PARTS[n]) continue; for (const [g] of geo(n)) { g.computeBoundingBox(); const b = g.boundingBox.clone(); b.translate(new THREE.Vector3(...(offs[n] || [0,0,0]))); fb.union(b); } }
     for (const [a, b] of arrows) { fb.expandByPoint(new THREE.Vector3(...a)); fb.expandByPoint(new THREE.Vector3(...b)); }
     const c = fb.getCenter(new THREE.Vector3()), sz = fb.getSize(new THREE.Vector3());
     const half = Math.max(45, Math.max(sz.x, sz.y, sz.z) * 0.9);
@@ -97,9 +107,9 @@ window.draw = (shown, fresh, offs, arrows, az, el, w, h, focus) => {
 window.ready = true;
 </script></body></html>`;
 
-const ALL = Object.keys(parts).filter(n => n !== "test_can");
-function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
-  for (let i = 0; i < v.length; i += 3) for (let k = 0; k < 3; k++) { lo[k] = Math.min(lo[k], v[i + k]); hi[k] = Math.max(hi[k], v[i + k]); }
+const ALL = Object.keys(parts).filter(n => n !== "test_can" && !n.startsWith("glue"));
+function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
+  for (const m of parts[n]) { const v = m.v; for (let i = 0; i < v.length; i += 3) for (let k = 0; k < 3; k++) { lo[k] = Math.min(lo[k], v[i + k]); hi[k] = Math.max(hi[k], v[i + k]); } }
   return lo.map((l, k) => (l + hi[k]) / 2); }
 
 (async () => {
@@ -128,7 +138,11 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
     const ZOOM = { 11: [-150, 15], 12: [-150, 20], 13: [-160, 15], 14: [-140, 20], 15: [-140, 20], 16: [-130, 25],
                    17: [-115, 50], 18: [-115, 50], 19: [-115, 45], 20: [-60, 30] };
     const [az, el] = ZOOM[s.n] || [s.az, s.el];
-    await p.evaluate(([sh, nw, o, a, az, el, f]) => window.draw(sh, nw, o, a, az, el, 1200, 860, f), [s.show, s.new, offs, arr, az, el, ZOOM[s.n] ? s.new : null]);
+    const A = ASTEP[s.n], paths = [];
+    for (const nm of A.screws) { const sc = SCREW[nm]; offs[nm] = sc.axis.map(c => -c * 18);
+      paths.push([sc.head.map((v, k) => v - sc.axis[k] * 34), sc.head.map((v, k) => v + sc.axis[k] * sc.length)]); }
+    const fresh = [...s.new, ...A.screws, ...A.glue, ...(s.n === 3 ? ["ballast"] : [])];
+    await p.evaluate(([sh, nw, o, a, az, el, f, pa]) => window.draw(sh, nw, o, a, az, el, 1200, 860, f, pa), [A.show, fresh, offs, arr, az, el, ZOOM[s.n] ? [...s.new, ...A.screws] : null, paths]);
     await shot(`step_${String(s.n).padStart(2, "0")}.png`);
   }
   // parts page: every printed part on its own
@@ -162,6 +176,10 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   .foot{position:absolute;left:62mm;right:14mm;bottom:8mm;display:grid;gap:2mm}
   .fit{display:flex;gap:3mm;align-items:flex-start;background:#ffe3e3;border:3px solid #c40000;border-radius:2.5mm;padding:2mm 3mm;font-size:16px;line-height:1.3}
   .fitb{background:#c40000;color:#fff;font-weight:700;font-size:18px;padding:.5mm 2.5mm;border-radius:1.5mm;flex:none}
+  .side{position:absolute;right:14mm;top:36mm;width:94mm;bottom:9mm;display:flex;flex-direction:column;gap:2.5mm;font-size:15px;line-height:1.3}
+  .lv{color:#fff;font-weight:800;font-size:20px;padding:1.5mm 3mm;border-radius:2mm;letter-spacing:.03em}
+  .sbox{border:2px solid #000;border-radius:2mm;padding:2mm 2.5mm}
+  .gluebox{border:3px solid #c9a400;background:#fff3b0;border-radius:2mm;padding:2mm 2.5mm}
   .note,.note2{font-size:17px;border-top:2px solid #000;padding-top:2mm;font-weight:600}
   .note{position:absolute;left:62mm;right:14mm;bottom:9mm}
   .warn::before{content:"!";display:inline-block;width:7mm;height:7mm;border:2.4px solid #000;border-radius:50%;text-align:center;font-weight:700;margin-right:2mm;line-height:6.4mm}
@@ -221,10 +239,14 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
     <p style="font-size:16px;margin-top:4mm"><span class="warn"></span>Before building: bench-test the electronics (docs/13_electronics_bench_test.md) and set the buck to <b>5.8 V</b>.</p></div></div></div>`;
   H += `<div class="pg"><h2><span class="chip pr" style="font-size:22px">PRINTED parts</span> &nbsp;blue in every drawing · 10 parts</h2><div class="grid">${printed.map(n => `<div class="cell" style="border-color:#1a4fa8"><img src="${img(`part_${n}.png`)}"><b>${PN[n]}</b><br>${NAME[n]}</div>`).join("")}</div></div>`;
   H += `<div class="pg"><h2><span class="chip bo" style="font-size:22px">BOUGHT parts</span> &nbsp;orange in every drawing · not printed</h2><div class="grid">${BOUGHT_SHOW.map(n => `<div class="cell" style="border-color:#a85f00"><img src="${img(`bought_${n}.png`)}"><b>${BOUGHT_NAME[n]}</b>${{ LM6UU_L1: " ×4", rod_L: " ×2", lift_servo_MG90S: " ×2" }[n] || ""}</div>`).join("")}</div></div>`;
-  H += `<div class="pg"><h2><span class="fitb" style="font-size:24px">FIT</span> &nbsp;Fits that need care (check these with calipers or by test-fitting)</h2>
-    <table style="width:100%;font-size:16px;margin-top:3mm"><tr><th style="width:18mm">Step</th><th style="width:60mm">Title</th><th>Size, test and fix</th></tr>
-    ${Object.entries(FIT).map(([n, t]) => `<tr><td style="font-size:22px;font-weight:700;text-align:center">${n}</td><td>${steps.find(x => x.n == n).title}</td><td>${t}</td></tr>`).join("")}</table>
-    <p style="font-size:16px;margin-top:3mm"><b>Rule:</b> sand or drill a little at a time and test after every few strokes: plastic can't be added back. Too loose: one layer of tape or a drop of superglue.</p></div>`;
+  H += `<div class="pg"><h2>Fit level of every step: start with the easy ones while the precise parts print</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:3mm">
+    ${["precise", "try", "easy"].map(k => { const v = NOTES.levels[k]; const ns = steps.filter(x => LEVEL[x.n] === k);
+      return `<div style="border:3px solid ${v.color};border-radius:3mm;padding:3mm"><div class="lv" style="background:${v.color}">${k === "precise" ? "⚠ " : ""}${v.label}</div>
+        <p style="font-size:14.5px;margin:2mm 0">${v.text}</p>
+        <table style="width:100%;font-size:14.5px">${ns.map(x => `<tr><td style="width:12mm;font-weight:700;font-size:18px;text-align:center">${x.n}</td><td>${x.title}${FIT[x.n] ? `<br><small>${FIT[x.n].replace(/<[^>]+>/g, "").split(/\.\s/)[0]}</small>` : ""}</td></tr>`).join("")}</table></div>`; }).join("")}
+    </div>
+    <div style="margin-top:4mm;font-size:15px"><b>Do while waiting:</b> ${NOTES.while_waiting.join(" · ")}.</div></div>`;
 
   // ---------------- PART E: electronics first (circuit + bench test), before any mechanical step
   H += `<div class="pg"><h1>PART E</h1><div style="font-size:18px;margin-top:3mm">Electronics first: wire it flat on the table and test it while the parts print</div>
@@ -295,10 +317,18 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
     const pr = first.filter(n => PRINTED_PARTS.includes(n)), bo = {};
     for (const n of first.filter(n => !PRINTED_PARTS.includes(n) && n !== "test_can")) { const k = BOUGHT_NAME[n] || n; bo[k] = (bo[k] || 0) + 1; }
     const chips = `<div class="chips">${pr.map(n => `<span class="chip pr">PRINTED · ${NAME[n]} <small>${PN[n]}</small></span>`).join("")}${Object.entries(bo).map(([k, q]) => `<span class="chip bo">BOUGHT · ${q > 1 ? q + "× " : ""}${k}</span>`).join("")}</div>`;
-    const fit = FIT[s.n] ? `<div class="fit"><span class="fitb">FIT</span><div>${FIT[s.n]}</div></div>` : "";
-    H += `<div class="pg"><div class="num">${s.n}</div><div class="ttl">${s.title}</div>${s.n === 1 ? '<div class="sec">PART M</div>' : ""}${chips}${box}${badge}
-      <div class="img" style="${fit ? "bottom:46mm;" : ""}${pr.length + Object.keys(bo).length > 3 ? "top:44mm" : ""}"><img src="${img(`step_${String(s.n).padStart(2, "0")}.png`)}"></div>
-      <div class="foot">${fit}${s.note ? `<div class="note2 ${/GLUE|must|first|don't|5.8/.test(s.note) ? "warn" : ""}">${s.note}</div>` : ""}</div></div>`;
+    const N = NOTES.steps[String(s.n)] || {}, lv = NOTES.levels[LEVEL[s.n]];
+    const A = ASTEP[s.n], sk = {}; for (const nm of A.screws) { const k = SCREW[nm].kind; sk[k] = (sk[k] || 0) + 1; }
+    const side = `<div class="side">
+      <div class="lv" style="background:${lv.color}">${LEVEL[s.n] === "precise" ? "⚠ " : ""}${lv.label}</div>
+      ${s.badge ? `<div class="sbox" style="border-width:3px"><b>Servo angle first:</b> ${s.badge[0]} → <b style="font-size:20px">${s.badge[1]}</b> (laptop panel, or <code>${cmd}</code>)</div>` : ""}
+      ${Object.keys(sk).length ? `<div class="sbox"><b>Screws</b> (red dashed line = path): ${Object.entries(sk).map(([k, q]) => `${q}× ${NOTES.screw_names[k]}`).join(", ")}</div>` : ""}
+      ${N.how ? `<div class="sbox">${N.how}</div>` : (s.note ? `<div class="sbox">${s.note}</div>` : "")}
+      ${N.fit ? `<div class="fit"><span class="fitb">FIT</span><div>${N.fit}</div></div>` : ""}
+      ${N.glue ? `<div class="gluebox"><b>GLUE</b> ${N.glue}</div>` : ""}
+      <div style="font-size:13px;color:#333">Rotate / zoom this step in 3D: <b>viewer/assembly.html#${s.n}</b></div></div>`;
+    H += `<div class="pg"><div class="num">${s.n}</div><div class="ttl">${s.title}</div>${s.n === 1 ? '<div class="sec">PART M</div>' : ""}${chips}
+      <div class="img" style="left:14mm;right:112mm;bottom:8mm;${pr.length + Object.keys(bo).length > 3 ? "top:44mm" : ""}"><img src="${img(`step_${String(s.n).padStart(2, "0")}.png`)}"></div>${side}</div>`;
   }
   H += `<div class="pg"><div class="num">${steps.length + 1}</div><div class="ttl">Wiring</div>
     <div class="img" style="left:14mm;right:110mm;top:28mm"><img src="${imgAny("docs/wiring/wiring_3d_column_clean.png")}"></div>

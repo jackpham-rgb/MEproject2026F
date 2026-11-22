@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>3D Assembly Guide</title>
+<meta name="description" content="Concept A can flipper: step-by-step 3D assembly. Rotate, zoom and pan every step; screws, glue and fit levels shown.">
+<style>
+:root{--ground:#eef1f4;--panel:#fff;--ink:#14181d;--muted:#56606c;--line:#cfd6de;--accent:#2f6fdb;
+  --pr:#2f72e0;--bo:#e8891c;--precise:#c40000;--try:#c77700;--easy:#1f7a45;--glue:#d9b400;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#101317;--panel:#181c22;--ink:#e8ecf1;--muted:#9aa4b1;--line:#2c333c;--accent:#6b9cf0;
+  --precise:#ff5a5a;--try:#f0a830;--easy:#5fd08e;--glue:#ffe14d;color-scheme:dark}}
+:root[data-theme="dark"]{--ground:#101317;--panel:#181c22;--ink:#e8ecf1;--muted:#9aa4b1;--line:#2c333c;--accent:#6b9cf0;
+  --precise:#ff5a5a;--try:#f0a830;--easy:#5fd08e;--glue:#ffe14d;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ground);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{display:grid;grid-template-columns:270px 1fr 380px;height:100vh;height:100dvh}
+#app>*{min-width:0}
+#steps{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto}
+#steps h1{font-size:17px;margin:0;padding:14px 14px 4px}
+#steps .sub{font-size:12.5px;color:var(--muted);padding:0 14px 10px}
+#steps .sub a{color:var(--accent)}
+.st{display:flex;gap:9px;align-items:center;width:100%;padding:8px 12px;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.st:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.st.on{background:color-mix(in srgb,var(--accent) 16%,transparent);box-shadow:inset 3px 0 0 var(--accent)}
+.st .n{font-weight:800;font-size:16px;width:24px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
+.st .t{flex:1;min-width:0;font-size:14px}
+.dot{width:11px;height:11px;border-radius:50%;flex:none}
+.dot.precise{background:var(--precise)}.dot.try{background:var(--try)}.dot.easy{background:var(--easy)}
+#view{position:relative;min-width:0}
+#view canvas{display:block;width:100%;height:100%;touch-action:none}
+#tools{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap;max-width:calc(100% - 20px)}
+button.tb,label.tb{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:6px 10px;font:600 13px system-ui,sans-serif;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+label.tb input{margin:0}
+#legend{position:absolute;left:10px;bottom:10px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:12.5px;display:grid;gap:3px}
+#legend span{display:flex;gap:6px;align-items:center}
+.sw{width:14px;height:10px;border-radius:2px;display:inline-block}
+#nav{position:absolute;right:10px;bottom:10px;display:flex;gap:6px}
+#nav button{font-size:15px;padding:9px 16px}
+#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lab{position:absolute;transform:translate(-50%,-120%);background:rgba(20,24,29,.86);color:#fff;font:600 12px system-ui,sans-serif;padding:3px 7px;border-radius:5px;white-space:nowrap}
+.lab.pr{background:#1f58b8}.lab.bo{background:#b35f00}.lab.sc{background:#444}.lab.gl{background:#8a7200}
+#info{background:var(--panel);border-left:1px solid var(--line);overflow-y:auto;padding:16px}
+#info .big{font-size:44px;font-weight:800;line-height:1;margin-right:10px}
+#info h2{font-size:20px;margin:0;line-height:1.2}
+.head{display:flex;align-items:center;margin-bottom:10px}
+.lvl{display:block;border-radius:8px;padding:9px 11px;margin:10px 0;font-size:14px;color:#fff}
+.lvl b{display:block;font-size:15px;letter-spacing:.04em}
+.lvl.precise{background:var(--precise)}.lvl.try{background:var(--try)}.lvl.easy{background:var(--easy)}
+.box{border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:10px 0;font-size:14px}
+.box h3{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 5px}
+.box.fit{border:2px solid var(--precise);background:color-mix(in srgb,var(--precise) 9%,transparent)}
+.box.glue{border:2px solid var(--glue);background:color-mix(in srgb,var(--glue) 14%,transparent)}
+.chip{display:inline-block;font:700 12.5px system-ui,sans-serif;padding:3px 8px;border-radius:6px;margin:0 4px 4px 0}
+.chip.pr{background:#2f72e0;color:#fff}.chip.bo{background:#e8891c;color:#111}.chip.sc{background:#5b6470;color:#fff}.chip.gl{background:#ffe14d;color:#111}
+ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
+#loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted)}
+@media (max-width:900px){
+  #app{grid-template-columns:1fr;grid-template-rows:auto 52vh 1fr;height:auto;min-height:100dvh}
+  #steps{border-right:0;border-bottom:1px solid var(--line);max-height:none;overflow:visible}
+  #steps .list{display:flex;overflow-x:auto;gap:0}
+  .st{flex:none;width:auto;border-top:0;border-right:1px solid var(--line);padding:8px 10px}
+  .st .t{display:none}
+  #view{height:52vh}
+  #info{border-left:0;border-top:1px solid var(--line)}
+  #legend{display:none}
+  #nav button{padding:8px 12px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="steps"><h1>3D assembly guide</h1>
+    <div class="sub">Drag to rotate · scroll / pinch to zoom · right-drag / two fingers to pan. <a href="../index.html">All viewers</a> · <a href="../docs/12_assembly_manual.pdf">PDF manual</a></div>
+    <div class="list" id="list"></div></aside>
+  <main id="view"><div id="loading">Loading the 3D parts (5 MB)…</div><div id="labels"></div>
+    <div id="tools">
+      <button class="tb" id="replay">▶ Replay step</button>
+      <button class="tb" id="fit">⤢ Fit view</button>
+      <label class="tb"><input type="checkbox" id="ghost" checked> Fade other parts</label>
+      <label class="tb"><input type="checkbox" id="showlab" checked> Labels</label>
+      <label class="tb"><input type="checkbox" id="real"> Real colours for printed</label>
+    </div>
+    <div id="legend">
+      <span><i class="sw" style="background:#2f72e0"></i> printed part</span>
+      <span><i class="sw" style="background:#fff;border:2px solid #ff8a00"></i> bought part, real look (orange outline = new)</span>
+      <span><i class="sw" style="background:#9aa1aa"></i> screw · dashed line = its path</span>
+      <span><i class="sw" style="background:#ffe14d"></i> glue</span>
+    </div>
+    <div id="nav"><button class="tb" id="prev">◀ Back</button><button class="tb" id="next">Next ▶</button></div>
+  </main>
+  <aside id="info"></aside>
+</div>
+<script src="lib/three.min.js"></script>
+<script src="lib/OrbitControls.js"></script>
+<script>
+(async () => {
+const $ = id => document.getElementById(id);
+let D;
+try { D = await (await fetch("data/assembly.json")).json(); }
+catch (e) { $("loading").textContent = "Couldn't load data/assembly.json. Open this page from the project website (or a local web server), not as a file."; return; }
+$("loading").remove();
+
+// ---------------- scene
+const view = $("view");
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+view.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const dark = matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light";
+scene.background = new THREE.Color(dark ? 0x15191e : 0xf3f5f8);
+const camera = new THREE.PerspectiveCamera(35, 1, 1, 5000);
+camera.up.set(0, 0, 1);
+camera.position.set(-260, -320, 240);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.12; controls.screenSpacePanning = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x9098a4, 0.85));
+const sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(-200, -300, 500); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(300, 200, 150); scene.add(fill);
+const grid = new THREE.GridHelper(600, 30, dark ? 0x3a424c : 0xc7ced6, dark ? 0x262c33 : 0xe1e6eb);
+grid.rotation.x = Math.PI / 2; grid.position.set(0, -60, -0.05); scene.add(grid);
+
+function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(view);
+
+// ---------------- meshes, grouped by owner part
+const PRINTED_COL = new THREE.Color(0x2f72e0), BOUGHT_HI = new THREE.Color(0xe8891c);
+const owners = {};           // owner -> {group, items:[{mesh, edges, base, kind}]}
+for (const m of D.meshes) {
+  let g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(m.v, 3)); g.setIndex(m.f);
+  g = g.toNonIndexed(); g.computeVertexNormals();
+  const base = new THREE.Color(m.color);
+  const mat = new THREE.MeshStandardMaterial({ color: base.clone(), roughness: m.kind === "screw" || m.kind === "bought" ? 0.45 : 0.6,
+    metalness: m.kind === "screw" ? 0.6 : 0.05, transparent: true, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+  const mesh = new THREE.Mesh(g, mat);
+  let edges = null;
+  if (m.kind === "printed" || m.kind === "can") {
+    edges = new THREE.LineSegments(new THREE.EdgesGeometry(g, 28), new THREE.LineBasicMaterial({ color: 0x0b1a33, transparent: true }));
+  } else if (m.kind === "bought") {
+    edges = new THREE.LineSegments(new THREE.EdgesGeometry(g, 35), new THREE.LineBasicMaterial({ color: 0xff8a00, transparent: true }));
+  }
+  const o = owners[m.owner] || (owners[m.owner] = { group: new THREE.Group(), items: [] });
+  o.group.add(mesh); if (edges) o.group.add(edges);
+  o.items.push({ mesh, edges, base, kind: m.kind });
+}
+for (const [n, o] of Object.entries(owners)) { o.group.name = n; scene.add(o.group); o.group.visible = false;
+  const b = new THREE.Box3().setFromObject(o.group); o.box = b; o.center = b.getCenter(new THREE.Vector3()); }
+const screwBy = Object.fromEntries(D.screws.map(s => [s.name, s]));
+const glueSet = new Set(D.glue.map(g => g.name));
+const printedSet = new Set(D.printed);
+
+// ---------------- step list
+const LV = D.levels;
+const steps = [{ n: 0, title: "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can").concat(["test_can"]), screws: [], glue: [] }, ...D.steps];
+const list = $("list");
+steps.forEach((s, i) => {
+  const b = document.createElement("button"); b.className = "st"; b.dataset.i = i;
+  b.innerHTML = `<span class="n">${s.n || "★"}</span>${s.level ? `<i class="dot ${s.level}" title="${LV[s.level].label}"></i>` : ""}<span class="t">${s.title}</span>`;
+  b.onclick = () => go(i); list.appendChild(b);
+});
+
+// ---------------- paths (dashed lines for this step's screws)
+let pathLines = [];
+function clearPaths() { pathLines.forEach(l => scene.remove(l)); pathLines = []; }
+function addPath(sc) {
+  const h = new THREE.Vector3(...sc.head), a = new THREE.Vector3(...sc.axis);
+  const g = new THREE.BufferGeometry().setFromPoints([h.clone().addScaledVector(a, -34), h.clone().addScaledVector(a, sc.length)]);
+  const l = new THREE.Line(g, new THREE.LineDashedMaterial({ color: dark ? 0xffd34d : 0xc40000, dashSize: 2.2, gapSize: 1.6, depthTest: false, transparent: true }));
+  l.computeLineDistances(); l.renderOrder = 10; scene.add(l); pathLines.push(l);
+}
+
+// ---------------- state + animation
+let cur = 0, anim = null;
+const ghostEl = $("ghost"), labEl = $("showlab"), realEl = $("real");
+function styleOwner(n, isNew) {
+  const o = owners[n]; if (!o) return;
+  const ghost = ghostEl.checked && !isNew && cur > 0;
+  for (const it of o.items) {
+    let c = it.base.clone();
+    if (it.kind === "printed") c = realEl.checked ? new THREE.Color(0x8fa3b8) : PRINTED_COL.clone();
+    if (ghost) c.lerp(new THREE.Color(dark ? 0x2a3038 : 0xffffff), 0.55);
+    it.mesh.material.color.copy(c);
+    it.mesh.material.opacity = ghost ? 0.5 : 1; it.mesh.material.depthWrite = !ghost;
+    if (it.edges) { it.edges.material.opacity = ghost ? 0.18 : 0.75;
+      if (it.kind === "bought") it.edges.visible = isNew && cur > 0; }
+  }
+}
+function offsetFor(s, n) {
+  if (!s.dist || !(s.new.includes(n))) return null;
+  const d = (s.per_part_dir && s.per_part_dir[n]) || s.dir; if (!d) return null;
+  return new THREE.Vector3(...d).multiplyScalar(Math.min(s.dist, 70));
+}
+function go(i) {
+  cur = Math.max(0, Math.min(steps.length - 1, i));
+  const s = steps[cur];
+  document.querySelectorAll(".st").forEach(b => b.classList.toggle("on", +b.dataset.i === cur));
+  const sel = document.querySelector(`.st[data-i="${cur}"]`); sel && sel.scrollIntoView({ block: "nearest", inline: "nearest" });
+  const show = new Set(s.show), fresh = new Set([...s.new, ...s.screws, ...s.glue]);
+  for (const [n, o] of Object.entries(owners)) { o.group.visible = show.has(n); o.group.position.set(0, 0, 0); o.group.rotation.set(0, 0, 0); styleOwner(n, fresh.has(n) || cur === 0); }
+  clearPaths(); s.screws.forEach(n => addPath(screwBy[n]));
+  renderInfo(s); frame(s, true); play(s);
+}
+function play(s) {
+  const t0 = performance.now();
+  anim = { s, t0 };
+}
+function tick(now) {
+  if (anim) {
+    const { s, t0 } = anim, t = (now - t0) / 1000;
+    const ease = x => x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3);
+    const kPart = ease((t - 0.3) / 1.3);
+    for (const n of s.new) { const o = owners[n], off = offsetFor(s, n); if (o && off) o.group.position.copy(off.clone().multiplyScalar(1 - kPart)); }
+    s.screws.forEach((n, j) => {
+      const o = owners[n], sc = screwBy[n]; if (!o) return;
+      const k = ease((t - 1.7 - j * 0.18) / 0.9), a = new THREE.Vector3(...sc.axis);
+      o.group.position.copy(a.clone().multiplyScalar(-30 * (1 - k)));
+      // spin about the screw axis
+      const h = new THREE.Vector3(...sc.head);
+      o.group.position.add(h); o.group.quaternion.setFromAxisAngle(a, (1 - k) * Math.PI * 6);
+      o.group.position.sub(h.clone().applyQuaternion(o.group.quaternion));
+    });
+    s.glue.forEach(n => { const o = owners[n]; if (o) o.items.forEach(it => it.mesh.material.opacity = 0.55 + 0.45 * Math.abs(Math.sin(t * 3))); });
+    if (t > 4.5 + s.screws.length * 0.18) { s.glue.forEach(n => { const o = owners[n]; if (o) o.items.forEach(it => it.mesh.material.opacity = 1); }); anim = null; }
+  }
+  controls.update(); renderer.render(scene, camera); labels(); requestAnimationFrame(tick);
+}
+function frame(s, smooth) {
+  const fresh = cur === 0 ? s.show : [...s.new, ...s.screws, ...s.glue];
+  const box = new THREE.Box3(), ctx = new THREE.Box3();
+  for (const n of fresh) if (owners[n]) { box.union(owners[n].box); const off = offsetFor(s, n); if (off) { const b = owners[n].box.clone(); b.translate(off); box.union(b); } }
+  for (const n of s.show) if (owners[n] && n !== "test_can") ctx.union(owners[n].box);
+  if (box.isEmpty()) box.copy(ctx);
+  const c = box.getCenter(new THREE.Vector3());
+  const r = Math.max(box.getSize(new THREE.Vector3()).length() * 0.75, ctx.getSize(new THREE.Vector3()).length() * 0.22, 55);
+  const dir = camera.position.clone().sub(controls.target).normalize();
+  if (cur === 0 || !smooth) dir.set(-0.55, -0.68, 0.48).normalize();
+  const dist = r / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 0.9;
+  camGoal = { target: c, pos: c.clone().addScaledVector(dir, dist), t0: performance.now() };
+}
+let camGoal = null;
+const _tick = tick;
+function camStep() {
+  if (camGoal) {
+    const k = Math.min(1, (performance.now() - camGoal.t0) / 700);
+    controls.target.lerp(camGoal.target, k * 0.25 + 0.05); camera.position.lerp(camGoal.pos, k * 0.25 + 0.05);
+    if (k >= 1 && controls.target.distanceTo(camGoal.target) < 0.5) camGoal = null;
+  }
+  requestAnimationFrame(camStep);
+}
+renderer.domElement.addEventListener("pointerdown", () => { camGoal = null; });
+renderer.domElement.addEventListener("wheel", () => { camGoal = null; }, { passive: true });
+
+// ---------------- labels
+const labBox = $("labels");
+function labels() {
+  labBox.innerHTML = ""; if (!labEl.checked) return;
+  const s = steps[cur]; if (cur === 0) return;
+  const W = renderer.domElement.clientWidth, H = renderer.domElement.clientHeight;
+  const put = (pos, text, cls) => { const p = pos.clone().project(camera); if (p.z > 1) return;
+    const d = document.createElement("div"); d.className = "lab " + cls; d.textContent = text;
+    d.style.left = (p.x * 0.5 + 0.5) * W + "px"; d.style.top = (-p.y * 0.5 + 0.5) * H + "px"; labBox.appendChild(d); };
+  const seen = new Set();
+  for (const n of s.new) { const o = owners[n]; if (!o) continue; const nm = D.names[n] || n; if (seen.has(nm)) continue; seen.add(nm);
+    const c = o.center.clone().add(o.group.position); c.z = o.box.max.z + o.group.position.z; put(c, nm, printedSet.has(n) ? "pr" : "bo"); }
+  const byKind = {};
+  for (const n of s.screws) { const sc = screwBy[n]; (byKind[sc.kind] = byKind[sc.kind] || []).push(sc); }
+  for (const [k, arr] of Object.entries(byKind)) { const sc = arr[0], h = new THREE.Vector3(...sc.head).addScaledVector(new THREE.Vector3(...sc.axis), -36);
+    put(h, `${arr.length}× ${D.screw_names[k]}`, "sc"); }
+  if (s.glue.length) { const g = D.glue.find(x => x.name === s.glue[0]); put(new THREE.Vector3(...g.at), "glue here", "gl"); }
+}
+
+// ---------------- info panel
+function renderInfo(s) {
+  const I = $("info");
+  if (cur === 0) {
+    I.innerHTML = `<div class="head"><span class="big">★</span><h2>Before you start</h2></div>
+      <p>23 steps. Every step shows the new parts flying into place and every screw driving in along its dashed path. Rotate and zoom freely.</p>
+      ${Object.entries(LV).map(([k, v]) => `<div class="lvl ${k}"><b>${v.label}</b>${v.text}<br><small>Steps: ${D.steps.filter(x => x.level === k).map(x => x.n).join(", ")}</small></div>`).join("")}
+      <div class="box"><h3>Do while the precise parts print</h3><ul>${D.while_waiting.map(t => `<li>${t}</li>`).join("")}</ul></div>
+      <div class="box"><h3>Colours</h3><span class="chip pr">blue = printed</span><span class="chip bo">orange outline = bought, new</span><span class="chip sc">grey = screw</span><span class="chip gl">yellow = glue</span><br>Bought parts are drawn as they look (servos, horns, bearings, boards).</div>`;
+    return;
+  }
+  const lv = LV[s.level];
+  const pr = s.new.filter(n => printedSet.has(n)), bo = {};
+  for (const n of s.new.filter(n => !printedSet.has(n))) { const k = D.names[n] || n; bo[k] = (bo[k] || 0) + 1; }
+  const sk = {}; for (const n of s.screws) { const k = screwBy[n].kind; sk[k] = (sk[k] || 0) + 1; }
+  const badge = s.badge ? `<div class="box"><h3>Servo angle first</h3><b>${s.badge[0]}: ${s.badge[1]}</b> (laptop panel) before fitting the horn or the part.</div>` : "";
+  I.innerHTML = `<div class="head"><span class="big">${s.n}</span><h2>${s.title}</h2></div>
+    <div class="lvl ${s.level}"><b>${lv.label}</b>${lv.text}</div>
+    <div>${pr.map(n => `<span class="chip pr">PRINTED · ${D.names[n] || n}</span>`).join("")}${Object.entries(bo).map(([k, q]) => `<span class="chip bo">BOUGHT · ${q > 1 ? q + "× " : ""}${k}</span>`).join("")}
+    ${Object.entries(sk).map(([k, q]) => `<span class="chip sc">${q}× ${D.screw_names[k]}</span>`).join("")}${s.glue.length ? '<span class="chip gl">GLUE</span>' : ""}</div>
+    ${s.how ? `<div class="box"><h3>How</h3>${s.how}</div>` : ""}
+    ${s.fit ? `<div class="box fit"><h3>Fit</h3>${s.fit}</div>` : ""}
+    ${s.glue_text ? `<div class="box glue"><h3>Glue</h3>${s.glue_text}</div>` : ""}
+    ${badge}
+    ${s.note && !s.how ? `<div class="box">${s.note}</div>` : ""}
+    ${s.screws.length ? `<div class="box"><h3>Screw path</h3>The dashed line shows where each screw goes in and which way. ${s.screws.length} screw${s.screws.length > 1 ? "s" : ""} in this step.</div>` : ""}`;
+}
+
+// ---------------- controls
+$("prev").onclick = () => go(cur - 1); $("next").onclick = () => go(cur + 1);
+$("replay").onclick = () => go(cur); $("fit").onclick = () => frame(steps[cur], false);
+[ghostEl, realEl].forEach(e => e.onchange = () => go(cur));
+addEventListener("keydown", e => { if (e.key === "ArrowRight") go(cur + 1); if (e.key === "ArrowLeft") go(cur - 1); });
+resize(); go(+(location.hash.slice(1)) || 0);
+addEventListener("hashchange", () => go(+(location.hash.slice(1)) || 0));
+requestAnimationFrame(tick); requestAnimationFrame(camStep);
+})();
+</script>
+</body>
+</html>

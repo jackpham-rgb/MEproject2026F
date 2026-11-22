@@ -1,0 +1,178 @@
+{
+ "names": {
+  "base": "Base",
+  "electronics_tray": "Electronics tray",
+  "turret_plate": "Turret plate",
+  "spine": "Spine",
+  "top_cap": "Top cap",
+  "carriage_arm": "Carriage + arm",
+  "lift_link": "Lift link",
+  "gripper_frame": "Gripper frame",
+  "finger_R": "Right finger (gear)",
+  "finger_L": "Left finger (gear + servo socket)",
+  "bearing_6807": "6807 ball bearing",
+  "turntable_servo_MG996R": "MG996R servo",
+  "turntable_horn": "Round servo horn (MG996R)",
+  "LM6UU_L1": "LM6UU linear bearing",
+  "LM6UU_L2": "LM6UU linear bearing",
+  "LM6UU_R1": "LM6UU linear bearing",
+  "LM6UU_R2": "LM6UU linear bearing",
+  "rod_L": "6 mm steel rod",
+  "rod_R": "6 mm steel rod",
+  "lift_servo_MG90S": "MG90S servo (lift)",
+  "lift_crank": "Single-arm horn, cut to 20 mm",
+  "wrist_servo": "MG90S servo (wrist)",
+  "wrist_horn": "Round servo horn (micro)",
+  "gripper_servo_SG90": "SG90 servo (gripper)",
+  "axle_R": "#6-32 screw as the axle",
+  "can_bumper": "Rubber pad 9 x 13.5 mm",
+  "arduino_uno": "Arduino Uno",
+  "buck_XL4015": "XL4015 buck converter",
+  "mini_breadboard": "Mini breadboard",
+  "capacitor_1000uF": "1000 uF capacitor",
+  "start_button": "12 mm push button",
+  "status_led": "5 mm LED + 220 ohm",
+  "dc_jack": "DC jack / terminal tip",
+  "ballast": "~100 g washers (ballast)",
+  "test_can": "Coke can"
+ },
+ "screw_names": {
+  "#6": "#6-32 x 1/2\" pan head",
+  "#8": "#8-32 x 1/2\" pan head",
+  "sb": "servo-bag screw (small, self-tapping)",
+  "M3": "horn centre screw (servo bag)"
+ },
+ "steps": {
+  "1": {
+   "fit": "<b>Ø47.1 mm press fit.</b> Bearing into the base pocket. Too tight: sand the pocket wall a little at a time. Loose: 1 layer of tape.",
+   "how": "Push on the OUTER ring only, evenly: flat block on top, squeeze in a vise or press with both thumbs. No glue.",
+   "level": "precise"
+  },
+  "2": {
+   "how": "4 x #8-32 screws from UNDERNEATH: through the 4 holes in the servo's tabs, up into the 2 printed blocks inside the base. They cut their own thread in the plastic: snug, don't over-tighten (it strips).",
+   "level": "easy"
+  },
+  "3": {
+   "glue": "Hot glue or tape the washers into the 2 back pockets: the pockets are open underneath, loose weight just stays on the table.",
+   "how": "~50 g of washers / coins / small rocks in each back pocket, glued in. Optional: 4 rubber feet or hot-glue dots under the base.",
+   "level": "easy"
+  },
+  "4": {
+   "how": "Turn the servo to 135° first (laptop panel: Base 135, or servo_setup: t 135). Press the round horn onto the spline with its 4 inner holes on the diagonals (45°, 135°…), as close as the spline teeth allow, then the small centre screw from the servo bag.",
+   "level": "easy"
+  },
+  "5": {
+   "fit": "<b>Ø34.95 mm press fit.</b> Hub into the bearing's inner ring. Too tight: sand the hub evenly while turning it. The plate must turn freely after.",
+   "how": "The hub drops into the bearing's inner ring and covers the horn (the horn sits inside the hub). Turn the horn until its 4 holes line up with the 4 holes in the plate, then drive 4 servo-bag screws DOWN through the plate into the horn. No glue: the 4 screws carry the turning force, the bearing carries the weight (the plate's shoulder rests on the inner ring) and the hub keeps it centred. The plate looks small next to the bearing because the bearing does the holding. If your horn has no holes on that circle: use the plate as a drill guide, 1.5 mm pilots through the horn. Superglue only if the hub is loose in the bearing.",
+   "level": "precise"
+  },
+  "6": {
+   "fit": "<b>Ø12.15 mm press fit ×4, in line.</b> Pockets print on their side: ream with a 12 mm drill or sandpaper on a dowel until each LM6UU presses in.",
+   "how": "2 from below, 2 from above, flush with the faces. Press with a flat block. No glue (a drop of superglue only if one is loose).",
+   "level": "precise"
+  },
+  "7": {
+   "fit": "<b>Ø6.0 mm press fit.</b> Rods into the blind holes, straight up. Too tight: drill 6 mm by hand. Rods must be parallel.",
+   "how": "Push each rod to the bottom of its hole. No screws, no glue: the top cap traps them in step 10.",
+   "level": "precise"
+  },
+  "8": {
+   "fit": "<b>Slide test.</b> The carriage must slide down both rods under its own weight. Sticks: ream the tight pocket, re-check the rods are parallel.",
+   "level": "precise"
+  },
+  "9": {
+   "how": "2 x #6-32 from ABOVE through the spine's foot into the turret plate (self-threading).",
+   "level": "easy"
+  },
+  "10": {
+   "fit": "<b>Ø6.0 mm, both rods.</b> Tight: drill 6 mm, 8 mm deep. After the screws: the carriage must still slide freely.",
+   "how": "2 x #6-32 from ABOVE through the cap into the top of the spine.",
+   "level": "try"
+  },
+  "11": {
+   "how": "Servo body through the bracket from the left, 2 servo-bag screws through its tabs into the bracket.",
+   "level": "easy"
+  },
+  "12": {
+   "fit": "<b>Ø3.9 mm running fit.</b> The link must swing freely on the screw. Binds: open the hole with a 5/32 in drill turned by hand.",
+   "how": "#6-32 through the link into the carriage's small boss: it is the pivot. Stop as soon as it is snug, then back off 1/4 turn so the link turns.",
+   "level": "try"
+  },
+  "13": {
+   "fit": "<b>20 mm horn arm.</b> Measure hole-to-centre: 20 mm (the lift height depends on it).",
+   "how": "Lift servo at 30° first. Horn on the spline + centre screw; a servo-bag screw through the horn's 20 mm hole into the link.",
+   "level": "try"
+  },
+  "14": {
+   "how": "Body through the arm's bracket from the front, 2 servo-bag screws through the tabs.",
+   "level": "easy"
+  },
+  "15": {
+   "how": "Wrist servo at 0° first. Round horn on the spline, holes on the diagonals, centre screw.",
+   "level": "easy"
+  },
+  "16": {
+   "how": "4 servo-bag screws through the frame's flange into the horn. Plates level, opening facing out.",
+   "level": "easy"
+  },
+  "17": {
+   "fit": "<b>Gear mesh: try it on.</b> Teeth engage with a little play and no binding over the full swing. <u>Never sand or file gear teeth.</u> Printers rarely print teeth exactly, so the file is made to be edited: if they bind, print the <b>looser</b> pair (cad/print/stl/finger_variants/, gear_thin 0.18 or 0.25); if they rattle, the <b>tighter</b> pair (0.00). Or set gear_thin in backend/cad/model.py and run backend/cad/finger_variants.py.",
+   "how": "Slide both fingers in together between the plates, both opened by the same angle, so the teeth mesh symmetrically.",
+   "level": "try"
+  },
+  "18": {
+   "fit": "<b>Ø3.9 mm running fit.</b> The finger must swing freely on the axle. Tight: twist a 5/32 in drill through by hand.",
+   "how": "#6-32 from the top through the frame and the right finger, threading into the bottom plate: it is the axle.",
+   "level": "try"
+  },
+  "19": {
+   "fit": "<b>Spline socket.</b> Snug on the SG90 spline, no wobble. Tight: scrape lightly inside with a knife tip, test after each pass.",
+   "how": "Gripper servo at 20° first. Spline down into the left finger's socket (the finger is the horn), 2 servo-bag screws through the tabs into the posts.",
+   "level": "try"
+  },
+  "20": {
+   "glue": "Superglue the rubber pad to the frame where the can's side touches.",
+   "how": "Cut 9 x 13.5 mm from the silicone sheet (or a rubber band / inner tube).",
+   "level": "easy"
+  },
+  "21": {
+   "glue": "A dab of hot glue on each peg holds the Uno and the buck. The breadboard is self-adhesive.",
+   "how": "Boards onto the printed pegs. Buck already set to 5.8 V (bench test).",
+   "level": "easy"
+  },
+  "22": {
+   "how": "Button, LED and DC jack go through the panel holes from the front; their nuts go on inside.",
+   "level": "easy"
+  },
+  "23": {
+   "how": "Tabs slide under the base wall, then 2 x #6-32 from UNDERNEATH through the tabs into the base.",
+   "level": "easy"
+  }
+ },
+ "levels": {
+  "precise": {
+   "label": "PRECISE FIT",
+   "color": "#c40000",
+   "text": "Press fits and alignment that decide whether the robot works. They depend on how your printer prints holes: print and check the tolerance coupon (plate A) first, then measure with calipers. Do these last, with the parts in hand."
+  },
+  "try": {
+   "label": "TRY-FIT",
+   "color": "#c77700",
+   "text": "Test before you tighten: it should turn, slide or mesh freely. Easy to fix with a drill bit by hand, a knife or sandpaper."
+  },
+  "easy": {
+   "label": "EASY",
+   "color": "#1f7a45",
+   "text": "Screws into servo tabs, glue, boards on pegs. Any print quality works: do these while the precise parts are still printing."
+  }
+ },
+ "while_waiting": [
+  "Electronics bench test (PART E) and set the buck to 5.8 V",
+  "Set every servo to its angle (laptop panel) before it gets its horn",
+  "Cut the 2 rods to 112 mm, file the ends",
+  "Cut a single-arm horn to a 20 mm hole radius (step 13)",
+  "Cut the rubber pad 9 x 13.5 mm (step 20)",
+  "Print the electronics tray first (plate C, draft) and do steps 21-22",
+  "Servos into their brackets as soon as each printed part arrives (steps 2, 11, 14)"
+ ]
+}
