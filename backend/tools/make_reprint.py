@@ -12,6 +12,7 @@ Rules (docs/19_reprint_strategy.md, with sources):
   speed     faster perimeters / infill within the stock hotend's PETG flow (8 mm3/s), cubic infill (faster than gyroid)
             where only stiffness matters, 0.28 mm layers on the big base (its pocket accuracy is in X-Y, set by TOL)
 """
+import math
 import os
 import shutil
 import sys
@@ -53,13 +54,51 @@ PER_PART = {"CA-302_lift_link": {"perimeters": "3", "fill_density": "0%", "brim_
             "CA-203_top_cap": {"support_material": "0"}}
 
 
+def stability():
+    """Every reprint part, every way it can lie on the bed: contact area, height, tip ratio. The orientation used is
+    print_prep's choice (stable footprint first, then press fits vertical, then least overhang). Parts that sit on a
+    small area or stand tall for their footprint get a 5 mm brim. Writes cad/print/reprint/STABILITY.md."""
+    sys.path.insert(0, os.path.join(ROOT, "backend", "cad"))
+    import drawings as D
+    import model as M
+    import print_prep as PP
+    import csv
+    chosen = {r["part_no"]: r["bed_face"] for r in csv.DictReader(open(os.path.join(ROOT, "cad", "print", "print_table.csv")))}
+    parts = {p["name"]: p for p in M.build_parts()}
+    pn_of = {v[0]: k for k, v in D.PN.items()}
+    lines = ["# Bed stability of the reprint parts", "",
+             "Contact = flat area touching the bed. Tip ratio = height / √contact (above ~2.5 a part can rock or get knocked",
+             "over by the nozzle). Overhang = flat area printed in the air (needs support). The chosen side is the one in the STL.", ""]
+    brims = {}
+    for _, _, _, pns, _ in PLATES:
+        for pn in pns:
+            nm = pn_of[pn]
+            lines += [f"## {pn} {D.PN[nm][1]}", "", "| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |",
+                      "|---|---:|---:|---:|---:|---|---|"]
+            for label, rot in PP.CANDIDATES.items():
+                e = PP.evaluate(PP.orient(parts[nm]["shape"].val(), rot), nm)
+                tip = e["h"] / math.sqrt(max(e["contact"], 1))
+                use = label == chosen.get(pn)
+                lines.append(f"| {label} | {e['contact']:.0f} | {e['h']:.0f} | {tip:.1f} | {e['overhang']:.0f} | {e['press_v']} of {e['press_all']} | {'**used**' if use else ''} |")
+                if use and (e["contact"] < 300 or tip > 2.5):
+                    brims[f"{pn}_{nm}"] = f"contact {e['contact']:.0f} mm², tip {tip:.1f}"
+            lines.append("")
+    lines += ["## Brims added", ""] + ([f"- {k}: {v} → 5 mm brim" for k, v in brims.items()] or ["- none needed"]) + [""]
+    open(os.path.join(OUT, "STABILITY.md"), "w").write("\n".join(lines))
+    return brims
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     for f in os.listdir(OUT):
         if f != "README.md":
             os.remove(os.path.join(OUT, f))
+    brims = stability()
+    per_part = {k: dict(v) for k, v in PER_PART.items()}
+    for k in brims:
+        per_part.setdefault(k, {})["brim_width"] = "5"
     I.main(PLATES, OUT)
-    F.main((), OUT, PLATES, OUT, PER_PART)
+    F.main((), OUT, PLATES, OUT, per_part)
     for name, prof, over, pns, why in PLATES:
         n = name[0]
         for ext in ("3mf", "ini", "stl"):
