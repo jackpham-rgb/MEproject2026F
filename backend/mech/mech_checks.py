@@ -514,9 +514,10 @@ F_link = max(abs(np.array(duty["lift"]["tau"]))) / (Rc / 1000) * 2
 I_l = 7 * 3 ** 3 / 12
 P_cr = math.pi ** 2 * PETG["E"] * I_l / L_LINK ** 2
 check("Strength", "lift link: buckling load / max link force", f"{P_cr / F_link:.0f}×", "≥ 10×", P_cr / F_link >= 10)
-# servo spline socket in the left finger: torque at stall, shear on the socket wall
-tau_sock = SERVO["grip"]["stall"] * 1000 / (2 * math.pi * 3.0 ** 2 * (P["finger_z"][1] - P["finger_z"][0] - 2))
-check("Strength", "SG90 spline socket shear at stall", f"{tau_sock:.2f} MPa", "≤ 10 MPa", tau_sock <= PETG["tau_allow"])
+# SG90 horn screwed to the left gear (2 servo-bag screws, 5 mm from the centre): bearing stress on the pilot wall at stall
+F_hs = SERVO["grip"]["stall"] * 1000 / (2 * P["ghorn_screw_r"])                    # N per screw (stall torque N*m -> N*mm)
+sig_hs = F_hs / (1.7 * (P["finger_z"][1] - P["finger_z"][0] - 1.5))
+check("Strength", "SG90 horn screws: pilot-wall bearing at stall", f"{sig_hs:.2f} MPa", "≤ 20 MPa", sig_hs <= PETG["sigma_allow"])
 # screws in PETG pilots: #6-32 pull-out (2.9 mm pilot, 6 mm engagement, 15 MPa shear, 75 % thread fill)
 F_pull = math.pi * 2.9 * 6 * 15 * 0.75
 F_screw_max = 9.4 * 0.0981 / 0.0495 / 2 * 2                  # MG996R stall reacted by its flange screws (worst screw load)

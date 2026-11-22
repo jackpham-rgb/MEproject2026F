@@ -181,7 +181,7 @@ def build():
         add("turntable_servo_MG996R", "bought", s, c)
     for nm, t, bc, sc in (("lift_servo_MG90S", trsf_axes((ltx, lty, ltz), (0, 0, -1), (-1, 0, 0)), C["black"], C["brass"]),
                           ("wrist_servo", trsf_axes((0, wy, gz), (0, 0, -1), (0, 1, 0)), C["black"], C["brass"]),
-                          ("gripper_servo_SG90", trsf_axes((-pvx, pvy, pt[1] + 0.5 - 5.8), (-1, 0, 0), (0, 0, -1)), C["sg90"], C["white"])):
+                          ("gripper_servo_SG90", trsf_axes((-pvx, pvy, p["grip_spline_tip"]), (-1, 0, 0), (0, 0, -1)), C["sg90"], C["white"])):
         for s, c in place(micro_servo_vis(bc, sc), t):
             add(nm, "bought", s, c)
 
@@ -189,6 +189,9 @@ def build():
     add("turntable_horn", "bought", moved(round_horn(12.5, 3.0, 0.9, [(8.0, 4, 45), (10.5, 8, 22.5)]), trsf_axes((0, 0, tz0 - 3), (1, 0, 0), (0, 0, 1))), C["white"])
     add("wrist_horn", "bought", moved(round_horn(10.0, 2.5, 0.7, [(7.0, 4, 45), (4.5, 4, 0)]), trsf_axes((0, wy - 2.5, gz), (1, 0, 0), (0, 1, 0))), C["white"])
     add("lift_crank", "bought", parts["lift_crank"]["shape"], C["white"])
+    ghz = p["finger_z"][1] + p["ghorn_gap"]                    # SG90 round horn flat on the left gear, hub up into the servo
+    add("gripper_horn", "bought", moved(round_horn(p["ghorn_r"], p["ghorn_disc"], 0.7, [(p["ghorn_screw_r"], 2, 0), (8.0, 4, 45)]),
+                                        trsf_axes((-pvx, pvy, ghz + p["ghorn_disc"]), (1, 0, 0), (0, 0, -1))), C["white"])
 
     # ---- electronics
     uo = (-72.0, ty0 + 8.0)
@@ -290,10 +293,12 @@ def build():
     for a in (45, 135, 225, 315):
         S.append(("gripper_frame", "sb", (7 * math.cos(math.radians(a)), wy + 3, gz + 7 * math.sin(math.radians(a))), (0, -1, 0), 6))
     S.append(("axle_R", "#6", (pvx, pvy, pt[1]), (0, 0, -1), 12.7))
-    tab_z = pt[1] + 0.5 - 5.8 + 10.1
+    tab_z = p["grip_spline_tip"] + 10.1
     gs_cx = -pvx - MICRO_HOLES_X
     for hx in (gs_cx - 13.75, gs_cx + 13.75):
         S.append(("gripper_servo_SG90", "sb", (hx, pvy, tab_z + 2.5), (0, 0, -1), 8))
+    for sx in (-1, 1):                                          # horn -> left gear
+        S.append(("gripper_horn", "sb", (-pvx + sx * p["ghorn_screw_r"], pvy, p["finger_z"][1] + p["ghorn_gap"] + p["ghorn_disc"]), (0, 0, -1), 6))
     for x in (-50, 50):
         S.append(("electronics_tray", "#6", (x, -half + p["base_wall"] + 4, 0.0), (0, 0, 1), 12.7))
     HOLE = {  # what the screw passes through / bites, with the drill bit to use by hand if it is tight
@@ -309,6 +314,7 @@ def build():
         "wrist_horn": "horn centre screw (servo bag)",
         "gripper_frame": "flange Ø1.7 → open to 3/32″ (2.4 mm) · bites the horn",
         "gripper_servo_SG90": "servo tab → post pilot Ø1.7 (1/16″)",
+        "gripper_horn": "horn hole → gear pilot Ø1.7 (1/16″), 5 mm from centre",
         "electronics_tray": "tray clear Ø3.9 (5/32″) → base pilot Ø2.9 (7/64″)",
     }
     screws = []
@@ -350,7 +356,7 @@ def build():
         12: [((-7, 12, cz1 + 2), "Ø3.9 running · 5/32″ bit")],
         13: [((-7, pin[0], pin[1]), "drill to 3/32″ (2.4 mm) · must turn")],
         18: [((pvx, pvy, pt[1]), "Ø3.9 running · 5/32″ bit")],
-        19: [((-pvx, pvy, pt[1]), "socket Ø6.0 → drill to horn-hub size, glue hub in")],
+        19: [((-pvx + p["ghorn_screw_r"], pvy, p["finger_z"][1]), "horn screws → pilots Ø1.7, 5 mm from centre")],
     }
     return meshes, screws, glue, callouts
 

@@ -72,8 +72,8 @@ FITS = [(T["n6_clear"], "#6-32 clearance / running"), (T["n6_pilot"], "#6-32 pil
 FEATURES = {("base", 36.0): "bearing seat floor bore", ("base", 21.0): "ballast washer pocket",
             ("base", 14.0): "cable hole from the turret", ("electronics_tray", 12.2): "12 mm START button",
             ("electronics_tray", 8.2): "DC panel jack", ("electronics_tray", 5.2): "5 mm status LED",
-            ("turret_plate", 27.0): "recess for the Ø25 MG996R horn", ("gripper_frame", 12.2): "SG90 spline + boss clearance",
-            ("finger_L", 6.0): "SG90 spline / horn socket"}
+            ("turret_plate", 27.0): "recess for the Ø25 MG996R horn", ("gripper_frame", 22.0): "opening: the SG90 horn turns in it",
+            ("finger_L", 1.7): "horn screw pilot (2, 5 mm from the gear centre)"}
 
 
 def fit_name(d, part=""):

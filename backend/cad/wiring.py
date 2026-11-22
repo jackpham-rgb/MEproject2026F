@@ -101,8 +101,7 @@ def micro_exit(origin, xdir, zdir):
 lt = P["lift_servo_tip"]
 EX_LIFT = micro_exit(lt, (0, 0, -1), (-1, 0, 0))
 EX_WRIST = micro_exit((0, P["wrist_tip_y"], P["grip_z"]), (0, 0, -1), (0, 1, 0))
-gs_face = P["plate_top"][1] + 0.5
-EX_GRIP = micro_exit((-P["pivot_x"], P["pivot_y"], gs_face - 5.8), (-1, 0, 0), (0, 0, -1))
+EX_GRIP = micro_exit((-P["pivot_x"], P["pivot_y"], P["grip_spline_tip"]), (-1, 0, 0), (0, 0, -1))
 a = math.radians(P["servo_ang"])                             # MG996R: far end face, 8 mm off the table
 EX_TURN = (30.5 * math.cos(a), 30.5 * math.sin(a), 50.0 - 42.0)
 

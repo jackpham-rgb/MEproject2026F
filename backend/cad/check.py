@@ -35,6 +35,8 @@ ALLOWED = {
     frozenset(("wrist_servo", "wrist_horn")),
     frozenset(("wrist_servo", "gripper_frame")),        # spline tip touches the flange face
     frozenset(("gripper_servo_SG90", "finger_L")),
+    frozenset(("gripper_servo_SG90", "gripper_horn")),   # spline in the horn hub
+    frozenset(("gripper_horn", "finger_L")),             # horn screwed flat on the gear
     # finger_L / finger_R: real involute gears now; they must NOT overlap (checked like any other pair)
     frozenset(("axle_R", "finger_R")),
 }

@@ -49,9 +49,13 @@ P = dict(
     # centre distance: standard 16.0); each tooth thinned 0.1 mm at the pitch circle -> 0.2 mm backlash
     pad_z=(46.0, 86.0),        # 40 mm pads centred near can mid-height (61.1)
     pad_t=5.5, pad_half_angle=28.0, grip_open_angle=75.0,
+    # gripper drive (like the earlier prototype): the SG90's round horn sits flat on the left finger's gear,
+    # 2 servo-bag screws through the horn into the gear; the spline goes into the horn's hub from above
+    ghorn_r=10.0, ghorn_disc=1.5, ghorn_hub_r=3.6, ghorn_hub_h=3.0, ghorn_screw_r=5.0, ghorn_gap=0.3,
     print_density=1.27, print_fill=0.60,                             # PETG, ~3 walls + 30 % infill
 )
 P["can_y"] = P["can_r_pos"]
+P["grip_spline_tip"] = P["finger_z"][1] + P["ghorn_gap"] + P["ghorn_disc"] + 0.5   # SG90 spline end, 2.5 mm into the horn hub
 P["base_top_z"] = P["base_h"]
 P["turret_z0"] = 53.0                                                 # servo tip 50 + 3 mm horn
 P["turret_z1"] = P["turret_z0"] + P["turret_t"]                       # 59
@@ -71,6 +75,7 @@ TOL = dict(
     n8_clear=4.6,      # #8-32 (4.17 mm major)
     n8_pilot=3.5,
     servo_pilot=1.7,   # self-tapping screws from the servo bags
+    servo_run=2.4,     # servo-bag screw as a PIN: the part turns on it (lift link crank end)
     rod_press=6.0,     # 6 mm rod: nominal hole prints ~0.1 mm under -> light press fit
     lm_press=12.15,    # LM6UU 12 mm OD: +0.15 -> snug press fit
     run_bore=3.9,      # gear on a #6 screw axle: running clearance
@@ -439,9 +444,9 @@ def build_parts():
             lm = cyl(sx * rx, ry, p["lm_od"] / 2, z0, z1).cut(cyl(sx * rx, ry, 3.0, z0 - 1, z1 + 1))
             add(f"LM6UU_{'L' if sx < 0 else 'R'}{i + 1}", "lift", lm, "buy", mass=8.0)
     link = box(-8.5, -5.5, pin[0] - 3.5, pin[0] + 3.5, cz1 + 2 - 3.5, pin[1] + 3.5)
-    link = link.cut(cyl_dir((-9, 12, cz1 + 2), (1, 0, 0), TOL["n6_clear"] / 2, 4)).cut(cyl_dir((-9, pin[0], pin[1]), (1, 0, 0), TOL["servo_pilot"] / 2, 4))
+    link = link.cut(cyl_dir((-9, 12, cz1 + 2), (1, 0, 0), TOL["n6_clear"] / 2, 4)).cut(cyl_dir((-9, pin[0], pin[1]), (1, 0, 0), TOL["servo_run"] / 2, 4))
     add("lift_link", "lift", link, "PETG", note="Link crank -> carriage. Carriage end: #6-32x1/2 pivot (3.9 mm running hole). "
-        "Crank end: servo-bag screw through the horn into the link.")
+        "Crank end: 2.4 mm running hole, servo-bag screw from outside through the link into the horn (the link turns on it).")
     wsrv = moved(micro_servo_local(), trsf_axes((0, p["wrist_tip_y"], gz), (0, 0, -1), (0, 1, 0)))
     add("wrist_servo", "lift", wsrv, "buy", mass=13.0, note="micro servo that reaches 180 deg (or 270 deg type)")
 
@@ -461,9 +466,11 @@ def build_parts():
     pvx, pvy = p["pivot_x"], p["pivot_y"]
     gr = gr.cut(cyl(pvx, pvy, TOL["n6_clear"] / 2, pt[0] - 1, pt[1] + 1))                 # right axle: clear in the top plate
     gr = gr.cut(cyl(pvx, pvy, TOL["n6_pilot"] / 2, pb[0] - 1, pb[1] + 1))                 # ... threads into the bottom plate
-    gr = gr.cut(cyl(-pvx, pvy, 6.1, pt[0] - 1, pt[1] + 1))                                # servo spline + boss through top plate
+    hz0 = p["finger_z"][1] + p["ghorn_gap"]                                                # horn disc bottom (on the gear)
+    gr = gr.cut(cyl(-pvx, pvy, p["ghorn_r"] + 1.0, pt[0] - 1, pt[1] + 1))                 # the horn turns inside the top plate
     # gripper servo posts (servo tabs at z = pt1 + 0.5 + 6.8)
-    gs_face = pt[1] + 0.5
+    spl_tip = p["grip_spline_tip"]
+    gs_face = spl_tip + 5.8                                                                # servo raised to sit on the horn
     tab_z = gs_face - 5.8 + 10.1                                                          # underside of the servo tabs
     gs_cx = -pvx - MICRO_HOLES_X
     for hx in (gs_cx - 13.75, gs_cx + 13.75):
@@ -471,7 +478,7 @@ def build_parts():
     add("gripper_frame", "wrist", gr, "PETG", note="Flange + 2 plates + posts in one print. Wrist horn: 4 servo-bag "
         "screws. Right gear axle: #6-32x1/2 from the top. Left gear rides on the gripper-servo horn. Servo: 2 servo-bag screws.")
     add("can_bumper", "wrist", box(-2.5, 2.5, py1, py1 + 1.6, pb[0], pt[1]), "silicone", note="can stop, 5 mm wide (clears the gear tips by 0.67 mm), cut from the 1/16 in silicone sheet: place the can against it")
-    gsrv = moved(micro_servo_local(), trsf_axes((-pvx, pvy, gs_face - 5.8), (-1, 0, 0), (0, 0, -1)))
+    gsrv = moved(micro_servo_local(), trsf_axes((-pvx, pvy, spl_tip), (-1, 0, 0), (0, 0, -1)))
     add("gripper_servo_SG90", "wrist", gsrv, "buy", mass=9.0)
     add("axle_R", "wrist", cyl(pvx, pvy, 1.75, pt[1] - 12.7, pt[1]), "buy", mass=1.6, note="#6-32x1/2 (kit), right-gear axle")
 
@@ -497,10 +504,17 @@ def build_parts():
     gear_R, _ = involute_gear(pvx, pvy, fz0, fz1, 180.0)
     gear_L, _ = involute_gear(-pvx, pvy, fz0, fz1, pitch_deg / 2)
     fR = arm.union(pad).union(gear_R).cut(cyl(pvx, pvy, TOL["run_bore"] / 2, fz0 - 1, fz1 + 1))
-    fL = arm.union(pad).mirror("YZ").union(gear_L).cut(cyl(-pvx, pvy, 3.0, fz0 + 2, fz1 + 1))   # spline / horn socket
+    fL = arm.union(pad).mirror("YZ").union(gear_L)
+    for sx in (-1, 1):                                                                     # 2 pilots: horn screws into the gear
+        fL = fL.cut(cyl(-pvx + sx * p["ghorn_screw_r"], pvy, TOL["servo_pilot"] / 2, fz0 + 1.5, fz1 + 1))
     add("finger_R", "finger_R", fR, "PETG", note="Involute gear (16T, m1, 20 deg, +0.1 profile shift, 0.2 mm backlash) + arm + can pad. Print "
         "flat. Runs on a #6-32 axle (3.9 mm bore). Line the pad with the 1/16 in (1.6 mm) silicone sheet: 32 x 40 mm.")
-    add("finger_L", "finger_L", fL, "PETG", note="Mirror of finger_R (gear turned half a tooth so the two mesh); its gear has the servo-spline socket.")
+    add("finger_L", "finger_L", fL, "PETG", note="Mirror of finger_R (gear turned half a tooth so the two mesh). The SG90 round horn is "
+        "screwed flat on its gear (2 servo-bag screws into 1.7 mm pilots, 5 mm from the centre); the spline goes into the horn.")
+    hz0 = fz1 + p["ghorn_gap"]
+    ghorn = cyl(-pvx, pvy, p["ghorn_r"], hz0, hz0 + p["ghorn_disc"]).union(
+        cyl(-pvx, pvy, p["ghorn_hub_r"], hz0 + p["ghorn_disc"], hz0 + p["ghorn_disc"] + p["ghorn_hub_h"]))
+    add("gripper_horn", "finger_L", ghorn, "buy", mass=1.0, note="SG90 round horn (in the servo bag), screwed to the left gear")
 
     # ---------------- tolerance test coupon (print first; not part of the assembly) ----------------
     cp = box(0, 70, 0, 22, 0, 8)

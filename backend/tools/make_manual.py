@@ -59,8 +59,8 @@ STEPS = [
      "Slide them in together between the plates, open by the same angle", (-60, 55), None),
     ("Right finger axle", ["axle_R"], UP, 25, [(1, S6)], None,
      "From the top through the right finger; it must swing freely", (-60, 55), None),
-    ("Gripper servo", ["gripper_servo_SG90"], UP, 40, [(2, SB), (1, SB)], ("SG90", "20°"),
-     "Spline down into the left finger's socket (it is the horn)", (-60, 55), None),
+    ("Horn on the left gear, then the gripper servo", ["gripper_horn", "gripper_servo_SG90"], UP, 40, [(2, SB), (2, SB)], ("SG90", "20°"),
+     "Horn flat on the left gear, 2 screws; then the servo's spline down into the horn hub", (-60, 55), None),
     ("Can bumper", ["can_bumper"], FRONT, 25, [], None,
      "Silicone or rubber, 9 × 13.5 mm, superglue to the frame", (-60, 35), None),
     ("Electronics on the tray", ["arduino_uno", "buck_XL4015", "mini_breadboard", "capacitor_1000uF"], UP, 40, [], None,
@@ -76,7 +76,7 @@ PER_PART_DIR = {"LM6UU_L1": DOWN, "LM6UU_R1": DOWN, "LM6UU_L2": UP, "LM6UU_R2": 
 ALLOWED = {frozenset(p) for p in [
     ("bearing_6807", "base"), ("bearing_6807", "turret_plate"), ("turntable_servo_MG996R", "turntable_horn"),
     ("lift_crank", "lift_servo_MG90S"), ("lift_crank", "lift_link"), ("wrist_servo", "wrist_horn"),
-    ("wrist_servo", "gripper_frame"), ("gripper_servo_SG90", "finger_L"), ("axle_R", "finger_R"),
+    ("wrist_servo", "gripper_frame"), ("gripper_servo_SG90", "finger_L"), ("gripper_servo_SG90", "gripper_horn"), ("gripper_horn", "finger_L"), ("axle_R", "finger_R"),
     ("axle_R", "gripper_frame"), ("rod_L", "turret_plate"), ("rod_R", "turret_plate"), ("rod_L", "top_cap"),
     ("rod_R", "top_cap"), ("lift_link", "carriage_arm")]}
 for n in ("LM6UU_L1", "LM6UU_L2", "LM6UU_R1", "LM6UU_R2"):
