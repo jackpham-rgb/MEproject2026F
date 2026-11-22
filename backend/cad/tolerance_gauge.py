@@ -66,12 +66,18 @@ def gauge():
     for name, ds, xs, y0, rh, xend, dmax in rows:
         g = g.union(box(x0 - 1, xend, y0, y0 + rh, 0, T))
     xr = max(r[5] for r in rows)
-    rx, py = xr + POCKET / 2 + 4.5, H / 2              # 6807 pocket ring right of the rows
-    hx, hy = rx + POCKET / 2 + 2.4 + HUB / 2 + 4.0, H / 2  # 6807 hub post right of the ring
+    lmr = [r for r in rows if r[0] == "LM6UU"][0]
+    rx, py = xr + POCKET / 2 + 4.5, lmr[3] + lmr[4] / 2   # 6807 pocket ring right of the rows, level with the LM6UU bar
+    hx, hy = rx + POCKET / 2 + 2.4 + HUB / 2 + 4.0, py     # 6807 hub post right of the ring
     g = g.union(cyl(rx, py, POCKET / 2 + 2.0, 0, T + 2.0)).cut(cyl(rx, py, POCKET / 2, -1, T + 4))
     g = g.union(cyl(hx, hy, HUB / 2, 0, T + 2.0)).cut(cyl(hx, hy, HUB / 2 - 1.8, -1, T + 4))
-    for yy in (H * 0.2, H * 0.8):                       # 2 ribs rows -> ring
-        g = g.union(box(xr - 2, rx - POCKET / 2 + 1, yy - 2.0, yy + 2.0, 0, T))
+    import math
+    lm = [r for r in rows if r[0] == "LM6UU"][0]           # the longest bar: ribs go from its end to the ring
+    py = lm[3] + lm[4] / 2
+    Ro = POCKET / 2 + 2.0
+    for yy in (lm[3] + 3.0, lm[3] + lm[4] - 3.0):
+        xring = rx - math.sqrt(max(Ro ** 2 - (yy - py) ** 2, 0)) + 1.0
+        g = g.union(box(lm[5] - 3, xring, yy - 2.0, yy + 2.0, 0, T))
     g = g.union(box(rx + POCKET / 2 - 1, hx - HUB / 2 + 1, py - 2.5, py + 2.5, 0, T))   # ring -> post
     for name, ds, xs, y0, rh, xend, dmax in rows:
         yc = y0 + rh - (dmax / 2 + 1.7)
