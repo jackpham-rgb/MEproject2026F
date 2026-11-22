@@ -19,7 +19,7 @@ solid booleans every 3 mm of travel; overlap > 1.0 mm³ with an assembled part =
 16. Gripper frame                        PASS
 17. Both fingers, gears meshed           PASS
 18. Right finger axle                    PASS
-19. Gripper servo                        PASS
+19. Horn on the left gear, then the gripper servo PASS
 20. Can bumper                           PASS
 21. Electronics on the tray              PASS
 22. Panel: button, LED, power            PASS

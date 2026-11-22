@@ -26,10 +26,11 @@ LM6UU_R2,lift,buy,1.6,8.0,17.0,12.0,121.5
 lift_link,lift,PETG,0.3,0.2,-7.0,12.5,138.1
 wrist_servo,lift,buy,6.9,13.0,0.0,42.1,55.9
 wrist_horn,wrist,buy,0.8,1.0,0.0,57.2,61.1
-gripper_frame,wrist,PETG,15.4,11.7,-0.1,72.4,72.8
+gripper_frame,wrist,PETG,15.0,11.5,0.1,72.2,72.7
 can_bumper,wrist,silicone,0.1,0.1,0.0,91.8,75.2
-gripper_servo_SG90,wrist,buy,6.9,9.0,-13.3,83.0,93.1
+gripper_servo_SG90,wrist,buy,6.9,9.0,-13.3,83.0,97.7
 axle_R,wrist,buy,0.1,1.6,8.1,83.0,75.7
 finger_R,finger_R,PETG,12.7,9.7,32.7,120.9,68.1
-finger_L,finger_L,PETG,12.7,9.7,-32.8,121.0,68.1
+finger_L,finger_L,PETG,12.8,9.7,-32.6,120.7,68.1
+gripper_horn,finger_L,buy,0.6,1.0,-8.1,83.0,80.5
 test_can,can,can,408.2,15.0,-0.0,127.0,60.7
