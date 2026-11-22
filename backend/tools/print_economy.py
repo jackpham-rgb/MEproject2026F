@@ -120,7 +120,7 @@ PARTS = {
 
 # PrusaSlicer 2.7 quick map: where each setting lives (Expert mode). (setting, where)
 PRUSA_STEPS = [
-    "**Fastest:** File › Open Project (Ctrl+O) › `cad/print/plates_AE/plate_X.3mf`. The parts are already on the bed AND every "
+    "**Fastest:** File › Open Project (Ctrl+O) › `cad/print/plates/plate_X.3mf`. The parts are already on the bed AND every "
     "setting on the plate's page is inside (printer CR-6 SE, PETG, layers, infill, supports): answer **Yes** to load its settings, then slice. "
     "Part already printed? Right-click it in the object list › Delete.",
     "Top right: switch the mode to **Expert** (red). Otherwise half of these fields are hidden.",

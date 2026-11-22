@@ -1,6 +1,6 @@
 """Plan P (quick prototype) picture: side + top view of the cardboard / foam-board version, real dimensions.
 
-    python3.13 backend/tools/make_plan_p.py      -> docs/plan_p/plan_p.png
+    python3.13 backend/tools/make_plan_p.py      -> archive/docs/plan_p/plan_p.png
 
 Every dimension comes from backend/cad/model.py, so the cardboard robot moves the can exactly like the
 printed one: grip height, 5 in radius, wrist axis through the can's centre, crank and link lengths.
@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.join(ROOT, "backend", "cad"))
 import model as M  # noqa: E402
 
 P = M.P
-OUT = os.path.join(ROOT, "docs", "plan_p")
+OUT = os.path.join(ROOT, "archive", "docs", "plan_p")
 os.makedirs(OUT, exist_ok=True)
 C = dict(card="#c9a273", foam="#f4f4f0", printed="#3d7be0", steel="#9aa3ad", servo="#2b2b2b", can="#d33a3a", glue="#e8b923")
 
@@ -105,7 +105,7 @@ def main():
     fig.suptitle("Plan P: the quick prototype (cardboard + foam board + hot glue, only the claw printed)", fontsize=13)
     fig.tight_layout(rect=(0, 0.05, 1, 0.95))
     fig.savefig(os.path.join(OUT, "plan_p.png"), dpi=120)
-    print("wrote docs/plan_p/plan_p.png")
+    print("wrote archive/docs/plan_p/plan_p.png")
 
 
 if __name__ == "__main__":

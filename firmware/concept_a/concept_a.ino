@@ -4,7 +4,7 @@
 // Every move eases in and out (slow - fast - slow) so the light can doesn't shake loose.
 // Single file, only the built-in Servo library: pastes straight into Tinkercad or Wokwi.
 //
-// Wiring (see docs/tinkercad_concept_a.md):
+// Wiring (see docs/04_wiring.md):
 //   D9  turntable servo      D10 lift servo       D6 wrist servo     D5 gripper servo
 //   D4  start button to GND  D13 LED (+220 ohm)
 // Real robot: Uno on its own 9 V battery; 12 V adapter -> XL4015 buck at 5.8 V -> servos only (docs/04_wiring.md, EE/).

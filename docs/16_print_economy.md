@@ -62,7 +62,7 @@ Print in this order (A first). Every plate fits the 235 × 235 mm bed; leave ~15
 
 ## PrusaSlicer: where to find everything
 
-1. **Fastest:** File › Open Project (Ctrl+O) › `cad/print/plates_AE/plate_X.3mf`. The parts are already on the bed AND every setting on the plate's page is inside (printer CR-6 SE, PETG, layers, infill, supports): answer **Yes** to load its settings, then slice. Part already printed? Right-click it in the object list › Delete.
+1. **Fastest:** File › Open Project (Ctrl+O) › `cad/print/plates/plate_X.3mf`. The parts are already on the bed AND every setting on the plate's page is inside (printer CR-6 SE, PETG, layers, infill, supports): answer **Yes** to load its settings, then slice. Part already printed? Right-click it in the object list › Delete.
 2. Top right: switch the mode to **Expert** (red). Otherwise half of these fields are hidden.
 3. Printer (once): Configuration › Configuration Wizard › Creality › **CR-6 SE**. Filament: Generic PETG.
 4. Lost? **Ctrl+F** searches every setting by name (type "support", "brim", "infill"…) and jumps to it.

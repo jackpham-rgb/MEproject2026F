@@ -52,7 +52,7 @@ Already have (check before you start):
 
 ## 2. Printing
 
-**Print by plate:** `cad/print/plates/plate0_coupon` → `plate1_base` (overnight) → `plate2_tray_spine` → `plate3_arm_claw` (.3mf keeps every part separate; layout in `cad/print/plates/plates.png`). **Settings:** `cad/print/settings/printer_settings.txt` (all slicers) and `concept_a_PETG_prusaslicer.ini` (PrusaSlicer: File → Import → Import Config, then set the Printer preset back to Creality CR-6 SE). The .3mf files already carry the per-part settings (supports, 100 % infill fingers, brim on the link): every plate was test-sliced in PrusaSlicer.
+**Print by plate:** first the tolerance gauge (`cad/print/tolerance_test/`), then `cad/print/plates/plate_A` … `plate_E` (each .3mf has the parts placed and that plate's settings inside: PrusaSlicer Ctrl+O, "Yes"). Settings per plate, and for other slicers: `docs/16_print_economy.md` and the manual's plate pages; every plate was test-sliced in PrusaSlicer.
 
 Single parts: `cad/print/stl/` (already turned to the best side). Orientation preview: `cad/print/print_orientations.png`. Printer: Creality CR-6 SE, 235 × 235 mm bed.
 

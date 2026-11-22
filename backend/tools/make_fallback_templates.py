@@ -1,9 +1,9 @@
 """Fallback kit (no 3D printer): 1:1 cut templates for the cardboard / foam-board robot + print-shop zips.
 
     python3.13 backend/tools/make_fallback_templates.py
-      -> fallback_no_printer/cut_templates.pdf          (US Letter, print at 100 % / "Actual size")
-      -> fallback_no_printer/templates_preview.png
-      -> fallback_no_printer/print_service/*.zip        (STL files for a makerspace / online print service)
+      -> archive/fallback_no_printer/cut_templates.pdf          (US Letter, print at 100 % / "Actual size")
+      -> archive/fallback_no_printer/templates_preview.png
+      -> archive/fallback_no_printer/print_service/*.zip        (STL files for a makerspace / online print service)
 
 Every dimension comes from backend/cad/model.py (same numbers as the printed robot and Plan P), so the
 cardboard robot puts the can in exactly the same place.
@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.join(ROOT, "backend", "cad"))
 import model as M  # noqa: E402
 
 P = M.P
-OUT = os.path.join(ROOT, "fallback_no_printer")
+OUT = os.path.join(ROOT, "archive", "fallback_no_printer")
 W, H = 215.9, 279.4                       # US Letter, mm
 LINK_HOLES = 11.4                          # lift link hole-to-hole (Plan P)
 SPINE_W = 40.0                             # spine width (foam board)
@@ -269,13 +269,13 @@ def build_zips():
                 info.compress_type = zipfile.ZIP_DEFLATED
                 with open(os.path.join(stl, f), "rb") as fh:
                     z.writestr(info, fh.read())
-        print(f"wrote fallback_no_printer/print_service/{name} ({len(files)} STL)")
+        print(f"wrote archive/fallback_no_printer/print_service/{name} ({len(files)} STL)")
 
 
 def main():
     os.makedirs(OUT, exist_ok=True)
     build_pdf([page1(), page2(), page3(), page4()])
-    print("wrote fallback_no_printer/cut_templates.pdf + templates_preview.png")
+    print("wrote archive/fallback_no_printer/cut_templates.pdf + templates_preview.png")
     build_zips()
 
 

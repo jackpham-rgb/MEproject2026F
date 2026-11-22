@@ -1,4 +1,4 @@
-"""Plates A-E as ready files: cad/print/plates_AE/plate_X.3mf (+ .stl).
+"""Plates A-E as ready files: cad/print/plates/plate_X.3mf (+ .stl).
 
     python3.13 backend/tools/make_plate_files.py      (run make_plate_inis.py first)
 
@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.join(ROOT, "backend", "tools"))
 import print_economy as E  # noqa: E402
 
 PL = E.PL
-OUT = os.path.join(ROOT, "cad", "print", "plates_AE")
+OUT = os.path.join(ROOT, "cad", "print", "plates")
 INIS = os.path.join(ROOT, "cad", "print", "settings", "plates")
 
 
@@ -56,7 +56,7 @@ def main(skip=(), out=OUT, plates=None, inis=INIS, per_part=None):
 
 
 if __name__ == "__main__":
-    # python3.13 backend/tools/make_plate_files.py [--skip CA-203,CA-201 --out cad/print/to_print_now]
+    # python3.13 backend/tools/make_plate_files.py [--skip CA-203,CA-201 --out archive/print_to_print_now]
     a = sys.argv[1:]
     sk = a[a.index("--skip") + 1].split(",") if "--skip" in a else ()
     main(sk, os.path.join(ROOT, a[a.index("--out") + 1]) if "--out" in a else OUT)

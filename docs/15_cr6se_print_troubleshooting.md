@@ -57,7 +57,7 @@ layer or the first half hour.
 
 ## Quick calibration prints (if the problems keep coming)
 
-1. **Our tolerance coupon** (`plate0_coupon`, 1 h): fit check of every hole.
+1. **Our tolerance gauge** (`cad/print/tolerance_test/`, ~1 h 20): bearing and claw fits, sizes engraved.
 2. **First-layer test**: a single-layer 100 × 100 mm square in the middle of the bed: tune the Z-offset until it's smooth and even.
 3. **Temperature tower** (230–240 °C) for your PETG: pick the temperature with the least stringing that still bonds well.
 4. **Retraction test** (two towers): 4, 5, 6, 7 mm: take the lowest with no strings.

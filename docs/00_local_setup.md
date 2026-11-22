@@ -16,7 +16,7 @@ No git? On GitHub, switch to the branch, then **Code → Download ZIP**.
 
 | What | How |
 |---|---|
-| Concept notes (PDR draft only) | `docs/draft/Project_Notes_ConceptA.docx` |
+| Concept notes (PDR draft only) | `archive/docs/draft/Project_Notes_ConceptA.docx` |
 | Wiring diagram | `docs/wiring/wiring_diagram.png` |
 | BOM + decision matrices | `docs/05_bom.md`, `docs/decision_matrix_and_bom.xlsx` |
 | Detail CAD, animated | Double-click `viewer/concept_a_detail.html` |
@@ -24,7 +24,7 @@ No git? On GitHub, switch to the branch, then **Code → Download ZIP**.
 | GIFs for docs and slides | `viewer/gifs/` |
 | Plots | `sim/concept_a_*.png` |
 | Design docs | `docs/*.md` (GitHub renders them) |
-| Breadboard simulation | Tinkercad: `docs/tinkercad_concept_a.md`. Wokwi: `wokwi/concept_a/README.md` |
+| Breadboard simulation | Tinkercad: `archive/docs/tinkercad_concept_a.md`. Wokwi: `archive/wokwi/concept_a/README.md` |
 
 ## 2. Arduino IDE (needed for the build anyway)
 

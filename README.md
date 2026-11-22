@@ -1,89 +1,54 @@
-# ME 2331/L Project 2: Design, Build, Test (can-flipping robot)
+# ME 2331/L Project 2: can-flipping robot (Concept A)
 
-An Arduino Uno robot takes an empty Coke can (66.2 × 122.2 mm) standing upright 5 in from the
-robot, **turns it upside down, and sets it down free-standing 90° away** at the same radius.
+An Arduino Uno robot picks up an empty Coke can standing 5 in away, **turns it upside down and sets it
+down free-standing 90° around the robot**: grip → lift 0.6 in → wrist flips 180° → turntable turns 90° →
+lower → release (7.4 s, one button press).
 
-## Selected design: Concept A (claw + wrist flip + turntable)
+![Concept A](viewer/gifs/conceptA_detail_cad.gif)
 
-A small crane at the corner, with 4 hobby servos doing one move at a time:
-**grip → lift 0.6 in → wrist flips 180° → turntable turns 90° → lower → release** (7.4 s; the 90° turn takes 2.5 s so the arm doesn't swing).
+Live site: **https://jackpham-rgb.github.io/MEproject2026F/** (all the pages below, also on a phone).
 
-- **The 90° is literal:** the turntable sits at the robot's location, so the robot visibly turns
-  90° and the can stays 5 in away the whole time.
-- **The lift is required:** without it, the flipping can dips 0.33 in into the table. With a
-  0.6 in lift it clears by 0.27 in.
-- **Electronics are servos only:** no encoder, motor driver or PID tuning. The code is one file
-  that runs in the Arduino IDE, Tinkercad and Wokwi.
+## Start here
 
-![Concept A detail CAD](viewer/gifs/conceptA_detail_cad.gif)
-
-Why A: [the decision matrix](docs/01_concepts_and_decision_matrix.md). The team ranking is
-A 3.85 → B 3.30 → D 3.00 → C 2.75.
-
-## Open in the browser (live site)
-
-| Page | Link |
+| I want to… | Open |
 |---|---|
-| Home (all viewers) | https://jackpham-rgb.github.io/MEproject2026F/ |
-| **Wiring, 360°** (drag to orbit, Legend on/off) | https://jackpham-rgb.github.io/MEproject2026F/viewer/wiring_360.html |
-| **Wiring through each move** (grip, lift, flip, turn, lower, release) | https://jackpham-rgb.github.io/MEproject2026F/viewer/wiring_motion.html |
-| **Control panel**: drive the robot from a laptop over USB (Chrome / Edge) | https://jackpham-rgb.github.io/MEproject2026F/viewer/control_panel.html |
-| **Detail CAD, animated** (firmware sequence + checks) | https://jackpham-rgb.github.io/MEproject2026F/viewer/concept_a_detail.html |
-| All 4 concepts | https://jackpham-rgb.github.io/MEproject2026F/viewer/concepts.html |
-| Wiring video, with legend / without | https://jackpham-rgb.github.io/MEproject2026F/docs/wiring/wiring_360.mp4 · https://jackpham-rgb.github.io/MEproject2026F/docs/wiring/wiring_360_clean.mp4 |
+| **Build it** | [Assembly manual (PDF)](docs/12_assembly_manual.pdf) · [3D step-by-step guide](viewer/assembly.html) (rotate / zoom, screw paths, fit levels) |
+| **Print the parts** | [`cad/print/`](cad/print/README.md): plates A–E (settings inside), tolerance gauge, printer tune-up |
+| **Wire and test the electronics** | [Wiring](docs/04_wiring.md) · [Bench test](docs/13_electronics_bench_test.md) · [Laptop control panel](viewer/control_panel.html) |
+| **Upload the code** | `firmware/concept_a/concept_a.ino` (Arduino IDE, board Uno) |
+| **See it meets the assignment** | [Requirements page](viewer/requirements.html) · [RVTM](docs/06_rvtm.md) |
+| **Hand in / report** | [Engineering report](docs/Engineering_Report_ConceptA.docx) · [2D drawings](docs/drawings/all_drawings.pdf) · [BOM](docs/05_bom.md) |
+| **Buy parts** | [Prototype BOM: have / buy / find at home](docs/11_bom_prototype_v1.md) |
 
-The site is GitHub Pages, published from the `claude/awesome-brahmagupta-i4dvbh` branch (root).
-The same files open offline: download the repo and double-click the `.html` (needs internet for the 3D library).
-
-![Wiring 360](docs/wiring/wiring_360_clean.gif)
-
-## Repo map
+## Folders
 
 | Folder | What's in it |
 |---|---|
-| **`cad/`** | CAD files only. `step/concept_a_assembly.step` (**open in SolidWorks / Fusion**) + `step/parts/`; `print/stl/` (print-ready STLs); `check/` (collision, mass and **43 engineering checks**: `mech_report.txt`); `claw/` (claw-only STEP for a close-up Fusion animation); `wiring/` (wires as solids + routing check). See `cad/README.md` |
-| **`docs/`** | Everything to read or hand in: concepts and decision matrix (01), analysis (02), detail design (03), wiring (04), BOM (05), RVTM (06), PDR plan (07), **build guide (08)**, **how the motors and claw work (09)**, **wire routing in 3D (10)**, **prototype v1 BOM: have / must buy / find at home (11)**, **assembly manual, IKEA style (12, PDF)**, **electronics bench test (13)**, **Plan P quick prototype (14)**, **CR-6 SE print troubleshooting (15)**, **economy printing per part (16)**, **tolerance re-check sheet (17)**, **CR-6 SE tune-up, PLA + PETG (18)**, **Part C report** (`Engineering_Report_ConceptA.docx`), **2D drawings** (`drawings/all_drawings.pdf`), Excel matrices + BOM, wiring diagram |
-| **3D assembly guide** | `viewer/assembly.html` (on the project site): every step in 3D with real-looking bought parts, screw paths, glue and fit levels (PRECISE / TRY-FIT / EASY). Data: `python3.13 backend/cad/visual.py` |
-| **`fallback_no_printer/`** | **If the 3D printer doesn't work:** options (print elsewhere / Plan P / zero-print), 1:1 cut templates PDF, STL zips + order sheet for a makerspace or print service |
-| **`EE/`** | Electronics results: servo PWM signals in firmware order, current budget, buck-vs-no-buck comparison, **LTspice circuit** (`EE/ltspice/`) |
-| **`firmware/`** | Arduino code: `concept_a/` (the robot), `servo_setup/` (fit horns at HOME, find calibration angles) |
-| **`sim/`** | Design-calc results (lift clearance, grip, servo loads) |
-| **`viewer/`** | Open in a browser (or on the [project site](https://jackpham-rgb.github.io/MEproject2026F/)): the detail CAD animated through the firmware sequence, the **360 wiring view**, all 4 concepts, GIFs |
-| **`wokwi/`** | Wokwi breadboard simulation (Tinkercad steps: `docs/tinkercad_concept_a.md`) |
-| **`backend/`** | All the code that generates the files above: `cad/` (CAD model, checks, exports, drawings, print prep), `ee/`, `sim/`, `tools/` (BOM, wiring diagram, viewers, report, emulator). See `backend/README.md` |
+| `docs/` | Everything to read: design (01–03, 09), wiring (04, 10), BOMs (05, 11), RVTM (06), build guide (08), manual (12), bench test (13), printing (15–18), report, drawings |
+| `cad/` | CAD: `step/` (open in SolidWorks / Fusion), `print/` (what to print + settings), `check/` (collision + engineering checks) |
+| `firmware/` | Arduino code: `concept_a/` (the robot), `servo_setup/`, `bench_test/` |
+| `viewer/` | Web pages: 3D assembly guide, control panel, CAD and wiring viewers, requirements |
+| `EE/`, `sim/` | Electronics simulation (power, LTspice) and design-calc results |
+| `backend/` | The code that generates all of the above ([backend/README.md](backend/README.md)) |
+| `archive/` | Old or replaced material, kept for reference (Plan P, no-printer fallback, PDR outline, draft notes, old plates, Tinkercad / Wokwi) |
 
-Older concept-stage files (the Concept D design, the block-level CAD) were removed from the
-branch; they are still in the git history.
+## Docs
 
-## Run it
-
-**Laptop setup, step by step (Windows/macOS): [docs/00_local_setup.md](docs/00_local_setup.md).**
-
-```bash
-pip install -r backend/requirements.txt cadquery
-python3 backend/cad/check.py      # motion + collision check (~5 min) -> cad/check/
-python3 backend/cad/export.py     # STEP -> cad/step/
-```
-
-Every generator and the order to run them: [backend/README.md](backend/README.md).
-
-Arduino IDE: open `firmware/concept_a/concept_a.ino`, board = Uno, then press the button.
-The Serial Monitor at 9600 baud shows each step.
+| # | Doc | # | Doc |
+|---|---|---|---|
+| 00 | [Laptop setup](docs/00_local_setup.md) | 10 | [Wire routing in 3D](docs/10_wiring_3d.md) |
+| 01 | [Concepts + decision matrix](docs/01_concepts_and_decision_matrix.md) | 11 | [Prototype BOM](docs/11_bom_prototype_v1.md) |
+| 02 | [Design analysis](docs/02_design_analysis.md) | 12 | [Assembly manual (PDF)](docs/12_assembly_manual.pdf) |
+| 03 | [Detail design](docs/03_detail_design.md) | 13 | [Electronics bench test](docs/13_electronics_bench_test.md) |
+| 04 | [Wiring](docs/04_wiring.md) | 15 | [Print troubleshooting (CR-6 SE)](docs/15_cr6se_print_troubleshooting.md) |
+| 05 | [BOM](docs/05_bom.md) | 16 | [Print settings per plate](docs/16_print_economy.md) |
+| 06 | [RVTM](docs/06_rvtm.md) | 17 | [Tolerance re-check sheet](docs/17_tolerance_recheck.md) |
+| 08 | [Build guide](docs/08_build_guide.md) | 18 | [Printer tune-up, PLA + PETG](docs/18_cr6se_tuneup.md) |
+| 09 | [How the motors and claw work](docs/09_how_it_moves.md) | | |
 
 ## Status
 
-Done (laptop only):
-- [x] 4 concepts, animated; team decision matrix → Concept A
-- [x] Design calcs: lift clearance, grip force, servo loads, lift jam check, error budget, power
-- [x] Detail CAD with PETG tolerances and kit screws; no collisions over the full firmware sequence
-- [x] Engineering checks: 43/43 pass (servo duty, lift mechanism, involute gears, can grip, dynamic stability, strength, power)
-- [x] Arduino code, verified on an emulated Uno; Tinkercad and Wokwi wiring
-- [x] Wiring diagram, BOM with reasons, binary decision matrices (Excel), RVTM, PDR plan
-- [x] Part C: 2D drawings (13 sheets) and the engineering report (results section waits for the build)
+- Design, CAD, engineering checks, firmware and electronics: done; firmware runs on the Uno, all servos move.
+- Now: tolerance gauge → correct the hole sizes → print plates B–E → assemble → calibrate → test runs (Part B).
 
-Still to do:
-- [ ] Hand sketches of the 4 concepts; PDR deck from `docs/07_pdr_outline.md`
-- [ ] Print the tolerance coupon, then the parts; order the purchased parts (`docs/05_bom.md`)
-- [ ] Measure the real servos / bearing and update `P` in `backend/cad/model.py`
-- [ ] Calibrate the servo angles on the real robot (constants at the top of the code)
-- [ ] Part C: add test results and photos to the report after the build
+Regenerating files, checks and the order to run them: [backend/README.md](backend/README.md).

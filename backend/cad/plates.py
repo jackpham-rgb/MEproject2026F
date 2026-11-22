@@ -1,4 +1,5 @@
-"""Pack the print-ready STLs onto build plates -> cad/print/plates/
+"""Pack the print-ready STLs onto build plates -> archive/print_old_plates/ (the original plates 0-3 + Plan P).
+The plates in use are cad/print/plates/plate_A..E (backend/tools/make_plate_files.py); pack() / write_3mf() here are shared.
 
     python3.13 backend/cad/print_prep.py   # oriented STLs + print_table.csv
     python3.13 backend/cad/plates.py       # plates
@@ -20,7 +21,7 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 PR = os.path.join(ROOT, "cad", "print")
-OUT = os.path.join(PR, "plates")
+OUT = os.path.join(ROOT, "archive", "print_old_plates")
 BED = (235.0, 235.0)   # Creality CR-6 SE
 EDGE, GAP = 7.0, 14.0   # 14 mm: room for supports that reach past a part's edge
 
@@ -31,7 +32,7 @@ PLATES = [  # (file stem, title, part numbers, when)
     # crashes for some groupings with a supported finger (checked by slicing every plate, see the README)
     ("plate2_tray_spine", "Plate 2: electronics tray + spine + right finger", ["CA-102", "CA-202", "CA-402"], "day"),
     ("plate3_arm_claw", "Plate 3: carriage arm + gripper frame + left finger", ["CA-301", "CA-401", "CA-403"], "day"),
-    # Plan P (quick prototype, docs/14_plan_p_quick_prototype.md): only the claw, as two short prints
+    # Plan P (quick prototype, archive/docs/14_plan_p_quick_prototype.md): only the claw, as two short prints
     ("planP_1_claw", "Plan P 1: gripper frame + right finger", ["CA-401", "CA-402"], "~2 h"),
     ("planP_2_finger", "Plan P 2: left finger + tolerance coupon", ["CA-403", "CA-900"], "~2 h"),
 ]
@@ -192,7 +193,7 @@ def main():
             w.writerow([stem, title, " ".join(pns), f"{hrs:.1f}", f"{g:.0f}", " ".join(sup) or "none", when])
     for s in summary:
         print(f"{s[0]:20s} {s[3]:5.1f} h {s[4]:5.0f} g  parts {' '.join(s[2])}  supports: {' '.join(s[5]) or 'none'}")
-    print("wrote cad/print/plates/ (.3mf + .stl per plate, plates.png, plates.csv)")
+    print("wrote archive/print_old_plates/ (.3mf + .stl per plate, plates.png, plates.csv)")
 
 
 if __name__ == "__main__":

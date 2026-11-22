@@ -16,31 +16,19 @@ CR-6 SE SPECIFICS
                             nozzle itself is the probe). Then adjust Z-offset on the first layer
   Card                      short file names, no spaces (P0COUPON.gcode ...): the screen cuts long names
 
-Files: cad/print/plates/plate0..3 (.3mf = separate parts, keeps per-part settings; .stl = one piece)
+Files: cad/print/plates/plate_A..E.3mf: parts placed + every setting inside (PrusaSlicer: Ctrl+O, "Yes").
+       plate_R.3mf = reprint of the turret plate, top cap, lift link. Single parts: cad/print/stl/.
        Parts are already turned to their best side. Don't rotate them, except 90 deg flat on the bed.
-Slicer: PrusaSlicer -> File > Import > Import Config... -> concept_a_PETG_prusaslicer.ini
-        Cura / Bambu / Orca: type the values below in by hand (names in brackets).
-
+Settings only: cad/print/settings/plates/plate_A..E.ini (Ctrl+L). Cura / Bambu / Orca: type the values in
+       from docs/16_print_economy.md (the manual's plate pages A-E show the same).
+First: the tolerance gauge, cad/print/tolerance_test/ (~1 h 20). Printer tune-up: docs/18_cr6se_tuneup.md.
 PRINTER PROBLEMS: docs/15_cr6se_print_troubleshooting.md (symptom -> cause -> fix)
-ONE FILE PER PLATE:     cad/print/plates_AE/plate_A..E.3mf (parts placed + all settings inside: just open it)
-                        settings only: cad/print/settings/plates/plate_A..E.ini (Ctrl+L)
-SAVE TIME + PLASTIC:    docs/16_print_economy.md (plates A-E, one setting per plate, typed in by hand, ~37 h -> ~24 h)
-QUICK PROTOTYPE FIRST: docs/14_plan_p_quick_prototype.md (only the claw printed: planP_1_claw, planP_2_finger)
 
-PRINT ORDER (times = PrusaSlicer 2.7 estimates with these settings; each plate test-sliced)
-  0. plate0_coupon        ~1.0 h   CHECK THE FITS FIRST (build guide section 2). Fix TOL if needed.
-  1. plate1_base         ~17 h     overnight: base, turret plate, top cap, lift link
-  2. plate2_tray_spine   ~12 h     tray, spine, right finger
-  3. plate3_arm_claw      ~8 h     carriage arm, gripper frame, left finger
-  Total ~38 h, ~330 g PETG. The fingers are on different plates on purpose: PrusaSlicer 2.7 crashes
-  ("G-code path conflict") when the supported left finger shares a plate with the right finger, the
-  tray or the base.
-
-PER-PART SETTINGS ARE ALREADY IN THE .3MF FILES (PrusaSlicer)
-  Open a plate: supports are on only for the base, turret plate, carriage arm and fingers; the
-  fingers are at 100 % infill; the lift link has a 5 mm brim. Right-click a part to see its settings.
-  Leave global supports OFF. Cura does not read these: in Cura add them per part by hand
-  (Per Model Settings).
+PLATES (one profile per plate, ~24 h total; details docs/16_print_economy.md)
+  A  coupon + lift link             STANDARD        B  base + spine + top cap   DRAFT 0.28
+  C  electronics tray               DRAFT 0.28      D  turret plate + carriage  STANDARD
+  E  2 fingers + gripper frame      DETAIL (slow outer wall, solid)
+  (The original plates 0-3 with one setting for everything: archive/print_old_plates/.)
 
 MATERIAL: PETG 1.75 mm
   Nozzle temperature        235 C (first layer 238 C, max 240) [printing temperature]
