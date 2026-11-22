@@ -97,6 +97,8 @@ def gear_test(thin):
     g1, _ = M.involute_gear(0, 0, 0, 3, 180.0, p)
     g2, _ = M.involute_gear(0, 0, 0, 3, 360.0 / p["gear_z"] / 2, p)
     g1 = g1.cut(cyl(0, 0, 3.9 / 2, -1, 5)); g2 = g2.cut(cyl(0, 0, 3.9 / 2, -1, 5))
+    lab = f"{int(round(thin * 100)):02d}"                   # variant engraved on each gear (00 / 10 / 18 / 25)
+    g1 = engrave(g1, lab, 0, -4.3, 3, 2.4, depth=0.4); g2 = engrave(g2, lab, 0, -4.3, 3, 2.4, depth=0.4)
     return base, g1, g2
 
 

@@ -15,7 +15,7 @@ Every size is engraved next to its hole / ring / disc (mm). Test with calipers *
 | **HORN** row 6.5 … 7.7 | an SG90 round horn, arms cut off (hub only) | the hole the hub presses into snugly (left finger socket) |
 | **Rings** 46.9 / 47.1 / 47.3 | the 6807 bearing's outside | the ring the bearing presses into (base pocket) |
 | **Discs** 34.75 / 34.90 / 35.05 | the 6807 bearing's hole | the disc that presses into the bearing snugly (turret hub) |
-| **Gear pairs** 0.00 / 0.10 / 0.18 / 0.25 | put both gears on the 2 pegs, turn one | the pair that turns smoothly with a little play: print the fingers of that variant (0.10 = standard) |
+| **Gear pairs** 0.00 / 0.10 / 0.18 / 0.25 (gears engraved 00 / 10 / 18 / 25) | put both gears with the same number on the matching base, turn one | the pair that turns smoothly with a little play: print the fingers of that variant (0.10 = standard) |
 | **Lift link** | — | replacement: its small (crank) hole is already 2.4 mm, so it turns on the screw |
 
 Also with calipers: the gauge's outside length (engraved X ….) and each hole's real diameter. Send the numbers:
