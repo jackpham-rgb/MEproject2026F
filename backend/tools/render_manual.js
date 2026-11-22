@@ -12,10 +12,35 @@ const mesh = JSON.parse(fs.readFileSync(path.join(ROOT, "backend/cad/build/viewe
 const steps = JSON.parse(fs.readFileSync(path.join(ROOT, "backend/cad/build/manual_steps.json"), "utf8")).steps;
 const parts = {}; for (const g of Object.values(mesh.groups)) for (const p of g) parts[p.name] = p;
 const LIB = path.join(ROOT, "viewer/lib");
+// printed (blue in every drawing) vs bought (orange)
+const PRINTED_PARTS = ["base", "electronics_tray", "turret_plate", "spine", "top_cap", "carriage_arm", "lift_link", "gripper_frame", "finger_R", "finger_L"];
+const BOUGHT_NAME = { bearing_6807: "6807 ball bearing", turntable_servo_MG996R: "MG996R servo", turntable_horn: "servo horn (round)",
+  LM6UU_L1: "LM6UU linear bearing", LM6UU_L2: "LM6UU linear bearing", LM6UU_R1: "LM6UU linear bearing", LM6UU_R2: "LM6UU linear bearing",
+  rod_L: "6 mm steel rod, 112 mm", rod_R: "6 mm steel rod, 112 mm", lift_servo_MG90S: "MG90S servo", lift_crank: "servo horn, cut to 20 mm",
+  wrist_servo: "MG90S servo", wrist_horn: "servo horn", gripper_servo_SG90: "SG90 servo", axle_R: "#6-32 screw (axle)",
+  can_bumper: "rubber pad, cut 9 × 13.5 mm", arduino_uno: "Arduino Uno", buck_XL4015: "XL4015 buck converter", mini_breadboard: "mini breadboard",
+  capacitor_1000uF: "1000 µF capacitor", start_button: "push button", status_led: "LED + 220 Ω", dc_jack: "DC jack / terminal tip" };
+// steps where a fit needs care (tolerance): what, the size, how to test / fix
+const BOUGHT_SHOW = ["bearing_6807", "LM6UU_L1", "rod_L", "turntable_servo_MG996R", "lift_servo_MG90S", "gripper_servo_SG90", "turntable_horn",
+  "axle_R", "can_bumper", "arduino_uno", "buck_XL4015", "mini_breadboard", "capacitor_1000uF", "start_button", "status_led"];
+const FIT = {
+  1: "<b>Ø47.1 mm press fit.</b> Bearing into the base pocket. Too tight: sand the pocket wall a little at a time. Loose: 1 layer of tape.",
+  5: "<b>Ø34.95 mm press fit.</b> Hub into the bearing. Too tight: sand the hub evenly while turning it. The plate must turn freely after.",
+  6: "<b>Ø12.15 mm press fit ×4, in line.</b> Pockets print on their side: ream with a 12 mm drill or sandpaper on a dowel until each LM6UU presses in.",
+  7: "<b>Ø6.0 mm press fit.</b> Rods into the blind holes, straight up. Too tight: drill 6 mm by hand. Rods must be parallel.",
+  8: "<b>Slide test.</b> The carriage must slide down both rods under its own weight. Sticks: ream the tight pocket, re-check the rods are parallel.",
+  10: "<b>Ø6.0 mm, both rods.</b> Tight: drill 6 mm, 8 mm deep. After the screws: the carriage must still slide freely.",
+  12: "<b>Ø3.9 mm running fit.</b> The link must swing freely on the screw. Binds: open the hole with a 5/32 in drill turned by hand.",
+  13: "<b>20 mm horn arm.</b> Measure hole-to-centre: 20 mm (the lift height depends on it).",
+  17: "<b>Gear mesh.</b> Teeth engage with a little play and no binding over the full swing. <u>Never sand or file gear teeth.</u>",
+  18: "<b>Ø3.9 mm running fit.</b> The finger must swing freely on the axle. Tight: twist a 5/32 in drill through by hand.",
+  19: "<b>Spline socket.</b> Snug on the SG90 spline, no wobble. Tight: scrape lightly inside with a knife tip, test after each pass.",
+};
 
 const DRAW = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff}</style></head><body>
 <script src="file://${LIB}/three.min.js"></script><script>
 const PARTS = ${JSON.stringify(parts)};
+const PRINTED = ${JSON.stringify(PRINTED_PARTS)};
 const renderer = new THREE.WebGLRenderer({antialias:true, preserveDrawingBuffer:true});
 renderer.setPixelRatio(2); document.body.appendChild(renderer.domElement);
 let W = 1200, H = 860; renderer.setSize(W, H);
@@ -32,8 +57,10 @@ window.draw = (shown, fresh, offs, arrows, az, el, w, h, focus) => {
   const box = new THREE.Box3();
   for (const n of shown) {
     const [g, e] = geo(n); const isNew = fresh.includes(n);
-    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({color: isNew ? 0xd6e4f5 : 0xffffff, polygonOffset:true, polygonOffsetFactor:1, polygonOffsetUnits:1}));
-    const l = new THREE.LineSegments(e, new THREE.LineBasicMaterial({color: isNew ? 0x000000 : 0x5a5a5a}));
+    const pr = PRINTED.includes(n), can = n === "test_can";
+    const col = can ? (isNew ? 0xe04040 : 0xf3c4c4) : pr ? (isNew ? 0x2f72e0 : 0xcadcf6) : (isNew ? 0xf29a2e : 0xe6e6e6);
+    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({color: col, polygonOffset:true, polygonOffsetFactor:1, polygonOffsetUnits:1}));
+    const l = new THREE.LineSegments(e, new THREE.LineBasicMaterial({color: isNew ? 0x000000 : 0x3a3a3a}));
     const o = offs[n] || [0,0,0]; m.position.set(...o); l.position.set(...o); root.add(m); root.add(l);
     g.computeBoundingBox(); const b = g.boundingBox.clone(); b.translate(new THREE.Vector3(...o)); box.union(b);
   }
@@ -82,7 +109,7 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   await p.goto("file://" + tmp); await p.waitForFunction("window.ready === true");
   const shot = async (file, w, h) => { const c = await p.$("canvas"); await c.screenshot({ path: path.join(OUT, file) }); };
   // cover: the whole robot with the can
-  await p.evaluate(([s]) => window.draw(s, [], {}, [], -125, 22), [[...ALL, "test_can"]]); await shot("cover.png");
+  await p.evaluate(([s]) => window.draw(s, s, {}, [], -125, 22), [[...ALL, "test_can"]]); await shot("cover.png");
   // every step
   for (const s of steps) {
     const offs = {}, arrows = [];
@@ -107,6 +134,7 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   // parts page: every printed part on its own
   const printed = ["base", "electronics_tray", "turret_plate", "spine", "top_cap", "carriage_arm", "lift_link", "gripper_frame", "finger_R", "finger_L"];
   for (const n of printed) { await p.evaluate(([n]) => window.draw([n], [n], {}, [], -60, 30, 400, 300), [n]); await shot(`part_${n}.png`); }
+  for (const n of BOUGHT_SHOW) { await p.evaluate(([n]) => window.draw([n], [n], {}, [], -60, 30, 400, 300), [n]); await shot(`bought_${n}.png`); }
   await b.close(); fs.unlinkSync(tmp);
 
   // ---------------- the manual (A4 landscape, IKEA style: pictures first, few words)
@@ -117,24 +145,34 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
   const screw = (lbl) => `<svg viewBox="0 0 60 16" width="60" height="16"><rect x="0" y="2" width="9" height="12" rx="2" fill="#fff" stroke="#000" stroke-width="1.6"/>
     <rect x="9" y="5" width="${lbl.includes("#8") ? 40 : lbl.includes("#6") ? 34 : 22}" height="6" fill="#fff" stroke="#000" stroke-width="1.4"/>
     ${Array.from({ length: 8 }, (_, i) => `<line x1="${12 + i * 4}" y1="5" x2="${14 + i * 4}" y2="11" stroke="#000" stroke-width="0.8"/>`).join("")}</svg>`;
-  const css = `@page{size:A4 landscape;margin:0}*{box-sizing:border-box}body{margin:0;font:14px/1.35 Helvetica,Arial,sans-serif;color:#000}
+  const css = `@page{size:A4 landscape;margin:0}*{box-sizing:border-box}body{margin:0;font:17px/1.35 Helvetica,Arial,sans-serif;color:#000}
   .pg{width:297mm;height:210mm;position:relative;page-break-after:always;overflow:hidden;padding:12mm 14mm}
-  .num{position:absolute;left:14mm;top:9mm;font:700 64px/1 Helvetica,Arial,sans-serif}
-  .ttl{position:absolute;left:44mm;top:14mm;font-size:15px;color:#333}
-  .img{position:absolute;left:60mm;right:12mm;top:16mm;bottom:22mm;display:flex;align-items:center;justify-content:center}
+  .num{position:absolute;left:14mm;top:8mm;font:700 72px/1 Helvetica,Arial,sans-serif}
+  .ttl{position:absolute;left:46mm;top:11mm;font-size:24px;font-weight:700;color:#000}
+  .chips{position:absolute;left:46mm;right:14mm;top:22mm;display:flex;flex-wrap:wrap;gap:2mm}
+  .chip{font-size:15px;font-weight:700;padding:1mm 3mm;border-radius:2mm;border:2px solid #000}
+  .chip small{font-weight:400;font-size:13px}
+  .chip.pr{background:#2f72e0;color:#fff;border-color:#1a4fa8}.chip.bo{background:#f29a2e;color:#000;border-color:#a85f00}
+  .img{position:absolute;left:62mm;right:12mm;top:34mm;bottom:28mm;display:flex;align-items:center;justify-content:center}
   .img img{max-width:100%;max-height:100%}
-  .box{position:absolute;left:14mm;top:34mm;width:42mm;border:1.6px solid #000;border-radius:3mm;padding:3mm;display:grid;gap:2.5mm}
-  .hw{display:flex;align-items:center;gap:2mm;font-weight:700}.hw small{font-weight:400;display:block;font-size:10.5px}
-  .servo{position:absolute;left:14mm;bottom:30mm;width:42mm;border:1.6px solid #000;border-radius:50%;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-  .servo b{font-size:30px}.servo span{font-size:11px}
-  .note{position:absolute;left:60mm;right:14mm;bottom:9mm;font-size:13px;border-top:1px solid #000;padding-top:2mm}
-  .warn::before{content:"!";display:inline-block;width:6mm;height:6mm;border:1.6px solid #000;border-radius:50%;text-align:center;font-weight:700;margin-right:2mm;line-height:5.4mm}
-  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4mm;margin-top:6mm}.cell{border:1px solid #000;border-radius:2mm;padding:2mm;text-align:center;font-size:12px}
-  .cell img{width:100%}h1{font-size:34px;margin:0}h2{font-size:20px;margin:0 0 3mm}.two{display:grid;grid-template-columns:1fr 1fr;gap:8mm}
-  table{border-collapse:collapse;font-size:12.5px}
-  .ebody{position:absolute;left:14mm;right:14mm;top:30mm;bottom:10mm;font-size:12px}.ebody.withimg{display:grid;grid-template-columns:1.15fr 1fr;gap:6mm}
-  .eimg{width:100%;align-self:start}.md{width:100%;margin-bottom:3mm}.md td,.md th{font-size:11px;padding:1mm 1.6mm;vertical-align:top}.ck{width:5mm;text-align:center;font-size:13px}
-  .ebody p{margin:0 0 2mm}.li{margin:0 0 1.5mm}.sec{position:absolute;right:14mm;top:12mm;font:700 13px Helvetica,Arial,sans-serif;border:1.6px solid #000;border-radius:2mm;padding:1mm 3mm}td,th{border:1px solid #000;padding:1.2mm 2mm;text-align:left}`;
+  .box{position:absolute;left:14mm;top:36mm;width:45mm;border:2.4px solid #000;border-radius:3mm;padding:3mm;display:grid;gap:3mm;background:#fff}
+  .hw{display:flex;align-items:center;gap:2mm;font-weight:700;font-size:18px}.hw small{font-weight:700;display:block;font-size:14px}
+  .servo{position:absolute;left:14mm;bottom:30mm;width:45mm;border:2.4px solid #000;border-radius:50%;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .servo b{font-size:36px}.servo span{font-size:14px;font-weight:700}
+  .foot{position:absolute;left:62mm;right:14mm;bottom:8mm;display:grid;gap:2mm}
+  .fit{display:flex;gap:3mm;align-items:flex-start;background:#ffe3e3;border:3px solid #c40000;border-radius:2.5mm;padding:2mm 3mm;font-size:16px;line-height:1.3}
+  .fitb{background:#c40000;color:#fff;font-weight:700;font-size:18px;padding:.5mm 2.5mm;border-radius:1.5mm;flex:none}
+  .note,.note2{font-size:17px;border-top:2px solid #000;padding-top:2mm;font-weight:600}
+  .note{position:absolute;left:62mm;right:14mm;bottom:9mm}
+  .warn::before{content:"!";display:inline-block;width:7mm;height:7mm;border:2.4px solid #000;border-radius:50%;text-align:center;font-weight:700;margin-right:2mm;line-height:6.4mm}
+  .legend{display:flex;gap:4mm;flex-wrap:wrap;font-size:16px}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4mm;margin-top:5mm}.cell{border:2px solid #000;border-radius:2mm;padding:2mm;text-align:center;font-size:15px}
+  .cell img{width:100%}h1{font-size:40px;margin:0}h2{font-size:24px;margin:0 0 3mm}.two{display:grid;grid-template-columns:1fr 1fr;gap:8mm}
+  table{border-collapse:collapse;font-size:15px}
+  .ebody{position:absolute;left:14mm;right:14mm;top:30mm;bottom:9mm;font-size:16px}.ebody.withimg{display:grid;grid-template-columns:1.15fr 1fr;gap:6mm}
+  .eimg{width:100%;align-self:start}.md{width:100%;margin-bottom:3mm}.md td,.md th{font-size:15.5px;padding:1mm 1.6mm;vertical-align:top}.ck{width:6mm;text-align:center;font-size:15px}
+  .ebody p{margin:0 0 2mm}.li{margin:0 0 1.5mm}.sec{position:absolute;right:14mm;top:10mm;font:700 16px Helvetica,Arial,sans-serif;border:2.4px solid #000;border-radius:2mm;padding:1mm 3mm}
+  td,th{border:1.4px solid #000;padding:1.2mm 2mm;text-align:left}th{background:#e8e8e8}`;
   const img = f => `data:image/png;base64,${fs.readFileSync(path.join(OUT, f)).toString("base64")}`;
   const imgAny = f => `data:image/png;base64,${fs.readFileSync(path.join(ROOT, f)).toString("base64")}`;
 
@@ -164,28 +202,36 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
     }
     endPara(); flush(); return out;
   };
-  const ePage = (n, title, body, imgSrc) => `<div class="pg"><div class="num">${n}</div><div class="ttl" style="left:${n.length > 2 ? 62 : 44}mm">${title}</div>
+  const ePage = (n, title, body, imgSrc) => `<div class="pg"><div class="num">${n}</div><div class="ttl" style="left:${n.length > 2 ? 68 : 50}mm">${title}</div>
     <div class="ebody ${imgSrc ? "withimg" : ""}">${imgSrc ? `<img class="eimg" src="${imgSrc}">` : ""}<div>${body}</div></div></div>`;
   let H = `<!doctype html><html><head><meta charset="utf-8"><title>Concept A Assembly Manual</title><style>${css}</style></head><body>`;
-  H += `<div class="pg"><h1>CONCEPT A</h1><div style="font-size:16px;margin-top:2mm">Can-flipping robot · assembly manual · ME 2331/L</div>
-    <div class="img" style="left:14mm;top:30mm"><img src="${img("cover.png")}"></div>
-    <div class="note">1 person · ~3 h after printing · read each page, then build. <b>Servo angles:</b> load <code>firmware/servo_setup</code> and type the command in the round badge (Serial Monitor, 9600).</div></div>`;
+  H += `<div class="pg"><h1>CONCEPT A</h1><div style="font-size:20px;margin-top:2mm;font-weight:700">Can-flipping robot · assembly manual · ME 2331/L</div>
+    <div class="img" style="left:14mm;right:106mm;top:36mm;bottom:26mm"><img src="${img("cover.png")}"></div>
+    <div style="position:absolute;right:14mm;top:14mm;width:88mm;display:grid;gap:3mm">
+      <span class="chip pr" style="font-size:18px">BLUE = PRINTED part</span><span class="chip bo" style="font-size:18px">ORANGE = BOUGHT part</span>
+      <span class="fit" style="font-size:16px"><span class="fitb">FIT</span><span>= this step needs a careful fit: measure, test, sand or drill</span></span>
+      <span style="font-size:15px">In each step the <b>new</b> parts are strong colour with black edges; parts already in place are pale.</span></div>
+    <div class="note">1 person · ~3 h after printing · read each page, then build. <b>Servo angles:</b> the laptop control panel (or <code>firmware/servo_setup</code>) moves the servo to the angle in the round badge before you fit the horn.</div></div>`;
   H += `<div class="pg"><h2>You need</h2><div class="two"><div><table><tr><th>Tool</th></tr>
     ${["Phillips screwdrivers #1 and #2", "Multimeter", "Hot-glue gun", "Superglue", "Wire stripper", "Small flat screwdriver (buck pot)", "Hacksaw (6 mm rod) + file", "Vise or clamp (bearing press)", "12 mm drill bit, turned by hand", "Sandpaper 120 + 240, craft knife, flush cutters"].map(t => `<tr><td>${t}</td></tr>`).join("")}</table></div>
     <div><table><tr><th>Hardware</th><th>Qty</th></tr>
     <tr><td>${screw("#6")} #6-32 × ½″</td><td>8</td></tr><tr><td>${screw("#8")} #8-32 × ½″</td><td>4</td></tr><tr><td>${screw("s")} servo-bag screws</td><td>~14</td></tr>
     <tr><td>6807-2RS bearing</td><td>1</td></tr><tr><td>LM6UU linear bearing</td><td>4</td></tr><tr><td>6 mm rod, cut 2 × 112 mm</td><td>2</td></tr>
     <tr><td>Servos: MG996R / MG90S / SG90</td><td>1 / 2 / 1</td></tr></table>
-    <p style="font-size:12.5px;margin-top:4mm"><span class="warn"></span>Before building: bench-test the electronics (docs/13_electronics_bench_test.md) and set the buck to <b>5.8 V</b>.</p></div></div></div>`;
-  H += `<div class="pg"><h2>Printed parts</h2><div class="grid">${printed.map(n => `<div class="cell"><img src="${img(`part_${n}.png`)}"><b>${PN[n]}</b><br>${NAME[n]}</div>`).join("")}</div></div>`;
+    <p style="font-size:16px;margin-top:4mm"><span class="warn"></span>Before building: bench-test the electronics (docs/13_electronics_bench_test.md) and set the buck to <b>5.8 V</b>.</p></div></div></div>`;
+  H += `<div class="pg"><h2><span class="chip pr" style="font-size:22px">PRINTED parts</span> &nbsp;blue in every drawing · 10 parts</h2><div class="grid">${printed.map(n => `<div class="cell" style="border-color:#1a4fa8"><img src="${img(`part_${n}.png`)}"><b>${PN[n]}</b><br>${NAME[n]}</div>`).join("")}</div></div>`;
+  H += `<div class="pg"><h2><span class="chip bo" style="font-size:22px">BOUGHT parts</span> &nbsp;orange in every drawing · not printed</h2><div class="grid">${BOUGHT_SHOW.map(n => `<div class="cell" style="border-color:#a85f00"><img src="${img(`bought_${n}.png`)}"><b>${BOUGHT_NAME[n]}</b>${{ LM6UU_L1: " ×4", rod_L: " ×2", lift_servo_MG90S: " ×2" }[n] || ""}</div>`).join("")}</div></div>`;
+  H += `<div class="pg"><h2><span class="fitb" style="font-size:24px">FIT</span> &nbsp;Fits that need care (check these with calipers or by test-fitting)</h2>
+    <table style="width:100%;font-size:16px;margin-top:3mm"><tr><th style="width:18mm">Step</th><th style="width:60mm">Title</th><th>Size, test and fix</th></tr>
+    ${Object.entries(FIT).map(([n, t]) => `<tr><td style="font-size:22px;font-weight:700;text-align:center">${n}</td><td>${steps.find(x => x.n == n).title}</td><td>${t}</td></tr>`).join("")}</table>
+    <p style="font-size:16px;margin-top:3mm"><b>Rule:</b> sand or drill a little at a time and test after every few strokes: plastic can't be added back. Too loose: one layer of tape or a drop of superglue.</p></div>`;
 
   // ---------------- PART E: electronics first (circuit + bench test), before any mechanical step
   H += `<div class="pg"><h1>PART E</h1><div style="font-size:18px;margin-top:3mm">Electronics first: wire it flat on the table and test it while the parts print</div>
     <div class="img" style="left:14mm;top:34mm"><img src="${imgAny("docs/wiring/wiring_diagram.png")}"></div></div>`;
   H += ePage("E1", "Circuit: every connection", mdSection("docs/04_wiring.md", "Wire list", true) +
-    `<p><b>Never</b> connect the 5.8 V rail to the Uno's 5V pin: the Uno gets its power only from the 9 V battery. Servo plug: brown = GND, red = +, orange = signal.</p>`,
-    imgAny("docs/wiring/wiring_diagram.png"));
-  H += `<div class="pg"><div class="num">E1b</div><div class="ttl" style="left:62mm">Schematic (standard symbols): same circuit, nets with the same name are connected</div>
+    `<p><b>Never</b> connect the 5.8 V rail to the Uno's 5V pin: the Uno gets its power only from the 9 V battery. Servo plug: brown = GND, red = +, orange = signal. Diagram: page "PART E".</p>`);
+  H += `<div class="pg"><div class="num">E1b</div><div class="ttl" style="left:62mm">Schematic: same circuit, same net name = connected</div>
     <div class="img" style="left:14mm;top:26mm;bottom:20mm"><img src="${imgAny("docs/wiring/schematic.png")}"></div>
     <div class="note">Uno on its own 9 V battery; the 12 V adapter feeds only the buck (servos). Uno GND and servo GND must be joined.</div></div>`;
   H += ePage("E2", "Bench test 1: power, no servos yet", mdSection("docs/13_electronics_bench_test.md", "1. Power"));
@@ -200,13 +246,14 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
     const md = t => inline(t);
     H += ePage("P0", "PrusaSlicer: where to find everything (quick map)",
       `<div style="display:grid;grid-template-columns:0.9fr 1.25fr;gap:6mm">
-        <div>${E.prusa_steps.map((t, i) => `<div class="li" style="font-size:12px"><b>${i + 1}.</b> ${md(t)}</div>`).join("")}
-          <table class="md" style="margin-top:3mm">${E.prusa_keys.map(([k, v]) => `<tr><td style="width:30mm"><b>${k}</b></td><td>${md(v)}</td></tr>`).join("")}</table></div>
-        <table class="md"><tr><th>Setting</th><th>Where</th></tr>${E.prusa_map.map(([k, v]) => `<tr><td style="width:36mm">${md(k)}</td><td>${md(v)}</td></tr>`).join("")}</table>
+        <div>${E.prusa_steps.map((t, i) => `<div class="li" style="font-size:15px"><b>${i + 1}.</b> ${md(t)}</div>`).join("")}</div>
+        <table class="md" style="align-self:start">${E.prusa_keys.map(([k, v]) => `<tr><td style="width:34mm;font-size:15px"><b>${k}</b></td><td style="font-size:15px">${md(v)}</td></tr>`).join("")}</table>
       </div>`);
+    H += ePage("P0b", "PrusaSlicer: where each setting lives",
+      `<table class="md"><tr><th>Setting</th><th>Where (Expert mode)</th></tr>${E.prusa_map.map(([k, v]) => `<tr><td style="width:62mm;font-size:14px">${md(k)}</td><td style="font-size:14px">${md(v)}</td></tr>`).join("")}</table>`);
     H += ePage("P1", "Printing: set these once (same for every plate)",
       `<table class="md">${E.common.map(([k, v]) => `<tr><td class="ck">☐</td><td style="width:55mm"><b>${md(k)}</b></td><td>${md(v)}</td></tr>`).join("")}</table>
-      <p style="font-size:13px">Then print plates <b>A → E</b> (next pages). Each page shows what goes on the bed and the settings for that whole plate.
+      <p style="font-size:16px">Then print plates <b>A → E</b> (next pages). Each page shows what goes on the bed and the settings for that whole plate.
       Total about <b>${Math.round(E.after[0])} h</b> and <b>${Math.round(E.after[1])} g</b> of PETG.</p>`);
     for (const P of E.plates) {
       const rows = [["Layer height", P.layer + " mm"], ["Walls", P.walls], ["Top / bottom layers", P.topbot], ["Infill density", P.infill.split(" ")[0]], ["Infill pattern", P.infill.split(" ")[1]],
@@ -217,7 +264,7 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
         <div style="position:absolute;left:14mm;width:160mm;top:146mm;font-size:12px"><b>Files to add (Ctrl+I), from <code>cad/print/stl/</code>:</b>
           <div style="display:grid;grid-template-columns:repeat(3,48mm);gap:4mm;margin-top:1.5mm">${P.parts.map(c => `<div style="text-align:center;font-size:11px"><img src="${imgAny(c.img)}" style="height:30mm;max-width:100%;border:1px solid #ccc"><br><code>${c.file}</code></div>`).join("")}</div></div>
         <div style="position:absolute;left:182mm;right:12mm;top:30mm">
-          <table class="md" style="font-size:14px">${rows.map(([k, v]) => `<tr><td class="ck">☐</td><td style="font-size:12px">${k}</td><td style="font-size:${String(v).length > 30 ? 12 : 16}px"><b>${v}</b></td></tr>`).join("")}</table>
+          <table class="md">${rows.map(([k, v]) => `<tr><td class="ck" style="padding:.5mm">☐</td><td style="font-size:13.5px;padding:.5mm 1.5mm">${k}</td><td style="padding:.5mm 1.5mm;font-size:${String(v).length > 30 ? 13 : 16}px"><b>${v}</b></td></tr>`).join("")}</table>
           <div style="margin-top:5mm;font-size:16px">≈ <b>${P.time}</b> · <b>${P.grams} g</b></div>
           <div style="margin-top:3mm;font-size:13px">PrusaSlicer: open <b><code>cad/print/plates_AE/plate_${P.letter}.3mf</code></b>: parts placed + all these settings inside. Other slicers: <code>plate_${P.letter}.stl</code> + type the settings.</div>
           <div style="margin-top:2mm;font-size:12px;color:#333">Same picture in your slicer: ${P.parts.length} part${P.parts.length > 1 ? "s" : ""}, flat side down as shown, don't rotate them up.</div>
@@ -238,14 +285,20 @@ function bbCenter(n) { const v = parts[n].v; let lo = [1e9, 1e9, 1e9], hi = [-1e
       <div class="li" style="font-size:14px">• Plates B and C (coarse layers): holes can come out a little tight: drill or sand them.</div>
       <div class="li" style="font-size:14px">• A part cracks at a screw: the screw was forced: drill one size bigger, use the next screw or hot glue.</div>`);
   }
+  const seen = new Set();
   for (const s of steps) {
+    const first = s.new.filter(n => !seen.has(n)); s.new.forEach(n => seen.add(n));
     const hw = {}; for (const [q, n] of s.hw) hw[n] = (hw[n] || 0) + q;
     const box = Object.keys(hw).length ? `<div class="box">${Object.entries(hw).map(([n, q]) => `<div class="hw">${q}×&nbsp;${screw(n)}<small>${n.replace(" screw", "")}</small></div>`).join("")}</div>` : "";
     const cmd = s.badge ? { "135°": "t 135", "30°": "l 30", "0°": "w 0", "20°": "g 20" }[s.badge[1]] : "";
     const badge = s.badge ? `<div class="servo"><span>${s.badge[0]}</span><b>${s.badge[1]}</b><span><code>${cmd}</code></span></div>` : "";
-    H += `<div class="pg"><div class="num">${s.n}</div><div class="ttl">${s.title}</div>${s.n === 1 ? '<div class="sec">PART M</div>' : ""}${box}${badge}
-      <div class="img"><img src="${img(`step_${String(s.n).padStart(2, "0")}.png`)}"></div>
-      ${s.note ? `<div class="note ${/GLUE|must|first|don't|5.8/.test(s.note) ? "warn" : ""}">${s.note}</div>` : ""}</div>`;
+    const pr = first.filter(n => PRINTED_PARTS.includes(n)), bo = {};
+    for (const n of first.filter(n => !PRINTED_PARTS.includes(n) && n !== "test_can")) { const k = BOUGHT_NAME[n] || n; bo[k] = (bo[k] || 0) + 1; }
+    const chips = `<div class="chips">${pr.map(n => `<span class="chip pr">PRINTED · ${NAME[n]} <small>${PN[n]}</small></span>`).join("")}${Object.entries(bo).map(([k, q]) => `<span class="chip bo">BOUGHT · ${q > 1 ? q + "× " : ""}${k}</span>`).join("")}</div>`;
+    const fit = FIT[s.n] ? `<div class="fit"><span class="fitb">FIT</span><div>${FIT[s.n]}</div></div>` : "";
+    H += `<div class="pg"><div class="num">${s.n}</div><div class="ttl">${s.title}</div>${s.n === 1 ? '<div class="sec">PART M</div>' : ""}${chips}${box}${badge}
+      <div class="img" style="${fit ? "bottom:46mm;" : ""}${pr.length + Object.keys(bo).length > 3 ? "top:44mm" : ""}"><img src="${img(`step_${String(s.n).padStart(2, "0")}.png`)}"></div>
+      <div class="foot">${fit}${s.note ? `<div class="note2 ${/GLUE|must|first|don't|5.8/.test(s.note) ? "warn" : ""}">${s.note}</div>` : ""}</div></div>`;
   }
   H += `<div class="pg"><div class="num">${steps.length + 1}</div><div class="ttl">Wiring</div>
     <div class="img" style="left:14mm;right:110mm;top:28mm"><img src="${imgAny("docs/wiring/wiring_3d_column_clean.png")}"></div>
