@@ -7,11 +7,15 @@ with the settings inside the 3MF: the correction is only right for the same laye
 |---|---|---|---|---|
 | `reprint_1.3mf` | carriage arm + lift link | **tonight** (short night) | 3 h 52 | ~39 g |
 | `reprint_5.3mf` | carriage arm + lift link + turret plate | **tonight** (long night, instead of 1) | 6 h 51 | ~65 g |
+| `reprint_7.3mf` | carriage arm + lift link + **left finger + gripper frame** (turret plate fixed by hand) | tomorrow, instead of 5 | 8 h 32 | ~74 g |
+| `reprint_6.3mf` | left finger + gripper frame only | any free daytime slot | 4 h 39 | ~35 g |
 | `reprint_2.3mf` | spare claw: gripper frame + both fingers | tomorrow during the shift | 6 h 49 | ~50 g |
 | `reprint_3.3mf` | base | **only if** sanding the old pocket 46.0 → 47.0 fails | 7 h 22 | ~125 g |
 | `reprint_4.3mf` | turret plate | **only if** sanding the hub / drilling the rod holes fails (not needed after 5) | 2 h 56 | ~26 g |
 
-The top cap is not reprinted: its holes were drilled by hand.
+The top cap is not reprinted: its holes were drilled by hand. The new left finger (horn screwed onto the gear) only works
+with the new gripper frame (servo 4.8 mm higher, 14 mm horn opening), so they always print together. The old right finger
+still meshes with it (same gear).
 
 Open in PrusaSlicer (Ctrl+O, "Yes" to load the settings), slice, print. Every plate has its settings inside:
 
