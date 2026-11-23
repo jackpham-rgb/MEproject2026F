@@ -195,7 +195,7 @@ function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
   .foot{position:absolute;left:62mm;right:14mm;bottom:8mm;display:grid;gap:2mm}
   .fit{display:flex;gap:3mm;align-items:flex-start;background:#ffe3e3;border:3px solid #c40000;border-radius:2.5mm;padding:2mm 3mm;font-size:16px;line-height:1.3}
   .fitb{background:#c40000;color:#fff;font-weight:700;font-size:18px;padding:.5mm 2.5mm;border-radius:1.5mm;flex:none}
-  .side{position:absolute;right:14mm;top:36mm;width:94mm;bottom:9mm;display:flex;flex-direction:column;gap:2.5mm;font-size:15px;line-height:1.3}
+  .side{position:absolute;right:14mm;top:34mm;width:94mm;bottom:7mm;display:flex;flex-direction:column;gap:2mm;font-size:14px;line-height:1.28}
   .lv{color:#fff;font-weight:800;font-size:20px;padding:1.5mm 3mm;border-radius:2mm;letter-spacing:.03em}
   .sbox{border:2px solid #000;border-radius:2mm;padding:2mm 2.5mm}
   .gluebox{border:3px solid #c9a400;background:#fff3b0;border-radius:2mm;padding:2mm 2.5mm}
@@ -326,6 +326,12 @@ function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
       <div class="li" style="font-size:14px">• Plates B and C (coarse layers): holes can come out a little tight: drill or sand them.</div>
       <div class="li" style="font-size:14px">• A part cracks at a screw: the screw was forced: drill one size bigger, use the next screw or hot glue.</div>`);
   }
+  // ---------------- MEASURE FIRST: CAD vs real, before PART M step 1 (from docs/17_tolerance_recheck.md)
+  H += ePage("M0", "Measure first: CAD file vs real part (calipers)", mdSection("docs/17_tolerance_recheck.md", "How to measure") +
+    mdSection("docs/17_tolerance_recheck.md", "A. Bought parts", true));
+  H += ePage("M0b", "Measure: tolerance gauge", mdSection("docs/17_tolerance_recheck.md", "B. Tolerance gauge", true));
+  H += ePage("M0c", "Measure: parts already printed", mdSection("docs/17_tolerance_recheck.md", "C. Parts already printed") +
+    `<p style="font-size:15px"><b>Send the numbers before the PRECISE FIT steps</b> (1, 5, 6, 7, 8): the hole sizes get corrected and those parts reprinted. EASY steps can go ahead.</p>`);
   const seen = new Set();
   for (const s of steps) {
     const first = s.new.filter(n => !seen.has(n)); s.new.forEach(n => seen.add(n));
