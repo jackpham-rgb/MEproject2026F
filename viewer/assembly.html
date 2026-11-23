@@ -55,6 +55,20 @@ label.tb input{margin:0}
 .chip{display:inline-block;font:700 12.5px system-ui,sans-serif;padding:3px 8px;border-radius:6px;margin:0 4px 4px 0}
 .chip.pr{background:#2f72e0;color:#fff}.chip.bo{background:#e8891c;color:#111}.chip.sc{background:#5b6470;color:#fff}.chip.gl{background:#ffe14d;color:#111}
 ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
+#measure{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:14px;background:var(--ground)}
+#measure.on{display:flex}
+#measure svg{width:100%;max-width:900px;height:auto;max-height:calc(100% - 56px);overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:10px}
+#mbar{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;justify-content:center}
+#mbar button.on{outline:2px solid var(--accent)}
+.mrow{border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin:6px 0;font-size:13.5px}
+.mrow.done{border-color:var(--easy);background:color-mix(in srgb,var(--easy) 8%,transparent)}
+.mrow .top{display:flex;gap:6px;align-items:baseline}
+.mrow .id{font-weight:800;flex:none;width:30px}
+.mrow .cad{margin-left:auto;flex:none;font-variant-numeric:tabular-nums;color:var(--muted)}
+.mrow .in{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:5px;margin-top:5px}
+.mrow input,.mrow select{width:100%;min-width:0;font:14px system-ui,sans-serif;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--ground);color:var(--ink)}
+.mrow input:disabled{opacity:.35}
+#info h4{margin:14px 0 2px;font-size:15px}
 #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted)}
 @media (max-width:900px){
   #app{grid-template-columns:1fr;grid-template-rows:auto 52vh 1fr;height:auto;min-height:100dvh}
@@ -88,6 +102,8 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
       <span><i class="sw" style="background:#9aa1aa"></i> screw · dashed line = its path</span>
       <span><i class="sw" style="background:#ffe14d"></i> glue</span>
     </div>
+    <div id="measure"><svg id="msvg" viewBox="0 0 900 520" font-family="system-ui,Arial,sans-serif"></svg>
+      <div id="mbar"><button class="tb" data-t="0">1 · First reading</button><button class="tb" data-t="4.2">2 · Turn ¼ turn, second reading</button><button class="tb" data-t="10">3 · Where in the hole</button><button class="tb" id="mpause">❚❚ Pause</button></div></div>
     <div id="nav"><button class="tb" id="prev">◀ Back</button><button class="tb" id="next">Next ▶</button></div>
   </main>
   <aside id="info"></aside>
@@ -153,7 +169,8 @@ const printedSet = new Set(D.printed);
 
 // ---------------- step list
 const LV = D.levels;
-const steps = [{ n: 0, title: "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can").concat(["test_can"]), screws: [], glue: [] }, ...D.steps];
+const steps = [{ n: 0, title: "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can").concat(["test_can"]), screws: [], glue: [] },
+  { n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }, ...D.steps];
 const list = $("list");
 steps.forEach((s, i) => {
   const b = document.createElement("button"); b.className = "st"; b.dataset.i = i;
@@ -197,6 +214,11 @@ function go(i) {
   const s = steps[cur];
   document.querySelectorAll(".st").forEach(b => b.classList.toggle("on", +b.dataset.i === cur));
   const sel = document.querySelector(`.st[data-i="${cur}"]`); sel && sel.scrollIntoView({ block: "nearest", inline: "nearest" });
+  const isM = !!s.measure;
+  $("measure").classList.toggle("on", isM); ["tools", "legend", "labels"].forEach(id => $(id).style.visibility = isM ? "hidden" : "");
+  renderer.domElement.style.visibility = isM ? "hidden" : "";
+  if (isM) { for (const o of Object.values(owners)) o.group.visible = false; clearPaths(); anim = null; renderInfo(s); M.start(0); return; }
+  M.stop();
   const show = new Set(s.show), fresh = new Set([...s.new, ...s.screws, ...s.glue]);
   for (const [n, o] of Object.entries(owners)) { o.group.visible = show.has(n); o.group.position.set(0, 0, 0); o.group.rotation.set(0, 0, 0); styleOwner(n, fresh.has(n) || cur === 0); }
   clearPaths(); s.screws.forEach(n => addPath(screwBy[n]));
@@ -256,7 +278,7 @@ renderer.domElement.addEventListener("wheel", () => { camGoal = null; }, { passi
 const labBox = $("labels");
 function labels() {
   labBox.innerHTML = ""; if (!labEl.checked) return;
-  const s = steps[cur]; if (cur === 0) return;
+  const s = steps[cur]; if (cur === 0 || s.measure) return;
   const W = renderer.domElement.clientWidth, H = renderer.domElement.clientHeight;
   const put = (pos, text, cls) => { const p = pos.clone().project(camera); if (p.z > 1) return;
     const d = document.createElement("div"); d.className = "lab " + cls; d.textContent = text;
@@ -294,9 +316,11 @@ function renderInfo(s) {
       <p>23 steps. Every step shows the new parts flying into place and every screw driving in along its dashed path. Rotate and zoom freely.</p>
       ${Object.entries(LV).map(([k, v]) => `<div class="lvl ${k}"><b>${v.label}</b>${v.text}<br><small>Steps: ${D.steps.filter(x => x.level === k).map(x => x.n).join(", ")}</small></div>`).join("")}
       <div class="box"><h3>Do while the precise parts print</h3><ul>${D.while_waiting.map(t => `<li>${t}</li>`).join("")}</ul></div>
+      <div class="box fit"><h3>Next: measure first</h3>Before step 1, measure the bought parts, the tolerance gauge and the parts already printed (step <b>M</b>, animated). The precise-fit holes get corrected from those numbers.</div>
       <div class="box"><h3>Colours</h3><span class="chip pr">blue = printed</span><span class="chip bo">orange outline = bought, new</span><span class="chip sc">grey = screw</span><span class="chip gl">yellow = glue</span><br>Bought parts are drawn as they look (servos, horns, bearings, boards).</div>`;
     return;
   }
+  if (s.measure) { M.info(I); return; }
   const lv = LV[s.level];
   const pr = s.new.filter(n => printedSet.has(n)), bo = {};
   for (const n of s.new.filter(n => !printedSet.has(n))) { const k = D.names[n] || n; bo[k] = (bo[k] || 0) + 1; }
@@ -314,13 +338,165 @@ function renderInfo(s) {
     ${s.screws.length ? `<div class="box"><h3>Screw path</h3>The dashed line shows where each screw goes in and which way. ${s.screws.length} screw${s.screws.length > 1 ? "s" : ""} in this step.</div>` : ""}`;
 }
 
+// ---------------- MEASURE FIRST: animated how-to + fill-in sheet (rows from docs/17_tolerance_recheck.md)
+const M = (() => {
+  const svg = $("msvg"), NS = "http://www.w3.org/2000/svg";
+  const RED = "#c40000", GRN = "#0a7a2f", INK = "#14181d";
+  svg.innerHTML = `
+  <defs><marker id="mA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker></defs>
+  <text id="mCap" x="30" y="44" font-size="28" font-weight="800" fill="${INK}"></text>
+  <text id="mSub" x="30" y="76" font-size="18" fill="#444"></text>
+  <g id="mTop">
+    <text x="330" y="112" font-size="15" fill="#666" text-anchor="middle">looking down into the hole (oval exaggerated)</text>
+    <rect x="170" y="128" width="320" height="250" rx="12" fill="#cfd6de" stroke="${INK}" stroke-width="2"/>
+    <ellipse cx="330" cy="253" rx="86" ry="70" fill="#fff" stroke="${INK}" stroke-width="3"/>
+    <g id="mCal">
+      <rect x="-150" y="-15" width="300" height="30" rx="3" fill="#59616b" opacity=".38"/>
+      <rect id="mJL" y="-10" width="12" height="20" fill="${INK}"/><rect id="mJR" y="-10" width="12" height="20" fill="${INK}"/>
+      <line id="mAr" y1="0" y2="0" stroke="${RED}" stroke-width="3" marker-start="url(#mA)" marker-end="url(#mA)"/>
+    </g>
+    <path id="mTurn" d="M455,140 a95,95 0 0 1 60,85" fill="none" stroke="${INK}" stroke-width="4" marker-end="url(#mA)" opacity="0"/>
+  </g>
+  <g id="mSide" opacity="0">
+    <text x="330" y="112" font-size="15" fill="#666" text-anchor="middle">the same hole cut in half, seen from the side</text>
+    <path d="M190,130 H280 V350 L300,390 H190 z" fill="#cfd6de" stroke="${INK}" stroke-width="2"/>
+    <path d="M470,130 H380 V350 L360,390 H470 z" fill="#cfd6de" stroke="${INK}" stroke-width="2"/>
+    <line x1="160" y1="390" x2="500" y2="390" stroke="${INK}" stroke-width="5"/>
+    <text x="330" y="414" font-size="15" fill="#444" text-anchor="middle">bed side: first layers bulge in ("elephant foot")</text>
+    <line id="mSA" stroke-width="3" marker-start="url(#mA)" marker-end="url(#mA)"/>
+    <text id="mSL" font-size="20" font-weight="800" text-anchor="middle"></text>
+  </g>
+  <g transform="translate(560,128)">
+    <rect width="300" height="120" rx="12" fill="#2b3036"/>
+    <text x="16" y="26" font-size="14" fill="#cfd6de">calipers screen</text>
+    <rect x="16" y="36" width="268" height="68" rx="6" fill="#b9c7a6"/>
+    <text id="mLcd" x="268" y="88" font-size="48" font-family="ui-monospace,Menlo,Consolas,monospace" text-anchor="end" fill="#1d2418">0.00</text>
+    <text x="276" y="100" font-size="12" text-anchor="end" fill="#1d2418"></text>
+  </g>
+  <g transform="translate(560,282)" font-size="16">
+    <text x="0" y="-10" font-size="15" fill="#666">your sheet</text>
+    <rect width="300" height="34" fill="#e9edf1" stroke="${INK}"/><rect y="34" width="300" height="42" fill="#fff" stroke="${INK}"/>
+    <line x1="150" y1="0" x2="150" y2="76" stroke="${INK}"/>
+    <text x="75" y="23" text-anchor="middle" font-weight="700">Measured</text><text x="225" y="23" text-anchor="middle" font-weight="700">Measured (90°)</text>
+    <text id="mV1" x="75" y="63" text-anchor="middle" font-size="24" font-weight="800" fill="${RED}"></text>
+    <text id="mV2" x="225" y="63" text-anchor="middle" font-size="24" font-weight="800" fill="${RED}"></text>
+  </g>
+  <text id="mFoot" x="560" y="410" font-size="16" fill="#333"></text>
+  <text id="mFoot2" x="560" y="432" font-size="16" fill="#333"></text>
+  <text x="30" y="500" font-size="15" fill="#555">Shafts and outside sizes (hub, post): same two readings, with the big outside jaws.</text>`;
+  const q = id => svg.querySelector("#" + id), set = (el, a) => Object.entries(a).forEach(([k, v]) => el.setAttribute(k, v));
+  const ease = x => x <= 0 ? 0 : x >= 1 ? 1 : (x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
+  const seg = (t, a, b) => ease((t - a) / (b - a));
+  const RX = 86, RY = 70, V1 = 6.08, V2 = 5.92, LOOP = 15.5;
+  let t0 = 0, raf = 0, paused = false, tp = 0;
+  function draw(t) {
+    let ang = 90 * seg(t, 4.8, 6.2), gap = 30, lcd = "", cap, sub, v1 = "", v2 = "", f1 = "", f2 = "";
+    if (t < 4.2) { gap = 30 + (2 * RX - 30) * seg(t, 0.5, 2.5); lcd = (V1 * gap / (2 * RX)).toFixed(2);
+      cap = "1 · First reading"; sub = "Small top jaws inside the hole, open them until they just touch.";
+      if (t > 2.9) { v1 = V1.toFixed(2); f1 = "Write it in “Measured”."; } }
+    else if (t < 10) { v1 = V1.toFixed(2);
+      if (t < 6.2) { gap = 2 * RX - (2 * RX - 30) * seg(t, 4.2, 4.8); lcd = t < 4.8 ? (V1 * gap / (2 * RX)).toFixed(2) : "- - -";
+        cap = "2 · Turn the calipers a quarter turn"; sub = "Same hole, like going from 12 to 3 on a clock."; }
+      else { gap = 30 + (2 * RY - 30) * seg(t, 6.3, 8.2); lcd = (V2 * gap / (2 * RY)).toFixed(2);
+        cap = "2 · Second reading, 90° from the first"; sub = "Printed holes are often a little oval: the numbers differ.";
+        if (t > 8.6) { v2 = V2.toFixed(2); f1 = "Write it in “Measured (90°)”."; f2 = "The SMALLER number is the one that counts."; } } }
+    else { v1 = V1.toFixed(2); v2 = V2.toFixed(2); cap = "3 · Measure halfway down the hole"; sub = "Not at the bed side: the first layers bulge in and read too small."; }
+    const side = seg(t, 9.8, 10.4);
+    q("mTop").setAttribute("opacity", 1 - side); q("mSide").setAttribute("opacity", side);
+    q("mCal").setAttribute("transform", `translate(330,253) rotate(${ang})`);
+    set(q("mJL"), { x: -gap / 2 }); set(q("mJR"), { x: gap / 2 - 12 }); set(q("mAr"), { x1: -gap / 2 + 13, x2: gap / 2 - 13 });
+    q("mAr").style.display = gap > 50 ? "" : "none";
+    q("mTurn").setAttribute("opacity", t > 4.5 && t < 6.6 ? 1 : 0);
+    if (t >= 10) {
+      const y = 374 - (374 - 245) * seg(t, 12, 13.2), foot = Math.max(0, (y - 350) / 40) * 20;
+      const xl = 280 + foot, xr = 380 - foot, good = t > 13.2, bad = t < 12;
+      const col = good ? GRN : bad ? RED : "#555";
+      set(q("mSA"), { x1: xl + 2, x2: xr - 2, y1: y, y2: y, stroke: col });
+      const r = 6.08 - (100 - (xr - xl)) / 18.2 * 0.28;
+      lcd = r.toFixed(2); set(q("mSL"), { x: 330, y: y - 14, fill: col }); q("mSL").textContent = good ? "✔ here" : bad ? "✘ too small here" : "";
+      f1 = good ? "Halfway down: the real hole size." : "At the bed: reads ~0.3 mm small."; f2 = "";
+    }
+    q("mCap").textContent = cap; q("mSub").textContent = sub; q("mLcd").textContent = lcd || "0.00";
+    q("mV1").textContent = v1; q("mV2").textContent = v2; q("mFoot").textContent = f1; q("mFoot2").textContent = f2;
+    document.querySelectorAll("#mbar [data-t]").forEach(b => b.classList.toggle("on", t >= +b.dataset.t && t < ({ "0": 4.2, "4.2": 10, "10": 99 })[b.dataset.t]));
+  }
+  function loop(now) { const t = paused ? tp : ((now - t0) / 1000) % LOOP; tp = t; draw(t); raf = requestAnimationFrame(loop); }
+  function start(at) { cancelAnimationFrame(raf); paused = false; $("mpause").textContent = "❚❚ Pause"; t0 = performance.now() - at * 1000; raf = requestAnimationFrame(loop); }
+  function stop() { cancelAnimationFrame(raf); }
+  document.querySelectorAll("#mbar [data-t]").forEach(b => b.onclick = () => start(+b.dataset.t));
+  $("mpause").onclick = () => { if (paused) { start(tp); } else { paused = true; $("mpause").textContent = "▶ Play"; } };
+
+  // ---- the sheet
+  const KEY = "conceptA.measure.v1";
+  let vals = {}; try { vals = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(vals)); } catch (e) {} };
+  let rows = null;
+  async function load() {
+    if (rows) return rows;
+    const md = await (await fetch("../docs/17_tolerance_recheck.md")).text();
+    rows = []; let sec = null, hdr = null;
+    for (const l of md.split("\n")) {
+      if (l.startsWith("## ")) { sec = /^## ([ABC])\./.test(l) ? l.slice(3) : null; hdr = null; continue; }
+      if (!sec || !l.startsWith("|") || /^\|[\s|:-]+\|$/.test(l.trim())) continue;
+      const c = l.trim().replace(/^\||\|$/g, "").split("|").map(x => x.trim().replace(/\*\*/g, ""));
+      if (!hdr) { hdr = c; continue; }
+      const g = k => c[hdr.findIndex(h => h === k)] ?? "";
+      const what = hdr.includes("Part") ? `${g("Part")}: ${g("Measure") || g("Feature")}` : g("Feature");
+      rows.push({ sec, id: c[0], what, cad: g("CAD") || g("Nominal"), no90: g("Measured (90°)") === "—", fit: hdr.includes("Fit with the real part") ? (g("Fit with the real part") || "fit") : null });
+    }
+    return rows;
+  }
+  const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  async function info(I) {
+    I.innerHTML = `<div class="head"><span class="big">M</span><h2>Measure first: CAD file vs real part</h2></div>
+      <div class="lvl precise"><b>BEFORE STEP 1</b>Send these numbers before the PRECISE FIT steps (1, 5, 6, 7, 8): the holes get corrected and those parts reprinted. EASY steps can go ahead.</div>
+      <div class="box"><h3>How (watch the animation)</h3><ul>
+        <li><b>Hole:</b> small top jaws inside, measure, turn the calipers a quarter turn, measure again: write <b>both</b>.</li>
+        <li>Halfway down the hole, not at the bed side.</li>
+        <li><b>Shaft / outside:</b> big jaws, two readings 90° apart.</li>
+        <li>Zero the calipers first; close the jaws until they just touch, don't squeeze.</li>
+        <li><b>Fit:</b> press (needs force) · snug (by hand, no play) · loose (wobbles) · no (won't go in).</li></ul></div>
+      <div id="mSheet">Loading the sheet…</div>`;
+    let R; try { R = await load(); } catch (e) { $("mSheet").textContent = "Couldn't load docs/17_tolerance_recheck.md: use the PDF manual pages M0–M0c."; return; }
+    if (!steps[cur].measure) return;
+    let h = "", last = "";
+    for (const r of R) {
+      if (r.sec !== last) { h += `<h4>${esc(r.sec)}</h4>`; last = r.sec; }
+      const v = vals[r.id] || {};
+      h += `<div class="mrow" data-id="${r.id}"><div class="top"><span class="id">${r.id}</span><span>${esc(r.what)}</span><span class="cad">CAD ${esc(r.cad)}</span></div>
+        <div class="in"><input inputmode="decimal" placeholder="Measured" data-k="a" value="${esc(v.a || "")}">
+        <input inputmode="decimal" placeholder="90°" data-k="b" value="${esc(v.b || "")}" ${r.no90 ? "disabled" : ""}>
+        ${r.fit ? `<select data-k="f" title="${esc(r.fit)}"><option value="">${esc(r.fit)}</option>${["press", "snug", "loose", "no", "yes"].map(o => `<option ${v.f === o ? "selected" : ""}>${o}</option>`).join("")}</select>` : "<span></span>"}</div></div>`;
+    }
+    h += `<div class="box"><h3>Also note</h3><input data-k="note" data-id="NOTE" placeholder="filament brand, nozzle / bed °C, settings" value="${esc((vals.NOTE || {}).note || "")}" style="width:100%;font:14px system-ui;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--ground);color:var(--ink)"></div>
+      <button class="tb" id="mCopy" style="width:100%;justify-content:center;padding:10px;font-size:15px">Copy my numbers (paste them in the chat)</button>
+      <p style="font-size:12.5px;color:var(--muted)">Saved in this browser as you type.</p>`;
+    $("mSheet").innerHTML = h;
+    const mark = el => { const v = vals[el.dataset.id] || {}; el.classList.toggle("done", !!v.a); };
+    $("mSheet").querySelectorAll(".mrow").forEach(mark);
+    $("mSheet").addEventListener("input", e => { const el = e.target, row = el.closest("[data-id]") || el; const id = row.dataset.id || el.dataset.id;
+      (vals[id] = vals[id] || {})[el.dataset.k] = el.value.trim(); save(); if (row.classList.contains("mrow")) mark(row); });
+    $("mCopy").onclick = async () => {
+      const out = R.filter(r => vals[r.id] && (vals[r.id].a || vals[r.id].f)).map(r => { const v = vals[r.id];
+        return `${r.id} ${r.what} | CAD ${r.cad} | ${v.a || "-"}${r.no90 ? "" : " / " + (v.b || "-")}${v.f ? " | fit " + v.f : ""}`; });
+      if (vals.NOTE && vals.NOTE.note) out.push("Note: " + vals.NOTE.note);
+      const txt = out.join("\n") || "(nothing filled in yet)";
+      try { await navigator.clipboard.writeText(txt); $("mCopy").textContent = "Copied ✔ (" + out.length + " lines)"; }
+      catch (e) { const ta = document.createElement("textarea"); ta.value = txt; ta.style.cssText = "width:100%;height:160px"; $("mCopy").after(ta); ta.select(); $("mCopy").textContent = "Select all + copy the box below"; }
+    };
+  }
+  return { start, stop, info };
+})();
+
 // ---------------- controls
 $("prev").onclick = () => go(cur - 1); $("next").onclick = () => go(cur + 1);
 $("replay").onclick = () => go(cur); $("fit").onclick = () => frame(steps[cur], false);
 [ghostEl, realEl].forEach(e => e.onchange = () => go(cur));
 addEventListener("keydown", e => { if (e.key === "ArrowRight") go(cur + 1); if (e.key === "ArrowLeft") go(cur - 1); });
-resize(); go(+(location.hash.slice(1)) || 0);
-addEventListener("hashchange", () => go(+(location.hash.slice(1)) || 0));
+const goHash = () => { const h = decodeURIComponent(location.hash.slice(1)).toLowerCase();
+  const i = steps.findIndex(s => String(s.n).toLowerCase() === h || (h === "measure" && s.measure)); go(i < 0 ? 0 : i); };
+resize(); goHash();
+addEventListener("hashchange", goHash);
 requestAnimationFrame(tick); requestAnimationFrame(camStep);
 })();
 </script>
