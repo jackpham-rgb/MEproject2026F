@@ -24,11 +24,15 @@ import make_plate_inis as I  # noqa: E402
 import print_economy as E  # noqa: E402
 
 OUT = os.path.join(ROOT, "cad", "print", "reprint")
+# easy-to-remove supports (docs/19; plus the "thin + hollow" guide: support lines ~half the normal width, sparse base,
+# wide-spaced interface): organic tree from the bed, 0.25 top gap / 0.2 bottom gap
 EASY_SUP = {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1",
             "support_material_style": "organic", "support_material_contact_distance": "0.25",
-            "support_material_bottom_contact_distance": "0.25", "support_material_interface_layers": "2",
-            "support_material_bottom_interface_layers": "0", "support_material_xy_spacing": "60%",
-            "support_material_threshold": "50"}
+            "support_material_bottom_contact_distance": "0.2", "support_material_interface_layers": "3",
+            "support_material_bottom_interface_layers": "2", "support_material_interface_spacing": "0.7",
+            "support_material_spacing": "2.5", "support_material_extrusion_width": "0.25",
+            "support_material_xy_spacing": "60%", "support_material_threshold": "50"}
+BRIM = {"brim_width": "3", "brim_separation": "0.3", "brim_type": "outer_only"}   # outer only, 0.3 gap: peels off
 FAST = {"perimeter_speed": "50", "external_perimeter_speed": "35", "infill_speed": "80", "solid_infill_speed": "60",
         "top_solid_infill_speed": "40", "support_material_speed": "60", "gap_fill_speed": "35", "travel_speed": "150",
         "only_retract_when_crossing_perimeters": "1", "thick_bridges": "1"}
@@ -50,7 +54,8 @@ PLATES = [
      ["CA-402", "CA-403", "CA-401"],
      "Gear teeth: slow outer wall, 5 walls (teeth are solid wall), 30 % gyroid inside instead of 100 %"),
     ("3  Base: ONLY if sanding the old pocket fails", "DRAFT",
-     {**FAST_DRAFT, **EASY_SUP, "perimeters": "3", "fill_density": "12%", "fill_pattern": "cubic"},
+     {**FAST_DRAFT, **EASY_SUP, "perimeters": "3", "fill_density": "12%", "fill_pattern": "cubic",
+      "support_material_extrusion_width": "0.34"},   # PrusaSlicer refuses 0.25 at 0.28 mm layers (too thin to print)
      ["CA-101"],
      "6807 pocket 48.0 in CAD (print ~47.05); coarse 0.28 mm layers, 3 walls round the pocket"),
     ("4  Turret plate: ONLY if sanding the hub / drilling the rod holes fails", "STANDARD",
@@ -58,7 +63,7 @@ PLATES = [
      ["CA-201"],
      "hub 34.3 in CAD (print ~34.9), rod holes 7.05 (print ~5.95)"),
 ]
-PER_PART = {"CA-302_lift_link": {"perimeters": "3", "fill_density": "0%", "brim_width": "5"},       # tiny: walls fill it
+PER_PART = {"CA-302_lift_link": {"perimeters": "3", "fill_density": "0%", **BRIM},       # tiny: walls fill it
             "CA-401_gripper_frame": {"perimeters": "4", "fill_density": "20%"}}
 
 
@@ -91,7 +96,7 @@ def stability():
                 if use and (e["contact"] < 300 or tip > 2.5):
                     brims[f"{pn}_{nm}"] = f"contact {e['contact']:.0f} mm², tip {tip:.1f}"
             lines.append("")
-    lines += ["## Brims added", ""] + ([f"- {k}: {v} → 5 mm brim" for k, v in brims.items()] or ["- none needed"]) + [""]
+    lines += ["## Brims added", ""] + ([f"- {k}: {v} → 3 mm brim (0.3 mm gap)" for k, v in brims.items()] or ["- none needed"]) + [""]
     open(os.path.join(OUT, "STABILITY.md"), "w").write("\n".join(lines))
     return brims
 
@@ -104,7 +109,7 @@ def main():
     brims = stability()
     per_part = {k: dict(v) for k, v in PER_PART.items()}
     for k in brims:
-        per_part.setdefault(k, {})["brim_width"] = "5"
+        per_part.setdefault(k, {}).update(BRIM)
     I.main(PLATES, OUT)
     F.main((), OUT, PLATES, OUT, per_part)
     for name, prof, over, pns, why in PLATES:

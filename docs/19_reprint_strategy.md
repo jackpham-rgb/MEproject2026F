@@ -7,13 +7,16 @@ Only the parts with fits that matter get reprinted, and only after the tolerance
 3. `python3.13 backend/tools/make_reprint.py` rebuilds `cad/print/reprint/` with the corrected sizes.
 4. Print `reprint_1..3.3mf` (Ctrl+O, "Yes"), check each fit as it comes off the bed.
 
-| Plate | Parts | Why they're reprinted |
-|---|---|---|
-| `reprint_1` | turret plate, top cap, lift link, carriage arm | 6807 hub Ø34.95, rod holes Ø6.0, LM6UU pockets Ø12.15, pivots |
-| `reprint_2` | gripper frame + both fingers (new horn drive) | gear mesh, axle, horn screws |
-| `reprint_3` | base | 6807 pocket Ø47.1 |
+| Plate | Parts | When | Time |
+|---|---|---|---|
+| `reprint_5` | carriage arm + lift link + turret plate | night 1 | 6 h 51 |
+| `reprint_1` | carriage arm + lift link (short-night version of 5) | night 1, instead of 5 | 3 h 52 |
+| `reprint_2` | spare claw: gripper frame + both fingers (horn drive) | day 2, during the shift | 6 h 49 |
+| `reprint_3` | base | only if sanding the old pocket 46.0 → 47.0 fails (instead of 2) | 7 h 22 |
+| `reprint_4` | turret plate | only after `reprint_1`, if hand-fixing the old one fails | 2 h 56 |
 
-Not reprinted: spine, tray (screw holes only: a drill bit by hand fixes them).
+Hole sizes corrected from the measurements (docs/17, round 1): holes printed ~1.05 mm small, so `TOL` adds that back.
+Not reprinted: top cap (drilled by hand), spine, tray (screw holes only: a drill bit by hand fixes them).
 
 ## Supports: easy to remove, less plastic
 
@@ -21,10 +24,19 @@ Not reprinted: spine, tray (screw holes only: a drill bit by hand fixes them).
 |---|---|---|
 | Style | **Organic** (Cura: Tree) | Prusa: organic supports are easy to remove, don't scar the surface and are fast and cheap to print [1] |
 | Placement | build plate only | nothing grows on the part's own surfaces |
-| Top contact Z distance | **0.25 mm** | the default 0.1 is reported as too tight; 0.2–0.25 is the common "breaks away cleanly" value, PETG needs the upper end [2][3] |
-| Interface layers | 2 top, 0 bottom | fewer interface layers = easier removal [2] |
+| Support line width | **0.25 mm** (0.34 on the 0.28 mm base) | about half the 0.45 mm part line: thin lines bond weakly and crush off [7]. PrusaSlicer refuses a line thinner than the layer height, hence 0.34 at 0.28 mm |
+| Top contact Z distance | **0.25 mm** | the default 0.1 is reported as too tight; 0.2–0.25 is the common "breaks away cleanly" value, PETG needs the upper end [2][3][7] |
+| Bottom contact Z distance | 0.2 mm | [7] |
+| Interface layers | 3 top, spaced **0.7 mm** (not solid); 2 bottom | a sparse interface still gives a flat underside but doesn't fuse into one sheet [7] |
+| Base spacing | 2.5 mm | sparse body [7]; Bambu's "hollow" base pattern has no PrusaSlicer equivalent: organic branches are already hollow |
 | XY separation | 60 % | keeps support off the side walls |
 | Overhang threshold | 50° | supports only where really needed |
+| Brim (only parts that could tip) | 3 mm, outer only, 0.3 mm gap | stable on a small footprint, peels off [7] |
+
+Checked by slicing (PrusaSlicer 2.7): the thin supports use ~4 % less filament and add 1–11 min per plate (more,
+thinner lines). The guide [7] was written for PLA+ on a Bambu printer; for PETG the same idea holds (PETG sticks to
+itself more, so the wide gaps matter even more), but it is a user report, not a test: check the first plate.
+Let the part cool completely before removing supports.
 
 Plus: a part that needs no support (top cap) has supports switched off for it. If one spot still needs help,
 paint it in PrusaSlicer (right-click the part › Add support enforcer / blocker) instead of raising the density.
@@ -54,8 +66,7 @@ moderate infill [5]. So:
 | "Combine infill every N layers" | helps only below 0.16 mm layers on a 0.4 mm nozzle (max ~0.32 mm infill) [6], so not used at 0.2 mm |
 | Only retract when crossing perimeters, thick bridges | fewer retractions and stronger bridges |
 
-**Real numbers (PrusaSlicer, CR-6 SE profile):** reprint_1 ~7 h 20, reprint_2 ~6 h 40 (51 g instead of 67 g at 100 %
-infill), reprint_3 ~7 h 15. The biggest remaining limit is the printer's acceleration: the stock CR-6 SE profile uses
+**Real numbers (PrusaSlicer, CR-6 SE profile):** see the table above (the claw: ~50 g instead of 67 g at 100 % infill). The biggest remaining limit is the printer's acceleration: the stock CR-6 SE profile uses
 500 mm/s²; 1000 mm/s² would save ~8 % (the base: 7 h 15 → 6 h 40). Try it only after the tune-up (docs/18): send
 `M201 X1000 Y1000` + `M500`, print the XYZ cube, and keep it if the cube still measures 20.00 mm with no ringing.
 
@@ -63,8 +74,8 @@ infill), reprint_3 ~7 h 15. The biggest remaining limit is the printer's acceler
 
 `cad/print/reprint/STABILITY.md` lists, for every reprint part and every side it could lie on, the contact area,
 height, tip ratio (height / √contact) and overhang. The side used is the most stable one that keeps the press-fit
-holes vertical. A part with less than 300 mm² on the bed or a tip ratio above 2.5 gets a 5 mm brim
-(lift link, both fingers).
+holes vertical. A part with less than 300 mm² on the bed or a tip ratio above 2.5 gets a brim
+(lift link, both fingers): 3 mm, outer only, 0.3 mm gap.
 
 ## Claw redesign (in this reprint)
 
@@ -82,3 +93,4 @@ engineering checks (horn-screw pilot bearing at SG90 stall) and the assembly ord
 4. 3DPrinting.com, How to get stronger FDM prints (CNC Kitchen tests): https://3dprinting.com/how-to/how-to-get-stronger-fdm-3d-prints/
 5. DigiKey Maker.io, How to make 3D prints stronger: https://www.digikey.com/en/maker/blogs/2025/how-to-make-3d-prints-stronger
 6. Prusa Knowledge Base, Infill (combine infill, patterns): https://help.prusa3d.com/article/infill_42
+7. r/BambuLab user guide "How to produce easy to remove supports every time" (PLA+, Bambu Studio), shared by the team

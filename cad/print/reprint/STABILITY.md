@@ -115,6 +115,6 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 
 ## Brims added
 
-- CA-302_lift_link: contact 87 mm², tip 0.3 → 5 mm brim
-- CA-402_finger_R: contact 251 mm², tip 2.5 → 5 mm brim
-- CA-403_finger_L: contact 251 mm², tip 2.5 → 5 mm brim
+- CA-302_lift_link: contact 87 mm², tip 0.3 → 3 mm brim (0.3 mm gap)
+- CA-402_finger_R: contact 251 mm², tip 2.5 → 3 mm brim (0.3 mm gap)
+- CA-403_finger_L: contact 251 mm², tip 2.5 → 3 mm brim (0.3 mm gap)
