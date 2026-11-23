@@ -70,7 +70,7 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 .mrow .cad{margin-left:auto;flex:none;font-variant-numeric:tabular-nums;color:var(--muted)}
 .mrow .in{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:5px;margin-top:5px}
 .mrow input,.mrow select{width:100%;min-width:0;font:14px system-ui,sans-serif;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--ground);color:var(--ink)}
-.mrow input:disabled{opacity:.35}
+.mrow input.opt::placeholder{font-style:italic;font-size:12px}
 #info h4{margin:14px 0 2px;font-size:15px}
 #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted)}
 @media (max-width:900px){
@@ -469,7 +469,7 @@ const M = (() => {
       h += `<div class="mrow" data-id="${r.id}"><div class="top"><span class="id">${r.id}</span><span>${esc(r.what)}</span><span class="cad">CAD ${esc(r.cad)}</span></div>
         <img class="pic" src="data/measure/${r.id}.png" loading="lazy" alt="${esc(r.id + ' ' + r.what)}" title="Click: show it big">
         <div class="in"><input inputmode="decimal" placeholder="Measured" data-k="a" value="${esc(v.a || "")}">
-        <input inputmode="decimal" placeholder="90°" data-k="b" value="${esc(v.b || "")}" ${r.no90 ? "disabled" : ""}>
+        <input inputmode="decimal" placeholder="${r.no90 ? "90°: not needed" : "90°"}" data-k="b" value="${esc(v.b || "")}" ${r.no90 ? 'class="opt" title="A length / thickness / screw: one reading is enough. Type a 2nd one if you like."' : ""}>
         ${r.fit ? `<select data-k="f" title="${esc(r.fit)}"><option value="">${esc(r.fit)}</option>${["press", "snug", "loose", "no", "yes"].map(o => `<option ${v.f === o ? "selected" : ""}>${o}</option>`).join("")}</select>` : "<span></span>"}</div></div>`;
     }
     h += `<div class="box"><h3>Also note</h3><input data-k="note" data-id="NOTE" placeholder="filament brand, nozzle / bed °C, settings" value="${esc((vals.NOTE || {}).note || "")}" style="width:100%;font:14px system-ui;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--ground);color:var(--ink)"></div>
@@ -484,7 +484,7 @@ const M = (() => {
       (vals[id] = vals[id] || {})[el.dataset.k] = el.value.trim(); save(); if (row.classList.contains("mrow")) mark(row); });
     $("mCopy").onclick = async () => {
       const out = R.filter(r => vals[r.id] && (vals[r.id].a || vals[r.id].f)).map(r => { const v = vals[r.id];
-        return `${r.id} ${r.what} | CAD ${r.cad} | ${v.a || "-"}${r.no90 ? "" : " / " + (v.b || "-")}${v.f ? " | fit " + v.f : ""}`; });
+        return `${r.id} ${r.what} | CAD ${r.cad} | ${v.a || "-"}${r.no90 && !v.b ? "" : " / " + (v.b || "-")}${v.f ? " | fit " + v.f : ""}`; });
       if (vals.NOTE && vals.NOTE.note) out.push("Note: " + vals.NOTE.note);
       const txt = out.join("\n") || "(nothing filled in yet)";
       try { await navigator.clipboard.writeText(txt); $("mCopy").textContent = "Copied ✔ (" + out.length + " lines)"; }
