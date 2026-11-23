@@ -8,6 +8,10 @@ corrected in one go, and only the parts that need it are reprinted (`cad/print/r
 
 - **Hole:** the small top jaws inside the hole; measure, turn the calipers 90°, measure again: write **both**.
   Measure in the middle of the hole's depth, not at the bed side (the first layer bulges out: "elephant foot").
+  **"Measured (90°)"** = the same hole again with the calipers turned a quarter turn (like going from 12 to 3 on a
+  clock). Printed holes are often a little oval, so the two numbers differ: both are needed.
+
+  ![Measure, turn 90°, measure again](manual/measure_90.svg)
 - **Shaft / outside (hub, post):** the big jaws; two readings 90° apart, write **both**.
 - **Length / width:** big jaws across the whole part, ~1 mm above the bed face.
 - Don't squeeze: close the jaws until they just touch. Zero the calipers first.

@@ -233,6 +233,7 @@ function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
       if (l.startsWith("|")) { endPara(); tbl.push(l); continue; }
       flush();
       if (!l.trim()) { endPara(); continue; }
+      if (l.trim().startsWith("![")) continue;   // pictures are placed by the page itself
       if (l.startsWith("- ")) { endPara(); para = l.slice(2); kind = "li"; }
       else if (para) para += " " + l.trim();
       else { para = l.trim(); kind = "p"; }
@@ -328,7 +329,8 @@ function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
   }
   // ---------------- MEASURE FIRST: CAD vs real, before PART M step 1 (from docs/17_tolerance_recheck.md)
   H += ePage("M0", "Measure first: CAD file vs real part (calipers)", mdSection("docs/17_tolerance_recheck.md", "How to measure") +
-    mdSection("docs/17_tolerance_recheck.md", "A. Bought parts", true));
+  `<div style="margin:4mm 0 0">${fs.readFileSync(path.join(ROOT, "docs/manual/measure_90.svg"), "utf8")}</div>`);
+  H += ePage("M0a", "Measure: bought parts", mdSection("docs/17_tolerance_recheck.md", "A. Bought parts", true));
   H += ePage("M0b", "Measure: tolerance gauge", mdSection("docs/17_tolerance_recheck.md", "B. Tolerance gauge", true));
   H += ePage("M0c", "Measure: parts already printed", mdSection("docs/17_tolerance_recheck.md", "C. Parts already printed") +
     `<p style="font-size:15px"><b>Send the numbers before the PRECISE FIT steps</b> (1, 5, 6, 7, 8): the hole sizes get corrected and those parts reprinted. EASY steps can go ahead.</p>`);
