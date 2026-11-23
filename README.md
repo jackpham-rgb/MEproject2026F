@@ -42,7 +42,7 @@ Live site: **https://jackpham-rgb.github.io/MEproject2026F/** (all the pages bel
 | 03 | [Detail design](docs/03_detail_design.md) | 13 | [Electronics bench test](docs/13_electronics_bench_test.md) |
 | 04 | [Wiring](docs/04_wiring.md) | 15 | [Print troubleshooting (CR-6 SE)](docs/15_cr6se_print_troubleshooting.md) |
 | 05 | [BOM](docs/05_bom.md) | 16 | [Print settings per plate](docs/16_print_economy.md) |
-| 06 | [RVTM](docs/06_rvtm.md) | 17 | [Tolerance re-check sheet](docs/17_tolerance_recheck.md) |
+| 06 | [RVTM](docs/06_rvtm.md) | 17 | [Measurement sheet: CAD vs real](docs/17_tolerance_recheck.md) |
 | 08 | [Build guide](docs/08_build_guide.md) | 18 | [Printer tune-up, PLA + PETG](docs/18_cr6se_tuneup.md) |
 | 09 | [How the motors and claw work](docs/09_how_it_moves.md) | | |
 

@@ -1,55 +1,82 @@
-# Tolerance re-check: measure, then correct the CAD
+# Measurement sheet: CAD file vs real part
 
-The first prints (turret plate, top cap, lift link) did not fit even with sanding. Sanding can only fix
-a few tenths of a millimetre, so the design sizes in `backend/cad/model.py` (`TOL`) have to be corrected
-to how **this printer** prints. Measure once, send the numbers, and every hole and shaft gets resized together.
+Fill in the **Measured** column and send it back. Every CAD value comes from `backend/cad/model.py`
+(the `TOL` table and the part dimensions). From the differences, every hole and shaft in the robot gets
+corrected in one go, and only the parts that need it are reprinted (`cad/print/reprint/`).
 
-## What to measure (calipers, 0.01 mm)
+## How to measure (digital calipers)
 
-Measure each one **twice, 90° apart**, and write down the smaller value for holes and the larger value for shafts.
-Holes print oval and slightly small at the top; measure in the middle of the hole's depth if you can.
+- **Hole:** the small top jaws inside the hole; measure, turn the calipers 90°, measure again: write **both**.
+  Measure in the middle of the hole's depth, not at the bed side (the first layer bulges out: "elephant foot").
+- **Shaft / outside (hub, post):** the big jaws; two readings 90° apart, write **both**.
+- **Length / width:** big jaws across the whole part, ~1 mm above the bed face.
+- Don't squeeze: close the jaws until they just touch. Zero the calipers first.
+- **Fit:** try the real part in it: **press** (needs force, stays), **snug** (slides in by hand, no play),
+  **loose** (wobbles), **no** (won't go in).
 
-| # | Part (already printed) | Feature | Design size (mm) | Measured (mm) | Fits? (tight / OK / loose) |
-|---|---|---|---:|---:|---|
-| 1 | Turret plate | Hub outside diameter (goes into the 6807 bearing) | 34.95 | | |
-| 2 | 6807 bearing | Inner ring bore (the real part) | 35.00 | | |
-| 3 | Turret plate | Rod hole, each of the 2 | 6.00 | | |
-| 4 | Steel rod | Rod diameter (the real part) | 6.00 | | |
-| 5 | Top cap | Rod hole, each of the 2 | 6.00 | | |
-| 6 | Top cap | Screw clearance hole (#6) | 3.90 | | |
-| 7 | Turret plate | Screw pilot hole (#6, spine screws) | 2.90 | | |
-| 8 | Turret plate | Small horn-screw holes (4) | 1.70 | | |
-| 9 | Lift link | Big hole (carriage pivot, #6) | 3.90 | | |
-| 10 | Lift link | Small hole (crank pin) | 1.70 | | |
-| 11 | Coupon (plate A), if printed | All 6 holes, left to right | 3.9 / 2.9 / 4.6 / 3.5 / 6.0 / 12.15 | | |
-| 12 | Base (when printed) | Bearing pocket diameter | 47.10 | | |
-| 13 | 6807 bearing | Outer ring diameter (the real part) | 47.00 | | |
-| 14 | LM6UU | Outer diameter (the real part) | 12.00 | | |
+## A. Bought parts (the real sizes everything is checked against)
 
-Also note: filament (PETG brand / colour), nozzle and bed temperature, and whether the part was printed with the
-DRAFT or STANDARD settings (plate pages A–E). Draft layers print holes a little smaller.
+| # | Part | Measure | Nominal | Measured | Measured (90°) |
+|---|---|---|---:|---:|---:|
+| A1 | 6 mm steel rod | outside diameter | 6.00 | | |
+| A2 | LM6UU | outside diameter | 12.00 | | |
+| A3 | 6807 bearing | outside diameter | 47.00 | | |
+| A4 | 6807 bearing | inside (bore) diameter | 35.00 | | |
+| A5 | 6807 bearing | width | 7.00 | | — |
+| A6 | #6-32 screw | thread outside diameter | 3.51 | | — |
+| A7 | #8-32 screw | thread outside diameter | 4.17 | | — |
+| A8 | Servo-bag screw (small) | thread outside diameter | ~2.2 | | — |
+| A9 | SG90 round horn | hub outside diameter (the round boss) | ~7 | | |
 
-## How the correction works
+## B. Tolerance gauge (`cad/print/tolerance_test/`)
 
-- **Hole printed smaller than designed** by δ = design − measured: the new design size = old size + δ (+ the fit you want).
-- **Shaft (hub) printed bigger** by δ = measured − design: the new design size = old size − δ.
-- Wanted fits: press fit 0.05–0.10 mm interference (bearing, rods, LM6UU), running fit +0.2–0.3 mm (pivots, axle),
-  self-tapping pilot about 80 % of the screw's outside diameter.
-- One printer usually shrinks every hole by about the same amount, so 3–4 good measurements correct all of them;
-  the coupon is the fastest way to get that number.
+| # | Feature | CAD | Measured | Measured (90°) | Fit with the real part |
+|---|---|---:|---:|---:|---|
+| B1 | ROD hole 1 | 6.00 | | | rod: |
+| B2 | ROD hole 2 | 6.15 | | | rod: |
+| B3 | ROD hole 3 | 6.30 | | | rod: |
+| B4 | ROD hole 4 | 6.45 | | | rod: |
+| B5 | LM6UU hole 1 | 12.10 | | | LM6UU: |
+| B6 | LM6UU hole 2 | 12.25 | | | LM6UU: |
+| B7 | LM6UU hole 3 | 12.40 | | | LM6UU: |
+| B8 | LM6UU hole 4 | 12.55 | | | LM6UU: |
+| B9 | AXLE hole 1 | 3.90 | | | #6 screw turns freely? |
+| B10 | AXLE hole 2 | 4.10 | | | |
+| B11 | AXLE hole 3 | 4.30 | | | |
+| B12 | HORN hole 1 | 6.80 | | | horn hub: |
+| B13 | HORN hole 2 | 7.10 | | | horn hub: |
+| B14 | HORN hole 3 | 7.40 | | | horn hub: |
+| B15 | Ring, inside | 47.25 | | | 6807: |
+| B16 | Post, outside | 34.80 | | | 6807: |
+| B17 | Overall length | 180.9 | | — | |
+| B18 | Overall width | 69.6 | | — | |
 
-After the numbers come back: `TOL` in `model.py` is updated, all checks re-run, and only the parts that are not yet
-printed (or that failed) are re-exported. Parts that already fit are not reprinted.
+## C. Parts already printed (original plate 1)
 
-## Until then
+| # | Part | Feature | CAD | Measured | Measured (90°) | Fit with the real part |
+|---|---|---|---:|---:|---:|---|
+| C1 | Turret plate | hub outside diameter (goes into the 6807) | 34.95 | | | 6807: |
+| C2 | Turret plate | rod hole, left | 6.00 | | | rod: |
+| C3 | Turret plate | rod hole, right | 6.00 | | | rod: |
+| C4 | Turret plate | rod holes, centre to centre (inside-to-inside + one Ø) | 34.0 | | — | |
+| C5 | Turret plate | overall width (round edge to round edge) | 80.0 | | — | |
+| C6 | Turret plate | plate thickness | 6.0 | | — | |
+| C7 | Top cap | rod hole, left | 6.00 | | | rod: |
+| C8 | Top cap | rod hole, right | 6.00 | | | rod: |
+| C9 | Top cap | screw hole (#6 clearance), one of the 2 | 3.90 | | | #6 passes? |
+| C10 | Top cap | overall length × width | 54.0 × 44.0 | | — | |
+| C11 | Lift link | big hole (carriage pivot) | 3.90 | | | #6 turns? |
+| C12 | Lift link | small hole (old print: crank pin) | 1.70 | | | |
+| C13 | Lift link | hole centre to centre | 9.36 | | — | |
+| C14 | Base (only if printed) | bearing pocket inside diameter | 47.10 | | | 6807: |
+| C15 | Base (only if printed) | overall length × width | 152.0 × 112.0 | | — | |
 
-- Precise steps (1, 5, 6, 7, 8) wait for the corrected parts; do the EASY steps first (see the fit levels in the manual).
-- A part that is only slightly tight: drill by hand with the bit named in the manual's callout boxes.
-- Don't force press fits: PETG cracks, and a cracked hub or pocket has to be reprinted anyway.
+**Also note:** filament (brand, PETG), nozzle / bed temperature used, and which settings the part was printed with
+(the original plate 1 used the old single-setting profile; the gauge used its own settings).
 
-## Gripper (open)
+## What happens with the numbers
 
-The SG90's bare spline does not grip the finger's Ø6 socket. Interim fix in step 19: glue the splined hub of a
-cut-down SG90 horn into the socket. The earlier prototype (servo in a pocket at the end of the arm, single-arm
-horn screwed onto the driving gear, second gear on a screw axle) is the model for the proper fix, to be decided
-with the plan B discussion.
+- A tells the real reference sizes (bearings and rods vary by maker).
+- B and C give how much this printer shrinks holes and grows shafts at each size. One printer usually has a nearly
+  constant offset, so 4–6 good readings correct everything.
+- Then: `TOL` updated → checks re-run → `cad/print/reprint/` regenerated → print the reprint plates.
