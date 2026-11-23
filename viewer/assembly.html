@@ -63,6 +63,9 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 .mrow{border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin:6px 0;font-size:13.5px}
 .mrow.done{border-color:var(--easy);background:color-mix(in srgb,var(--easy) 8%,transparent)}
 .mrow .top{display:flex;gap:6px;align-items:baseline}
+.mrow .pic{display:block;width:100%;height:130px;object-fit:contain;background:#fff;border-radius:6px;margin:6px 0 2px;cursor:zoom-in}
+#mpic{display:none;width:100%;max-width:900px;max-height:calc(100% - 56px);object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:10px}
+#measure.pic #msvg{display:none}#measure.pic #mpic{display:block}
 .mrow .id{font-weight:800;flex:none;width:30px}
 .mrow .cad{margin-left:auto;flex:none;font-variant-numeric:tabular-nums;color:var(--muted)}
 .mrow .in{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:5px;margin-top:5px}
@@ -102,7 +105,7 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
       <span><i class="sw" style="background:#9aa1aa"></i> screw · dashed line = its path</span>
       <span><i class="sw" style="background:#ffe14d"></i> glue</span>
     </div>
-    <div id="measure"><svg id="msvg" viewBox="0 0 900 520" font-family="system-ui,Arial,sans-serif"></svg>
+    <div id="measure"><img id="mpic" alt=""><svg id="msvg" viewBox="0 0 900 520" font-family="system-ui,Arial,sans-serif"></svg>
       <div id="mbar"><button class="tb" data-t="0">1 · First reading</button><button class="tb" data-t="4.2">2 · Turn ¼ turn, second reading</button><button class="tb" data-t="10">3 · Where in the hole</button><button class="tb" id="mpause">❚❚ Pause</button></div></div>
     <div id="nav"><button class="tb" id="prev">◀ Back</button><button class="tb" id="next">Next ▶</button></div>
   </main>
@@ -421,7 +424,7 @@ const M = (() => {
     document.querySelectorAll("#mbar [data-t]").forEach(b => b.classList.toggle("on", t >= +b.dataset.t && t < ({ "0": 4.2, "4.2": 10, "10": 99 })[b.dataset.t]));
   }
   function loop(now) { const t = paused ? tp : ((now - t0) / 1000) % LOOP; tp = t; draw(t); raf = requestAnimationFrame(loop); }
-  function start(at) { cancelAnimationFrame(raf); paused = false; $("mpause").textContent = "❚❚ Pause"; t0 = performance.now() - at * 1000; raf = requestAnimationFrame(loop); }
+  function start(at) { $("measure").classList.remove("pic"); cancelAnimationFrame(raf); paused = false; $("mpause").textContent = "❚❚ Pause"; t0 = performance.now() - at * 1000; raf = requestAnimationFrame(loop); }
   function stop() { cancelAnimationFrame(raf); }
   document.querySelectorAll("#mbar [data-t]").forEach(b => b.onclick = () => start(+b.dataset.t));
   $("mpause").onclick = () => { if (paused) { start(tp); } else { paused = true; $("mpause").textContent = "▶ Play"; } };
@@ -464,6 +467,7 @@ const M = (() => {
       if (r.sec !== last) { h += `<h4>${esc(r.sec)}</h4>`; last = r.sec; }
       const v = vals[r.id] || {};
       h += `<div class="mrow" data-id="${r.id}"><div class="top"><span class="id">${r.id}</span><span>${esc(r.what)}</span><span class="cad">CAD ${esc(r.cad)}</span></div>
+        <img class="pic" src="data/measure/${r.id}.png" loading="lazy" alt="${esc(r.id + ' ' + r.what)}" title="Click: show it big">
         <div class="in"><input inputmode="decimal" placeholder="Measured" data-k="a" value="${esc(v.a || "")}">
         <input inputmode="decimal" placeholder="90°" data-k="b" value="${esc(v.b || "")}" ${r.no90 ? "disabled" : ""}>
         ${r.fit ? `<select data-k="f" title="${esc(r.fit)}"><option value="">${esc(r.fit)}</option>${["press", "snug", "loose", "no", "yes"].map(o => `<option ${v.f === o ? "selected" : ""}>${o}</option>`).join("")}</select>` : "<span></span>"}</div></div>`;
@@ -472,6 +476,8 @@ const M = (() => {
       <button class="tb" id="mCopy" style="width:100%;justify-content:center;padding:10px;font-size:15px">Copy my numbers (paste them in the chat)</button>
       <p style="font-size:12.5px;color:var(--muted)">Saved in this browser as you type.</p>`;
     $("mSheet").innerHTML = h;
+    $("mSheet").addEventListener("click", e => { const im = e.target.closest(".pic"); if (!im) return;
+      stop(); paused = true; $("mpause").textContent = "▶ Animation"; $("mpic").src = im.src; $("measure").classList.add("pic"); });
     const mark = el => { const v = vals[el.dataset.id] || {}; el.classList.toggle("done", !!v.a); };
     $("mSheet").querySelectorAll(".mrow").forEach(mark);
     $("mSheet").addEventListener("input", e => { const el = e.target, row = el.closest("[data-id]") || el; const id = row.dataset.id || el.dataset.id;

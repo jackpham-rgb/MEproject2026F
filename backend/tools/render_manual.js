@@ -208,6 +208,11 @@ function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
   table{border-collapse:collapse;font-size:15px}
   .ebody{position:absolute;left:14mm;right:14mm;top:30mm;bottom:9mm;font-size:16px}.ebody.withimg{display:grid;grid-template-columns:1.15fr 1fr;gap:6mm}
   .eimg{width:100%;align-self:start}.md{width:100%;margin-bottom:3mm}.md td,.md th{font-size:15.5px;padding:1mm 1.6mm;vertical-align:top}.ck{width:6mm;text-align:center;font-size:15px}
+  .mgrid{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(2,80mm);gap:3mm}
+  .mc{border:2px solid #000;border-radius:2mm;padding:1.5mm;display:flex;flex-direction:column;gap:1mm;font-size:12.5px;line-height:1.2;overflow:hidden}
+  .mp{height:37mm;display:flex;align-items:center;justify-content:center}.mp img{max-width:100%;max-height:37mm}
+  .mt{min-height:9mm}.mcad{font-size:13px}.mb{display:grid;grid-template-columns:auto 1fr;gap:1mm 1.5mm;align-items:end;margin-top:auto}
+  .mb span{font-size:11.5px}.mb i{border-bottom:1.5px solid #000;height:6mm}
   .ebody p{margin:0 0 2mm}.li{margin:0 0 1.5mm}.sec{position:absolute;right:14mm;top:10mm;font:700 16px Helvetica,Arial,sans-serif;border:2.4px solid #000;border-radius:2mm;padding:1mm 3mm}
   td,th{border:1.4px solid #000;padding:1.2mm 2mm;text-align:left}th{background:#e8e8e8}`;
   const img = f => `data:image/png;base64,${fs.readFileSync(path.join(OUT, f)).toString("base64")}`;
@@ -240,7 +245,7 @@ function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
     }
     endPara(); flush(); return out;
   };
-  const ePage = (n, title, body, imgSrc) => `<div class="pg"><div class="num">${n}</div><div class="ttl" style="left:${n.length > 2 ? 68 : 50}mm">${title}</div>
+  const ePage = (n, title, body, imgSrc) => `<div class="pg"><div class="num">${n}</div><div class="ttl" style="left:${n.length > 4 ? 86 : n.length > 2 ? 68 : 50}mm">${title}</div>
     <div class="ebody ${imgSrc ? "withimg" : ""}">${imgSrc ? `<img class="eimg" src="${imgSrc}">` : ""}<div>${body}</div></div></div>`;
   let H = `<!doctype html><html><head><meta charset="utf-8"><title>Concept A Assembly Manual</title><style>${css}</style></head><body>`;
   H += `<div class="pg"><h1>CONCEPT A</h1><div style="font-size:20px;margin-top:2mm;font-weight:700">Can-flipping robot · assembly manual · ME 2331/L</div>
@@ -330,10 +335,32 @@ function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
   // ---------------- MEASURE FIRST: CAD vs real, before PART M step 1 (from docs/17_tolerance_recheck.md)
   H += ePage("M0", "Measure first: CAD file vs real part (calipers)", mdSection("docs/17_tolerance_recheck.md", "How to measure") +
   `<div style="margin:4mm 0 0">${fs.readFileSync(path.join(ROOT, "docs/manual/measure_90.svg"), "utf8")}</div>`);
-  H += ePage("M0a", "Measure: bought parts", mdSection("docs/17_tolerance_recheck.md", "A. Bought parts", true));
-  H += ePage("M0b", "Measure: tolerance gauge", mdSection("docs/17_tolerance_recheck.md", "B. Tolerance gauge", true));
-  H += ePage("M0c", "Measure: parts already printed", mdSection("docs/17_tolerance_recheck.md", "C. Parts already printed") +
-    `<p style="font-size:15px"><b>Send the numbers before the PRECISE FIT steps</b> (1, 5, 6, 7, 8): the hole sizes get corrected and those parts reprinted. EASY steps can go ahead.</p>`);
+  // measurement cards: picture of the feature (viewer/data/measure/<row>.png, from backend/tools/measure_pictures.py)
+  // + CAD value + boxes to write in; rows parsed from docs/17 so the sheet never drifts from it
+  const mRows = (() => { const out = []; let sec = null, hdr = null;
+    for (const l of fs.readFileSync(path.join(ROOT, "docs/17_tolerance_recheck.md"), "utf8").split("\n")) {
+      if (l.startsWith("## ")) { sec = /^## ([ABC])\./.test(l) ? l.slice(3, 4) : null; hdr = null; continue; }
+      if (!sec || !l.startsWith("|") || /^\|[\s|:-]+\|$/.test(l.trim())) continue;
+      const c = l.trim().replace(/^\||\|$/g, "").split("|").map(x => x.trim().replace(/\*\*/g, ""));
+      if (!hdr) { hdr = c; continue; }
+      const g = k => c[hdr.indexOf(k)] ?? "";
+      out.push({ sec, id: c[0], what: hdr.includes("Part") ? `${g("Part")}: ${g("Measure") || g("Feature")}` : g("Feature"),
+        cad: g("CAD") || g("Nominal"), no90: g("Measured (90°)") === "—", fit: hdr.includes("Fit with the real part") ? (g("Fit with the real part") || "fit") : null });
+    } return out; })();
+  const card = r => `<div class="mc"><div class="mp"><img src="${imgAny("viewer/data/measure/" + r.id + ".png")}"></div>
+    <div class="mt"><b>${r.id}</b> ${inline(r.what)}</div><div class="mcad">CAD <b>${r.cad}</b></div>
+    <div class="mb"><span>Measured</span><i></i>${r.no90 ? "" : "<span>90°</span><i></i>"}${r.fit ? `<span>${inline(r.fit.replace(/:$/, ""))}</span><i class="f"></i>` : ""}</div></div>`;
+  const cardPages = (sec, n, title, tail) => { const R = mRows.filter(r => r.sec === sec);
+    for (let i = 0, k = 0; i < R.length; i += 10, k++) {
+      const last = i + 10 >= R.length;
+      H += ePage(n + (k ? "-" + (k + 1) : ""), title + (R.length > 10 ? ` (${k + 1}/${Math.ceil(R.length / 10)})` : ""),
+        `<div class="mgrid">${R.slice(i, i + 10).map(card).join("")}</div>` + (last && tail ? tail : ""));
+    } };
+  cardPages("A", "M0a", "Measure: bought parts (the real reference sizes)");
+  cardPages("B", "M0b", "Measure: tolerance gauge");
+  cardPages("C", "M0c", "Measure: parts already printed", `<p style="font-size:14px;margin-top:3mm"><b>Also note:</b> filament, nozzle / bed temperature, settings used.
+    <b>Send the numbers before the PRECISE FIT steps</b> (1, 5, 6, 7, 8): the hole sizes get corrected and those parts reprinted. EASY steps can go ahead.
+    The 3D guide (step M) has the same sheet to type into and copy.</p>`);
   const seen = new Set();
   for (const s of steps) {
     const first = s.new.filter(n => !seen.has(n)); s.new.forEach(n => seen.add(n));
