@@ -36,23 +36,30 @@ FAST_DRAFT = {**FAST, "perimeter_speed": "60", "external_perimeter_speed": "45",
 
 # (name, profile, plate settings, parts, why). The leading digit names the file (reprint_N).
 PLATES = [
-    ("1  Precision fits: turret plate + top cap + lift link + carriage arm", "STANDARD",
+    ("1  Tonight: carriage arm + lift link (LM6UU pockets, pivots)", "STANDARD",
      {**FAST, **EASY_SUP, "perimeters": "4", "fill_density": "15%", "fill_pattern": "cubic"},
-     ["CA-201", "CA-203", "CA-302", "CA-301"],
-     "6807 hub, rod holes, LM6UU pockets, pivots: 0.2 mm, 4 walls carry the fits and the screws"),
-    ("2  Claw: gripper frame + 2 fingers", "DETAIL",
+     ["CA-301", "CA-302"],
+     "LM6UU pockets 13.0 in CAD (print ~12.0), pivots: 0.2 mm, 4 walls; same speeds/temps as the measured gauge"),
+    ("5  Tonight, LONG version (6-7 h of sleep): carriage arm + lift link + turret plate", "STANDARD",
+     {**FAST, **EASY_SUP, "perimeters": "4", "fill_density": "15%", "fill_pattern": "cubic"},
+     ["CA-301", "CA-302", "CA-201"],
+     "plate 1 + the turret plate in one go: no hand-fixing of the hub / rod holes"),
+    ("2  Claw spare: gripper frame + 2 fingers", "DETAIL",
      {**FAST, **EASY_SUP, "perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
       "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
      ["CA-402", "CA-403", "CA-401"],
      "Gear teeth: slow outer wall, 5 walls (teeth are solid wall), 30 % gyroid inside instead of 100 %"),
-    ("3  Base", "DRAFT",
+    ("3  Base: ONLY if sanding the old pocket fails", "DRAFT",
      {**FAST_DRAFT, **EASY_SUP, "perimeters": "3", "fill_density": "12%", "fill_pattern": "cubic"},
      ["CA-101"],
-     "6807 pocket: its size is set in X-Y by TOL, so coarse 0.28 mm layers are fine; 3 walls round the pocket"),
+     "6807 pocket 48.0 in CAD (print ~47.05); coarse 0.28 mm layers, 3 walls round the pocket"),
+    ("4  Turret plate: ONLY if sanding the hub / drilling the rod holes fails", "STANDARD",
+     {**FAST, **EASY_SUP, "perimeters": "4", "fill_density": "15%", "fill_pattern": "cubic"},
+     ["CA-201"],
+     "hub 34.3 in CAD (print ~34.9), rod holes 7.05 (print ~5.95)"),
 ]
 PER_PART = {"CA-302_lift_link": {"perimeters": "3", "fill_density": "0%", "brim_width": "5"},       # tiny: walls fill it
-            "CA-401_gripper_frame": {"perimeters": "4", "fill_density": "20%"},
-            "CA-203_top_cap": {"support_material": "0"}}
+            "CA-401_gripper_frame": {"perimeters": "4", "fill_density": "20%"}}
 
 
 def stability():

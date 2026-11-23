@@ -1,13 +1,17 @@
 # Reprint: the parts with fits that matter
 
-**Wait:** these files are regenerated after the tolerance gauge is measured (`TOL` in `backend/cad/model.py` corrected,
-then `python3.13 backend/tools/make_reprint.py`). Printing them before that reprints the old hole sizes.
+**Hole sizes corrected from the measurements of 2026-11-23** (docs/17: holes printed ~1.05 mm small). Print these
+with the settings inside the 3MF: the correction is only right for the same layer height, speeds and temperatures.
 
-| File | Parts | Time | PETG |
-|---|---|---|---|
-| `reprint_1.3mf` | turret plate, top cap, lift link (crank hole 2.4 mm), carriage arm | ~7 h 20 | ~75 g |
-| `reprint_2.3mf` | gripper frame + both fingers (new horn drive) | ~6 h 40 | ~51 g |
-| `reprint_3.3mf` | base | ~7 h 15 | ~121 g |
+| File | Parts | When | Time | PETG |
+|---|---|---|---|---|
+| `reprint_1.3mf` | carriage arm + lift link | **tonight** (short night) | 3 h 47 | ~41 g |
+| `reprint_5.3mf` | carriage arm + lift link + turret plate | **tonight** (long night, instead of 1) | 6 h 40 | ~67 g |
+| `reprint_2.3mf` | spare claw: gripper frame + both fingers | tomorrow during the shift | 6 h 42 | ~52 g |
+| `reprint_3.3mf` | base | **only if** sanding the old pocket 46.0 → 47.0 fails | 7 h 21 | ~125 g |
+| `reprint_4.3mf` | turret plate | **only if** sanding the hub / drilling the rod holes fails (not needed after 5) | 2 h 52 | ~27 g |
+
+The top cap is not reprinted: its holes were drilled by hand.
 
 Open in PrusaSlicer (Ctrl+O, "Yes" to load the settings), slice, print. Every plate has its settings inside:
 

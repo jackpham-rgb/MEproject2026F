@@ -70,21 +70,26 @@ P["lift_stroke"] = P["lift_crank"] * (math.sin(math.radians(P["lift_theta0"] + P
 #   12x #6-32x1/2, 10x #8-32x1/2, 10x #8-32x3/4, 10x #10-24x3/4, 10x 1/4-20x3/4, 5x 1/4-20x1.
 # No nuts -> screws self-thread into printed pilot holes (fine in PETG for these loads).
 TOL = dict(
-    n6_clear=3.9,      # #6-32 (3.51 mm major) passes freely
-    n6_pilot=2.9,      # #6-32 cuts its own thread
-    n6_head=7.2,       # pan-head pocket (head 6.6 mm)
-    n8_clear=4.6,      # #8-32 (4.17 mm major)
-    n8_pilot=3.5,
-    servo_pilot=1.7,   # self-tapping screws from the servo bags
-    servo_run=2.4,     # servo-bag screw as a PIN: the part turns on it (lift link crank end)
-    rod_press=6.0,     # 6 mm rod: nominal hole prints ~0.1 mm under -> light press fit
-    lm_press=12.15,    # LM6UU 12 mm OD: +0.15 -> snug press fit
-    run_bore=3.9,      # gear on a #6 screw axle: running clearance
-    peg=2.8,           # printed peg for 3.2 mm board holes (Uno); the buck uses 2.6 mm pegs for its 3.0 mm holes
-    bear_shaft=34.95,  # printed hub into the 35 mm bearing bore (prints ~+0.05)
-    bear_housing=47.1, # bearing outer race into the printed tower
+    # MEASURED 2026-11-23 (docs/17, tolerance gauge + plate 1 parts, PETG 235/80, 0.2 mm, uncalibrated CR-6 SE):
+    #   holes print ~1.05 mm UNDER in diameter (6-12.5 mm holes: -0.92..-1.15; 47 mm ring -0.81..-1.10),
+    #   round bosses ~0.55-0.80 OVER, long flat outsides +0.24 on 80 mm. So CAD = wanted real size + that offset.
+    #   (old values, before the measurement, in brackets)
+    n6_clear=4.8,      # [3.9] #6-32 (3.51 mm major) passes freely: real ~3.75
+    n6_pilot=3.9,      # [2.9] #6-32 cuts its own thread: real ~2.85
+    n6_head=8.1,       # [7.2] pan-head pocket (head 6.6 mm): real ~7.05
+    n8_clear=5.6,      # [4.6] #8-32 (measured 4.06 major): real ~4.55
+    n8_pilot=4.5,      # [3.5]
+    servo_pilot=2.7,   # [1.7] self-tapping screws from the servo bags: real ~1.6 (small holes close up even more)
+    servo_run=3.5,     # [2.4] servo-bag screw as a PIN: the part turns on it (lift link crank end): real ~2.4
+    rod_press=7.05,    # [6.0] 6 mm rod (measured 6.00): gauge 6.00->4.91 ... 6.45->5.33 => real ~5.95, light press
+    lm_press=13.0,     # [12.15] LM6UU (measured 11.95): gauge 12.10->11.00 ... 12.55->11.50 => real ~12.0, snug
+    run_bore=4.8,      # [3.9] gear on a #6 screw axle: running clearance, real ~3.75
+    peg=2.5,           # [2.8] printed peg for 3.2 mm board holes (pegs print over): real ~2.8
+    bear_shaft=34.3,   # [34.95] hub into the 6807 bore (measured 35.00): printed 34.95->35.5, gauge post 34.80->35.6
+                       #   => real ~34.9; a loose hub gets a wrap of tape, an oversize one needs sanding (harder)
+    bear_housing=48.0, # [47.1] 6807 outer race (measured 47.00): printed 47.10->46.0, gauge ring 47.25->46.44 => real ~47.05
     gap_moving=0.5,    # minimum gap between parts that move relative to each other
-    gear_backlash=0.2, # added to the gear centre distance
+    gear_backlash=0.2, # added to the gear centre distance (the printed gears mesh well: unchanged)
 )
 
 # Firmware angles (kept equal to firmware/concept_a/concept_a.ino)
