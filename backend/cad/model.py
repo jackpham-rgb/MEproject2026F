@@ -92,6 +92,12 @@ TOL = dict(
     gap_moving=0.5,    # minimum gap between parts that move relative to each other
     gear_backlash=0.2, # added to the gear centre distance (the printed gears mesh well: unchanged)
 )
+# A CALIBRATED printer (print service, makerspace) prints holes close to size: export with the nominal fits instead
+# of this CR-6 SE's +1 mm correction:  CA_NOMINAL_HOLES=1 python3.13 backend/cad/print_prep.py  -> cad/print/nominal/
+import os as _os  # noqa: E402
+if _os.environ.get("CA_NOMINAL_HOLES"):
+    TOL.update(n6_clear=3.9, n6_pilot=2.9, n6_head=7.2, n8_clear=4.6, n8_pilot=3.5, servo_pilot=1.7, servo_run=2.4,
+               rod_press=6.0, lm_press=12.15, run_bore=3.9, peg=2.8, bear_shaft=34.95, bear_housing=47.1)
 
 # Firmware angles (kept equal to firmware/concept_a/concept_a.ino)
 FW = dict(TURN_START=135, TURN_TARGET=45, LIFT_DOWN=30, LIFT_UP=75, WRIST_UP=0, WRIST_FLIP=180,

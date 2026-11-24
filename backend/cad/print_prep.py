@@ -29,7 +29,7 @@ sys.path.insert(0, HERE)
 import model      # noqa: E402
 import drawings   # noqa: E402  (hidden-line projection + hole finder)
 
-OUT = os.path.join(ROOT, "cad", "print")
+OUT = os.path.join(ROOT, "cad", "print", "nominal") if os.environ.get("CA_NOMINAL_HOLES") else os.path.join(ROOT, "cad", "print")
 os.makedirs(os.path.join(OUT, "stl"), exist_ok=True)
 BED = (220, 220, 250)            # Ender-3 class bed, mm (EST: check yours)
 G_PER_H = 12.0                   # PETG at 0.2 mm layers, ~60 mm/s (EST)
@@ -126,7 +126,7 @@ def main():
     fig.suptitle("Print orientations (blue = bed outline; parts shown as they sit on the bed)", fontsize=11)
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "print_orientations.png"), dpi=110)
-    print(f"wrote {len(table)} STL files to cad/print/stl/, cad/print/print_table.csv, cad/print/print_orientations.png")
+    print(f"wrote {len(table)} STL files to {os.path.relpath(OUT, ROOT)}/stl/ + print_table.csv + print_orientations.png")
 
 
 if __name__ == "__main__":
