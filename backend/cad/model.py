@@ -494,6 +494,11 @@ def build_parts():
         gr = gr.cut(cyl_dir((7 * math.cos(math.radians(a)), wy - 1, gz + 7 * math.sin(math.radians(a))), (0, 1, 0), 0.85, 6))
     gr = gr.union(box(-px, px, wy, py1, pb[0], pb[1]))                                    # bottom plate (4 mm: axle thread)
     gr = gr.union(box(-px, px, wy, py1, pt[0], pt[1]))                                    # top plate
+    # trim (2026-11-24): nothing touches the plate wings in front of the back strip. Top plate keeps its left side
+    # (gripper-servo post at x -27), loses the right wing; the bottom plate keeps only the strip under the gears (+-16)
+    gr = gr.cut(box(16, px + 1, wy + 6, py1 + 1, pt[0] - 1, pt[1] + 1))
+    for x0, x1 in ((-px - 1, -16), (16, px + 1)):
+        gr = gr.cut(box(x0, x1, wy + 6, py1 + 1, pb[0] - 1, pb[1] + 1))
     for x in (-15, 0, 15):                                                                # back posts (inside the finger swing)
         gr = gr.union(box(x - 3, x + 3, wy, wy + 6, pb[1], pt[0]))
     pvx, pvy = p["pivot_x"], p["pivot_y"]

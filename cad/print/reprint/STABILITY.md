@@ -29,11 +29,11 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 
 | Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
 |---|---:|---:|---:|---:|---|---|
-| -Z (as modelled, bottom down) | 84 | 43 | 4.7 | 3616 | 0 of 0 |  |
-| +Z (upside down, top face down) | 43 | 43 | 6.6 | 3656 | 0 of 0 |  |
-| +X face down | 211 | 62 | 4.3 | 300 | 0 of 0 |  |
-| -X face down | 211 | 62 | 4.3 | 300 | 0 of 0 |  |
-| +Y face down | 403 | 33 | 1.6 | 763 | 0 of 0 |  |
+| -Z (as modelled, bottom down) | 84 | 43 | 4.7 | 2423 | 0 of 0 |  |
+| +Z (upside down, top face down) | 43 | 43 | 6.6 | 2464 | 0 of 0 |  |
+| +X face down | 39 | 62 | 9.9 | 472 | 0 of 0 |  |
+| -X face down | 105 | 62 | 6.0 | 406 | 0 of 0 |  |
+| +Y face down | 246 | 33 | 2.1 | 921 | 0 of 0 |  |
 | -Y face down | 1091 | 33 | 1.0 | 75 | 0 of 0 | **used** |
 
 ## CA-301 Carriage + arm
@@ -73,11 +73,11 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 
 | Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
 |---|---:|---:|---:|---:|---|---|
-| -Z (as modelled, bottom down) | 84 | 43 | 4.7 | 3616 | 0 of 0 |  |
-| +Z (upside down, top face down) | 43 | 43 | 6.6 | 3656 | 0 of 0 |  |
-| +X face down | 211 | 62 | 4.3 | 300 | 0 of 0 |  |
-| -X face down | 211 | 62 | 4.3 | 300 | 0 of 0 |  |
-| +Y face down | 403 | 33 | 1.6 | 763 | 0 of 0 |  |
+| -Z (as modelled, bottom down) | 84 | 43 | 4.7 | 2423 | 0 of 0 |  |
+| +Z (upside down, top face down) | 43 | 43 | 6.6 | 2464 | 0 of 0 |  |
+| +X face down | 39 | 62 | 9.9 | 472 | 0 of 0 |  |
+| -X face down | 105 | 62 | 6.0 | 406 | 0 of 0 |  |
+| +Y face down | 246 | 33 | 2.1 | 921 | 0 of 0 |  |
 | -Y face down | 1091 | 33 | 1.0 | 75 | 0 of 0 | **used** |
 
 ## CA-402 Finger, right
@@ -106,11 +106,11 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 
 | Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
 |---|---:|---:|---:|---:|---|---|
-| -Z (as modelled, bottom down) | 84 | 43 | 4.7 | 3616 | 0 of 0 |  |
-| +Z (upside down, top face down) | 43 | 43 | 6.6 | 3656 | 0 of 0 |  |
-| +X face down | 211 | 62 | 4.3 | 300 | 0 of 0 |  |
-| -X face down | 211 | 62 | 4.3 | 300 | 0 of 0 |  |
-| +Y face down | 403 | 33 | 1.6 | 763 | 0 of 0 |  |
+| -Z (as modelled, bottom down) | 84 | 43 | 4.7 | 2423 | 0 of 0 |  |
+| +Z (upside down, top face down) | 43 | 43 | 6.6 | 2464 | 0 of 0 |  |
+| +X face down | 39 | 62 | 9.9 | 472 | 0 of 0 |  |
+| -X face down | 105 | 62 | 6.0 | 406 | 0 of 0 |  |
+| +Y face down | 246 | 33 | 2.1 | 921 | 0 of 0 |  |
 | -Y face down | 1091 | 33 | 1.0 | 75 | 0 of 0 | **used** |
 
 ## Brims added

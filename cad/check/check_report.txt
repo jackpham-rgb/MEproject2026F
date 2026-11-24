@@ -19,20 +19,20 @@ COLLISION SWEEP: 289 poses x 35 parts, solid booleans, tolerance 1.0 mm^3
   PASS  table clearance (lowest moving parts): test_can -0.0 mm, gripper_servo_SG90 +12.4 mm, finger_R +29.3 mm, gripper_frame +30.8 mm, finger_L +36.2 mm
 
 MASS (printed: volume x 1.27 g/cc x 0.60 fill factor, EST; purchased: typical datasheet mass)
-  robot total 570 g (printed 289 g, purchased 281 g), can 15 g
-  PETG filament ~289 g (+ supports / purge ~15 %)
-  CG at home: (-1.6, -25.9, 56.5) mm
+  robot total 567 g (printed 285 g, purchased 281 g), can 15 g
+  PETG filament ~285 g (+ supports / purge ~15 %)
+  CG at home: (-1.6, -26.5, 56.4) mm
     turret     122.7 g
     crank        1.0 g
     lift        88.7 g
-    wrist       23.4 g
+    wrist       20.2 g
     finger_L    10.7 g
     finger_R     9.7 g
 
 SERVO LOADS FROM CAD MASSES (stall ratings at 5 V: MG996R 9.4, MG90S 1.8, SG90 1.6 kg*cm)
-  lift: 147 g moving (incl. can), CG 40 mm in front of the rods, bushing span 43 mm
-        jam ratio 2*mu*e/L = 0.019 with LM6UU (printed slide mu 0.3 would be 0.56) -> PASS; crank torque 0.33 kg*cm vs MG90S 1.8 -> 6x margin
-  wrist: 59 g rotating (incl. can), CG 11.2 mm off the roll axis -> 0.07 kg*cm vs micro servo 1.8 -> 27x margin
-  turntable: J = 7.7 kg*cm^2, accel torque 0.032 kg*cm vs MG996R 9.4 (weight on the 6807 bearing)
+  lift: 144 g moving (incl. can), CG 40 mm in front of the rods, bushing span 43 mm
+        jam ratio 2*mu*e/L = 0.018 with LM6UU (printed slide mu 0.3 would be 0.55) -> PASS; crank torque 0.32 kg*cm vs MG90S 1.8 -> 6x margin
+  wrist: 56 g rotating (incl. can), CG 11.2 mm off the roll axis -> 0.06 kg*cm vs micro servo 1.8 -> 29x margin
+  turntable: J = 7.5 kg*cm^2, accel torque 0.031 kg*cm vs MG996R 9.4 (weight on the 6807 bearing)
 
-(run time 797 s)
+(run time 812 s)

@@ -5,11 +5,11 @@ with the settings inside the 3MF: the correction is only right for the same laye
 
 | File | Parts | Time | PETG | When |
 |---|---|---|---|---|
-| `reprint_3.3mf` | **base** | 7 h 40 | ~131 g | priority 1 |
+| `reprint_3.3mf` | **base**, time-optimised: 0.32 mm layers, lightning infill, 3 walls | 5 h 45 | ~113 g | (was 7 h 40) |
 | `reprint_a.3mf` | **carriage arm, on its side** (stronger arm, side gussets, teardrop pockets: no support inside) | 5 h 09 | ~52 g | the old one snapped at the arm |
-| `reprint_8.3mf` | **gripper frame + right finger** (frame with a 16 mm horn opening) | 4 h 40 | ~35 g | goes with the new left finger you printed |
-| `reprint_b.3mf` | a + 8 on one plate | 9 h 44 | ~87 g | only if a 10 h window; PrusaSlicer's command line crashed AFTER slicing it once: if your slicer crashes, print a and 8 separately |
-| `reprint_2.3mf` | whole claw (frame + both fingers) | 6 h 52 | ~51 g | only if the left finger is reprinted too |
+| `reprint_8.3mf` | **gripper frame + right finger** (frame: 16 mm horn opening, unused plate wings cut off: −27 % plastic) | 4 h 15 | ~30 g | goes with the new left finger you printed |
+| `reprint_b.3mf` | a + 8 on one plate | 9 h 20 | ~81 g | only if a 10 h window; PrusaSlicer's command line crashed AFTER slicing it once: if your slicer crashes, print a and 8 separately |
+| `reprint_2.3mf` | whole claw (frame + both fingers) | 6 h 27 | ~45 g | only if the left finger is reprinted too |
 
 Round 1 plates (1, 4, 5, 6, 7, 9; 5 was printed): `archive/reprint_2026-11-23/`.
 

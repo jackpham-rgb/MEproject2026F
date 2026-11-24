@@ -40,12 +40,16 @@ FAST = {"perimeter_speed": "50", "external_perimeter_speed": "35", "infill_speed
 FAST_DRAFT = {**FAST, "perimeter_speed": "60", "external_perimeter_speed": "45", "infill_speed": "90"}   # 0.28 mm: keep the draft speeds
 
 # (name, profile, plate settings, parts, why). The leading digit names the file (reprint_N).
+# base, time-optimised (sliced 2026-11-24): 0.28 mm + 12 % cubic 7 h 22 -> 0.32 mm + lightning 10 % 5 h 45.
+# 3 walls kept: at 2 the middle of the 3 mm walls would be left hollow by lightning infill (4 h 33 but weak walls).
+# 0.32 mm = 80 % of the 0.4 nozzle (the max); the 8 mm3/s volumetric cap of the stock hotend is in the profile.
+BASE_FAST = {"layer_height": "0.32", "support_material_extrusion_width": "0.38", "perimeters": "3",
+             "fill_pattern": "lightning", "fill_density": "10%", "top_solid_layers": "3", "bottom_solid_layers": "3"}
 PLATES = [   # round 2 (2026-11-24). Round 1 plates 1, 4, 5, 6, 7, 9: archive/reprint_2026-11-23/
     ("3  Base", "DRAFT",
-     {**FAST_DRAFT, **EASY_SUP, "perimeters": "3", "fill_density": "12%", "fill_pattern": "cubic",
-      "support_material_extrusion_width": "0.34"},   # PrusaSlicer refuses 0.25 at 0.28 mm layers (too thin to print)
+     {**FAST_DRAFT, **EASY_SUP, **BASE_FAST},
      ["CA-101"],
-     "6807 pocket 48.0 in CAD (prints ~47.05); coarse 0.28 mm layers, 3 walls round the pocket"),
+     "time-optimised: 0.32 mm layers, lightning infill (only under top faces), 3 walls = the 3 mm walls print solid"),
     ("8  Gripper frame + right finger", "DETAIL",
      {**FAST, **EASY_SUP, "perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
       "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
@@ -63,8 +67,7 @@ PLATES = [   # round 2 (2026-11-24). Round 1 plates 1, 4, 5, 6, 7, 9: archive/re
 ]
 PER_PART = {"CA-301_carriage_arm": {"perimeters": "5", "fill_density": "30%", "fill_pattern": "gyroid"},   # the arm snapped: more walls
             "CA-302_lift_link": {"perimeters": "3", "fill_density": "0%", **BRIM},       # tiny: walls fill it
-            "CA-101_base": {"layer_height": "0.28", "support_material_extrusion_width": "0.34", "perimeters": "3", "top_solid_layers": "4", "bottom_solid_layers": "4", "fill_density": "12%",
-                            "fill_pattern": "cubic", "external_perimeter_speed": "45", "perimeter_speed": "60", "infill_speed": "90"},
+            "CA-101_base": {**BASE_FAST, "external_perimeter_speed": "45", "perimeter_speed": "60", "infill_speed": "90"},
             "CA-402_finger_R": {"perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
                                 "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
             "CA-401_gripper_frame": {"perimeters": "4", "fill_density": "20%", "external_perimeter_speed": "25", "perimeter_speed": "35"},
