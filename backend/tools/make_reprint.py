@@ -62,6 +62,11 @@ PLATES = [
      {**FAST, **EASY_SUP, "perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
       "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
      ["CA-402", "CA-401"], "right finger + frame"),
+    ("9  Gripper frame + right finger + base, one go (base at its own 0.28 mm layers)", "DETAIL",
+     {**FAST, **EASY_SUP, "perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
+      "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
+     ["CA-402", "CA-401", "CA-101"],
+     "plate 8 + plate 3: the claw parts at 0.2 mm, the base keeps 0.28 mm layers and its own walls / infill / speed (per-part)"),
     ("2  Claw spare: gripper frame + 2 fingers", "DETAIL",
      {**FAST, **EASY_SUP, "perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
       "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
@@ -78,7 +83,7 @@ PLATES = [
      "hub 34.3 in CAD (print ~34.9), rod holes 7.05 (print ~5.95)"),
 ]
 PER_PART = {"CA-302_lift_link": {"perimeters": "3", "fill_density": "0%", **BRIM},       # tiny: walls fill it
-            "CA-101_base": {"perimeters": "3", "top_solid_layers": "4", "bottom_solid_layers": "4", "fill_density": "12%",
+            "CA-101_base": {"layer_height": "0.28", "support_material_extrusion_width": "0.34", "perimeters": "3", "top_solid_layers": "4", "bottom_solid_layers": "4", "fill_density": "12%",
                             "fill_pattern": "cubic", "external_perimeter_speed": "45", "perimeter_speed": "60", "infill_speed": "90"},
             "CA-402_finger_R": {"perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
                                 "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},

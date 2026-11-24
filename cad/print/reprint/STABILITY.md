@@ -157,6 +157,39 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | +Y face down | 30 | 79 | 14.4 | 134 | 0 of 1 |  |
 | -Y face down | 3 | 79 | 45.0 | 144 | 0 of 1 |  |
 
+## CA-401 Gripper frame
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 84 | 43 | 4.7 | 3657 | 0 of 0 |  |
+| +Z (upside down, top face down) | 43 | 43 | 6.6 | 3697 | 0 of 0 |  |
+| +X face down | 211 | 62 | 4.3 | 300 | 0 of 0 |  |
+| -X face down | 211 | 62 | 4.3 | 300 | 0 of 0 |  |
+| +Y face down | 403 | 33 | 1.6 | 763 | 0 of 0 |  |
+| -Y face down | 1091 | 33 | 1.0 | 75 | 0 of 0 | **used** |
+
+## CA-101 Base
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 1559 | 52 | 1.3 | 10133 | 1 of 1 |  |
+| +Z (upside down, top face down) | 10671 | 52 | 0.5 | 1020 | 1 of 1 | **used** |
+| +X face down | 890 | 152 | 5.1 | 4742 | 0 of 1 |  |
+| -X face down | 5159 | 152 | 2.1 | 985 | 0 of 1 |  |
+| +Y face down | 0 | 112 | 112.0 | 6580 | 0 of 1 |  |
+| -Y face down | 7346 | 112 | 1.3 | 169 | 0 of 1 |  |
+
+## CA-402 Finger, right
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 251 | 40 | 2.5 | 443 | 1 of 1 | **used** |
+| +Z (upside down, top face down) | 251 | 40 | 2.5 | 443 | 1 of 1 |  |
+| +X face down | 0 | 42 | 42.1 | 1209 | 0 of 1 |  |
+| -X face down | 3 | 42 | 24.1 | 121 | 0 of 1 |  |
+| +Y face down | 30 | 79 | 14.4 | 134 | 0 of 1 |  |
+| -Y face down | 3 | 79 | 45.0 | 144 | 0 of 1 |  |
+
 ## CA-403 Finger, left
 
 | Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |

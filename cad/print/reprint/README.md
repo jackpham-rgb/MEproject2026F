@@ -8,6 +8,7 @@ with the settings inside the 3MF: the correction is only right for the same laye
 | `reprint_5.3mf` | carriage arm + lift link + turret plate | 6 h 47 | ~66 g | **printed 2026-11-23: fits** |
 | `reprint_2.3mf` | **whole claw: gripper frame + both fingers** | 6 h 52 | ~51 g | next (the new left finger needs the new frame) |
 | `reprint_3.3mf` | base | 7 h 40 | ~131 g | only if the rotary tool can't open the old pocket 46.0 → 47.0 |
+| `reprint_9.3mf` | gripper frame + right finger + base (base keeps 0.28 mm layers) | 12 h 21 | ~167 g | = 8 + 3 in one go: no time saved, over a 10 h window |
 | `reprint_6.3mf` | left finger + gripper frame | 4 h 42 | ~36 g | if the old right finger is kept |
 | `reprint_8.3mf` | right finger + gripper frame | 4 h 40 | ~36 g | if a new left finger is already printed |
 | `reprint_7.3mf` | carriage arm + lift link + left finger + frame | 8 h 34 | ~75 g | (superseded: 5 was printed) |
