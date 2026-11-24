@@ -1,28 +1,27 @@
 ASSEMBLY CHECK: every part slides to its place along its arrow (backend/tools/make_manual.py)
 solid booleans every 3 mm of travel; overlap > 1.0 mm³ with an assembled part = blocked
 
- 1. Bearing into the base                PASS
- 2. Turntable servo                      PASS
- 3. Weight + feet                        PASS
- 4. Servo horn                           PASS
- 5. Turret plate                         PASS
- 6. Linear bearings into the carriage    PASS
- 7. Carriage onto the rods (on the table) PASS
- 8. Rods + carriage into the turret plate PASS
- 9. Spine                                PASS
-10. Top cap                              PASS
-11. Lift servo                           PASS
-12. Lift link                            PASS
-13. Crank                                PASS
-14. Wrist servo                          PASS
-15. Wrist horn                           PASS
-16. Gripper frame                        PASS
-17. Both fingers, gears meshed           PASS
-18. Right finger axle                    PASS
-19. Horn on the left gear, then the gripper servo PASS
-20. Can bumper                           PASS
-21. Electronics on the tray              PASS
-22. Panel: button, LED, power            PASS
-23. Tray onto the base                   PASS
+ 1. Linear bearings into the carriage    PASS
+ 2. Lift link onto the carriage          PASS
+ 3. Lift servo into the spine            PASS
+ 4. Crank: horn on the link, then on the lift servo PASS
+ 5. Turret plate + turntable horn (on the table) PASS
+ 6. Spine onto the turret plate          PASS
+ 7. Rods down through the carriage into the plate PASS
+ 8. Top cap                              PASS
+ 9. Gripper frame onto the wrist horn (on the table) PASS
+10. Both fingers, gears meshed           PASS
+11. Right finger axle                    PASS
+12. Horn on the left gear, then the gripper servo PASS
+13. Wrist servo into the arm             PASS
+14. Claw onto the wrist servo            PASS
+15. Can bumper                           PASS
+16. Bearing into the base                PASS
+17. Turntable servo                      PASS
+18. Weight + feet                        PASS
+19. Column onto the turntable servo      PASS
+20. Electronics on the tray              PASS
+21. Panel: button, LED, power            PASS
+22. Tray onto the base                   PASS
 
 RESULT: every step can be assembled in this order

@@ -15,24 +15,24 @@ COLLISION SWEEP: 289 poses x 35 parts, solid booleans, tolerance 1.0 mm^3
   can after LOWER: centre (127.0, 0.0) mm (target (127.0, 0.0)), INVERTED, tilt 0.0 deg, bottom at z = -0.00 mm -> PASS
   gap measurement: every 4th pose (72); collision booleans: every pose
   pads at GRIP end: 0.00 mm from the can (0 = touching; the servo then squeezes past contact); at RELEASE end: 13.3 mm clear
-  tip-over: robot CG stays 37 mm inside the support footprint (worst at TURN) -> PASS
+  tip-over: robot CG stays 38 mm inside the support footprint (worst at TURN) -> PASS
   PASS  table clearance (lowest moving parts): test_can -0.0 mm, gripper_servo_SG90 +12.4 mm, finger_R +29.3 mm, gripper_frame +30.8 mm, finger_L +36.2 mm
 
 MASS (printed: volume x 1.27 g/cc x 0.60 fill factor, EST; purchased: typical datasheet mass)
-  robot total 571 g (printed 290 g, purchased 281 g), can 15 g
-  PETG filament ~290 g (+ supports / purge ~15 %)
-  CG at home: (-1.6, -25.8, 56.6) mm
-    turret     122.8 g
+  robot total 570 g (printed 289 g, purchased 281 g), can 15 g
+  PETG filament ~289 g (+ supports / purge ~15 %)
+  CG at home: (-1.6, -25.9, 56.5) mm
+    turret     122.7 g
     crank        1.0 g
-    lift        90.0 g
-    wrist       23.5 g
+    lift        88.7 g
+    wrist       23.4 g
     finger_L    10.7 g
     finger_R     9.7 g
 
 SERVO LOADS FROM CAD MASSES (stall ratings at 5 V: MG996R 9.4, MG90S 1.8, SG90 1.6 kg*cm)
-  lift: 149 g moving (incl. can), CG 40 mm in front of the rods, bushing span 43 mm
-        jam ratio 2*mu*e/L = 0.019 with LM6UU (printed slide mu 0.3 would be 0.56) -> PASS; crank torque 0.33 kg*cm vs MG90S 1.8 -> 5x margin
+  lift: 147 g moving (incl. can), CG 40 mm in front of the rods, bushing span 43 mm
+        jam ratio 2*mu*e/L = 0.019 with LM6UU (printed slide mu 0.3 would be 0.56) -> PASS; crank torque 0.33 kg*cm vs MG90S 1.8 -> 6x margin
   wrist: 59 g rotating (incl. can), CG 11.2 mm off the roll axis -> 0.07 kg*cm vs micro servo 1.8 -> 27x margin
   turntable: J = 7.7 kg*cm^2, accel torque 0.032 kg*cm vs MG996R 9.4 (weight on the 6807 bearing)
 
-(run time 671 s)
+(run time 797 s)

@@ -14,11 +14,11 @@ turret_plate,turret,PETG,31.4,23.9,0.0,-5.3,56.2
 turntable_horn,turret,buy,1.5,4.0,-0.0,-0.0,51.5
 rod_L,turret,buy,3.1,24.9,-17.0,12.0,111.0
 rod_R,turret,buy,3.1,24.9,17.0,12.0,111.0
-spine,turret,PETG,28.0,21.4,0.5,-20.4,114.6
+spine,turret,PETG,27.9,21.3,0.5,-20.4,114.7
 top_cap,turret,PETG,13.6,10.4,-0.0,-2.1,165.0
 lift_servo_MG90S,turret,buy,6.9,13.4,13.4,-6.0,144.8
 lift_crank,crank,buy,0.4,1.0,-4.2,0.3,147.3
-carriage_arm,lift,PETG,58.8,44.8,0.0,14.7,96.5
+carriage_arm,lift,PETG,57.1,43.5,0.0,14.9,96.2
 LM6UU_L1,lift,buy,1.6,8.0,-17.0,12.0,78.5
 LM6UU_L2,lift,buy,1.6,8.0,-17.0,12.0,121.5
 LM6UU_R1,lift,buy,1.6,8.0,17.0,12.0,78.5
@@ -26,7 +26,7 @@ LM6UU_R2,lift,buy,1.6,8.0,17.0,12.0,121.5
 lift_link,lift,PETG,0.3,0.2,-7.0,12.6,138.1
 wrist_servo,lift,buy,6.9,13.0,0.0,42.1,55.9
 wrist_horn,wrist,buy,0.8,1.0,0.0,57.2,61.1
-gripper_frame,wrist,PETG,15.5,11.8,-0.2,72.5,72.9
+gripper_frame,wrist,PETG,15.4,11.7,-0.2,72.4,72.9
 can_bumper,wrist,silicone,0.1,0.1,0.0,91.8,75.2
 gripper_servo_SG90,wrist,buy,6.9,9.0,-13.3,83.0,97.7
 axle_R,wrist,buy,0.1,1.6,8.1,83.0,75.7

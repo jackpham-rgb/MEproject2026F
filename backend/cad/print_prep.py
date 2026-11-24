@@ -39,6 +39,9 @@ CANDIDATES = {"-Z (as modelled, bottom down)": None, "+Z (upside down, top face 
               "+X face down": ((0, 1, 0), 90), "-X face down": ((0, 1, 0), -90),
               "+Y face down": ((1, 0, 0), -90), "-Y face down": ((1, 0, 0), 90)}
 PRESS = ("LM6UU", "rod press", "6807")
+# forced orientations (part -> bed face), where strength beats the automatic choice:
+#   carriage_arm on its +X side: the arm beam's layers run along the beam (standing, -Y down, it snapped across the layers)
+FORCE = {"carriage_arm": "+X face down"}
 
 
 def evaluate(shape, part):
@@ -77,6 +80,8 @@ def main():
         base = p["shape"].val()
         best = None
         for label, rot in CANDIDATES.items():
+            if p["name"] in FORCE and label != FORCE[p["name"]]:
+                continue
             s = orient(base, rot)
             e = evaluate(s, p["name"])
             stable = e["contact"] >= 200 or e["contact"] >= 0.5 * e["w"] * e["d"]

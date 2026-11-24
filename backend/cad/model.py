@@ -82,7 +82,8 @@ TOL = dict(
     servo_pilot=2.7,   # [1.7] self-tapping screws from the servo bags: real ~1.6 (small holes close up even more)
     servo_run=3.5,     # [2.4] servo-bag screw as a PIN: the part turns on it (lift link crank end): real ~2.4
     rod_press=7.05,    # [6.0] 6 mm rod (measured 6.00): gauge 6.00->4.91 ... 6.45->5.33 => real ~5.95, light press
-    lm_press=13.0,     # [12.15] LM6UU (measured 11.95): gauge 12.10->11.00 ... 12.55->11.50 => real ~12.0, snug
+    lm_press=13.3,     # [12.15, 13.0] LM6UU (measured 11.95): 13.0 printed ~12.0 = too tight with support bits left
+                       #   inside, so 13.3 => real ~12.25: slides in by hand; loose -> one wrap of tape on the bearing
     run_bore=4.8,      # [3.9] gear on a #6 screw axle: running clearance, real ~3.75
     peg=2.5,           # [2.8] printed peg for 3.2 mm board holes (pegs print over): real ~2.8
     bear_shaft=34.3,   # [34.95] hub into the 6807 bore (measured 35.00): printed 34.95->35.5, gauge post 34.80->35.6
@@ -105,6 +106,21 @@ COLORS = dict(print="#3d7be0", print2="#e0a33d", tpu="#2f2f2f", servo="#1f2329",
 # --------------------------------------------------------------------------------------
 def box(x0, x1, y0, y1, z0, z1):
     return cq.Workplane("XY").box(x1 - x0, y1 - y0, z1 - z0).translate(((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2))
+
+
+def teardrop_z(x, y, r, z0, z1, up=(0, 1), flank=55.0, cap=None):
+    """Hole along Z that prints lying on its side without support: circle + a point toward `up` (the print's up
+    direction, in XY). Flanks at `flank` deg from horizontal, steeper than the 50 deg support threshold.
+    cap = how far from the centre (along `up`) the point may reach: it is cut flat there, to stay inside a wall."""
+    a = math.radians(90 - flank)
+    d = r / math.cos(math.radians(flank))
+    pts = [(r * math.cos(a), r * math.sin(a)), (0, d), (-r * math.cos(a), r * math.sin(a)), (0, 0)]
+    tri = cq.Workplane("XY").polyline(pts).close().extrude(z1 - z0)              # local: point along +Y
+    if cap is not None and cap < d:
+        tri = tri.cut(cq.Workplane("XY").box(4 * d, 2 * d, 3 * (z1 - z0), centered=(True, False, True)).translate((0, cap, 0)))
+    ang = math.degrees(math.atan2(-up[0], up[1]))                               # rotate +Y onto `up`
+    tri = tri.rotate((0, 0, 0), (0, 0, 1), ang).translate((x, y, z0))
+    return cyl(x, y, r, z0, z1).union(tri)
 
 
 def cyl(x, y, r, z0, z1):
@@ -395,6 +411,8 @@ def build_parts():
     # flange on top of the turret plate's spine foot (tz1 .. tz1+4), screws from above into the plate
     spine = spine.union(box(-25, 25, -24, -12, tz1 + 4, tz1 + 8)).cut(cyl(-15, -16, TOL["n6_clear"] / 2, tz1 + 3, tz1 + 9)).cut(cyl(15, -16, TOL["n6_clear"] / 2, tz1 + 3, tz1 + 9))
     spine = spine.cut(cyl(-15, -21, TOL["n6_pilot"] / 2, p["rod_top"] - 18, p["rod_top"])).cut(cyl(15, -21, TOL["n6_pilot"] / 2, p["rod_top"] - 18, p["rod_top"]))
+    for sx in (-1, 1):                                                                     # head relief: the #6 pan head
+        spine = spine.cut(cyl(sx * 15, -16, 3.8, tz1 + 8, tz1 + 14))                    # (6.6) would hit the wall 2 mm away
     spine = spine.cut(box(-8, 8, -25, -17, tz1 + 12, tz1 + 50))                          # cable window
     # lift-servo bracket: frame behind the servo tabs (servo body x 2.8..25.5, tabs at x 7.1..9.6)
     ltx, lty, ltz = p["lift_servo_tip"]
@@ -428,10 +446,14 @@ def build_parts():
     car = box(-cx_, cx_, cy0, cy1, cz0, cz1)
     lm_z = [(cz0, cz0 + p["lm_len"]), (cz1 - p["lm_len"], cz1)]
     for sx in (-1, 1):
-        car = car.cut(cyl(sx * rx, ry, 3.6, cz0 - 1, cz1 + 1))                           # rod clearance
+        # printed lying on its +X side (print up = -X: the arm beam's layers then run along its length, the strong
+        # way): teardrop holes pointing -X, so no support grows inside the pockets; the point stops 1.6 mm inside the wall
+        up = (-1, 0)
+        car = car.cut(teardrop_z(sx * rx, ry, 3.6, cz0 - 1, cz1 + 1, up=up, cap=cx_ + sx * rx - 1.6))       # rod clearance
         for z0, z1 in lm_z:
-            car = car.cut(cyl(sx * rx, ry, TOL["lm_press"] / 2, z0, z1))                  # LM6UU press pockets
-    car = car.cut(box(-9.0, -5.0, 6.5, 17.5, cz1 - 3.5, cz1 + 1))                       # relief: the link end swings here
+            car = car.cut(teardrop_z(sx * rx, ry, TOL["lm_press"] / 2, z0, z1, up=up, cap=cx_ + sx * rx - 1.6))  # LM6UU
+    car = car.cut(box(-9.0, -1.0, 6.5, 17.5, cz1 - 3.5, cz1 + 1))                       # relief: the link end swings here
+    #                                                       (and the pivot screw's pan head sits in it, x -5.5..-3.1)
     car = car.union(box(-11.5, -9.0, 8, 16, cz1, cz1 + 6)).cut(
         cyl_dir((-12.5, 12, cz1 + 2), (1, 0, 0), TOL["n6_pilot"] / 2, 5))                 # link pivot: #6-32x1/2 threads in
     # arm beam + wrist bracket (wrist servo body passes through the bracket window)
@@ -442,9 +464,14 @@ def build_parts():
     brkt = brkt.cut(box(-6.4, 6.4, by1 - 5, by1 + 1, w_body_z[0] - 0.3, w_body_z[1] + 0.3))
     for hz in (gz - (MICRO_HOLES_X - 13.75), gz - (MICRO_HOLES_X + 13.75)):           # wrist-servo tab screws (M2)
         brkt = brkt.cut(cyl_dir((0, by1 - 5, hz), (0, 1, 0), 0.85, 7))
+    # side gussets where the beam meets the wrist bracket (it snapped there, printed standing): 8 mm triangles under
+    # the beam, outside the wrist servo body (x +-6.4), on both sides
+    for g0, g1 in ((-11.0, -7.2), (7.2, 11.0)):
+        gus = cq.Workplane("YZ").polyline([(by1 - 4, cz0), (by1 - 12, cz0), (by1 - 4, cz0 - 8)]).close().extrude(g1 - g0).translate((g0, 0, 0))
+        car = car.union(gus)
     car = car.union(beam).union(brkt)
-    add("carriage_arm", "lift", car, "PETG", note="Carriage + arm + wrist bracket in one print. 4x LM6UU press-fit "
-        "(12.15 mm pockets, 43 mm apart on each rod). Wrist servo: 2 servo-bag screws. Link pivot: #6-32x1/2.")
+    add("carriage_arm", "lift", car, "PETG", note="Carriage + arm + wrist bracket in one print. 4x LM6UU "
+        "(teardrop pockets: no support inside, ~12.25 mm as printed, 43 mm apart on each rod). Wrist servo: 2 servo-bag screws. Link pivot: #6-32x1/2.")
     for sx in (-1, 1):
         for i, (z0, z1) in enumerate(lm_z):
             lm = cyl(sx * rx, ry, p["lm_od"] / 2, z0, z1).cut(cyl(sx * rx, ry, 3.0, z0 - 1, z1 + 1))
@@ -473,7 +500,8 @@ def build_parts():
     gr = gr.cut(cyl(pvx, pvy, TOL["n6_clear"] / 2, pt[0] - 1, pt[1] + 1))                 # right axle: clear in the top plate
     gr = gr.cut(cyl(pvx, pvy, TOL["n6_pilot"] / 2, pb[0] - 1, pb[1] + 1))                 # ... threads into the bottom plate
     hz0 = p["finger_z"][1] + p["ghorn_gap"]                                                # horn disc bottom (on the gear)
-    gr = gr.cut(cyl(-pvx, pvy, p["ghorn_r"] + 1.0, pt[0] - 1, pt[1] + 1))                 # the horn turns inside the top plate
+    gr = gr.cut(cyl(-pvx, pvy, p["ghorn_r"] + 2.0, pt[0] - 1, pt[1] + 1))                 # the horn turns inside the top plate;
+    #                                                       Ø16 (was 14) so a screwdriver reaches the 2 horn screws at r 5
     # gripper servo posts (servo tabs at z = pt1 + 0.5 + 6.8)
     spl_tip = p["grip_spline_tip"]
     gs_face = spl_tip + 5.8                                                                # servo raised to sit on the horn

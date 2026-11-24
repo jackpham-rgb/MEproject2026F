@@ -173,7 +173,9 @@ const printedSet = new Set(D.printed);
 // ---------------- step list
 const LV = D.levels;
 const steps = [{ n: 0, title: "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can").concat(["test_can"]), screws: [], glue: [] },
-  { n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }, ...D.steps];
+  { n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }, ...D.steps,
+  ...(D.motion ? [{ n: "▶", title: "Watch it run: the whole movement", run: true, level: null, new: [],
+    show: Object.keys(owners), screws: [], glue: [] }] : [])];
 const list = $("list");
 steps.forEach((s, i) => {
   const b = document.createElement("button"); b.className = "st"; b.dataset.i = i;
@@ -223,7 +225,9 @@ function go(i) {
   if (isM) { for (const o of Object.values(owners)) o.group.visible = false; clearPaths(); anim = null; renderInfo(s); M.start(0); return; }
   M.stop();
   const show = new Set(s.show), fresh = new Set([...s.new, ...s.screws, ...s.glue]);
-  for (const [n, o] of Object.entries(owners)) { o.group.visible = show.has(n); o.group.position.set(0, 0, 0); o.group.rotation.set(0, 0, 0); styleOwner(n, fresh.has(n) || cur === 0); }
+  for (const [n, o] of Object.entries(owners)) { o.group.visible = show.has(n); o.group.position.set(0, 0, 0); o.group.rotation.set(0, 0, 0);
+    o.group.matrixAutoUpdate = true; styleOwner(n, fresh.has(n) || cur === 0 || s.run); }
+  RUN.t0 = s.run ? performance.now() : null; RUN.paused = false;
   clearPaths(); s.screws.forEach(n => addPath(screwBy[n]));
   renderInfo(s); frame(s, true); play(s);
 }
@@ -231,7 +235,56 @@ function play(s) {
   const t0 = performance.now();
   anim = { s, t0 };
 }
+// ---------------- "watch it run": firmware sequence, same kinematics as model.py / the motion viewer
+const RUN = { t0: null, paused: false, tp: 0 };
+const MO = D.motion, D2R = Math.PI / 180;
+function rotAbout(p, axis, deg) {
+  return new THREE.Matrix4().makeTranslation(p[0], p[1], p[2])
+    .multiply(new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(...axis).normalize(), deg * D2R))
+    .multiply(new THREE.Matrix4().makeTranslation(-p[0], -p[1], -p[2]));
+}
+function mats4(q) {
+  const P = MO.params, L = P.lift_servo_tip, T = { fixed: new THREE.Matrix4() };
+  T.turret = rotAbout([0, 0, 0], [0, 0, 1], q.psi);
+  T.crank = T.turret.clone().multiply(rotAbout([0, L[1], L[2]], [1, 0, 0], q.theta - P.lift_theta0));
+  T.lift = T.turret.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0, q.h));
+  T.wrist = T.lift.clone().multiply(rotAbout([0, 0, P.grip_z], [0, 1, 0], q.phi));
+  T.finger_R = T.wrist.clone().multiply(rotAbout([P.pivot_x, P.pivot_y, 0], [0, 0, 1], -q.alpha));
+  T.finger_L = T.wrist.clone().multiply(rotAbout([-P.pivot_x, P.pivot_y, 0], [0, 0, 1], q.alpha));
+  return T;
+}
+const RT = (() => { if (!MO) return null;
+  const SEQ = MO.sequence, DUR = { HOME: 0.6, GRIP: 0.8, LIFT: 1.0, FLIP: 1.5, TURN: 1.5, LOWER: 1.0, RELEASE: 0.6,
+    "H-LIFT": 1.0, "H-CLOSE": 0.8, "H-WRIST": 1.5, "H-TURN": 1.5, "H-LOWER": 1.0, "H-OPEN": 0.8 }, PAUSE = { RELEASE: 1.6, "H-OPEN": 1.0 };
+  const cnt = {}; SEQ.forEach(q => cnt[q.label] = (cnt[q.label] || 0) + 1);
+  const times = [], canM = []; let t = 0, gripW = null, Tc = new THREE.Matrix4();
+  SEQ.forEach((q, i) => {
+    if (i > 0 && SEQ[i - 1].label !== q.label && PAUSE[SEQ[i - 1].label]) t += PAUSE[SEQ[i - 1].label];
+    t += (DUR[q.label] || 1) / cnt[q.label]; times.push(t);
+    const T = mats4(q);
+    if (q.attached && !gripW) gripW = T.wrist.clone();
+    if (q.attached) Tc = T.wrist.clone().multiply(gripW.clone().invert());
+    canM.push(Tc.clone());
+  });
+  return { SEQ, times, canM, end: t + 1.2 }; })();
+const PHASE = { HOME: "Home: arm down, claw open", GRIP: "Grip: the fingers close on the can", LIFT: "Lift: the carriage slides up the rods",
+  FLIP: "Flip: the wrist turns the can upside down", TURN: "Turn: the turret swings to the drop spot", LOWER: "Lower: the carriage slides down",
+  RELEASE: "Release: the fingers open, the can stands inverted", "H-LIFT": "Return: lift", "H-CLOSE": "Return: claw closes",
+  "H-WRIST": "Return: wrist back", "H-TURN": "Return: turret back", "H-LOWER": "Return: lower", "H-OPEN": "Return: claw open, ready" };
+function runPose(now) {
+  const t = RUN.paused ? RUN.tp : ((now - RUN.t0) / 1000) % RT.end; RUN.tp = t;
+  let i = 0; while (i < RT.times.length - 1 && RT.times[i + 1] <= t) i++;
+  const q = RT.SEQ[i], T = mats4(q);
+  for (const [n, o] of Object.entries(owners)) {
+    const g = MO.groups[n] || "fixed"; o.group.matrixAutoUpdate = false;
+    o.group.matrix.copy(g === "can" ? RT.canM[i] : (T[g] || T.fixed));
+    if (g === "can") o.group.visible = !q.label.startsWith("H-");
+  }
+  const ph = $("runPhase"); if (ph) ph.textContent = PHASE[q.label] || q.label;
+  const jt = $("runJoints"); if (jt) jt.textContent = `turret ${q.turn.toFixed(0)}° · lift servo ${q.lift.toFixed(0)}° (carriage +${q.h.toFixed(0)} mm) · wrist ${q.wrist.toFixed(0)}° · claw ${q.grip.toFixed(0)}°`;
+}
 function tick(now) {
+  if (RUN.t0 !== null && RT) runPose(now);
   if (anim) {
     const { s, t0 } = anim, t = (now - t0) / 1000;
     const ease = x => x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3);
@@ -252,7 +305,7 @@ function tick(now) {
   controls.update(); renderer.render(scene, camera); labels(); requestAnimationFrame(tick);
 }
 function frame(s, smooth) {
-  const fresh = cur === 0 ? s.show : [...s.new, ...s.screws, ...s.glue];
+  const fresh = cur === 0 || s.run ? s.show.filter(n => n !== "test_can") : [...s.new, ...s.screws, ...s.glue];
   const box = new THREE.Box3(), ctx = new THREE.Box3();
   for (const n of fresh) if (owners[n]) { box.union(owners[n].box); const off = offsetFor(s, n); if (off) { const b = owners[n].box.clone(); b.translate(off); box.union(b); } }
   for (const n of s.show) if (owners[n] && n !== "test_can") ctx.union(owners[n].box);
@@ -260,7 +313,7 @@ function frame(s, smooth) {
   const c = box.getCenter(new THREE.Vector3());
   const r = Math.max(box.getSize(new THREE.Vector3()).length() * 0.75, ctx.getSize(new THREE.Vector3()).length() * 0.22, 55);
   const dir = camera.position.clone().sub(controls.target).normalize();
-  if (cur === 0 || !smooth) dir.set(-0.55, -0.68, 0.48).normalize();
+  if (cur === 0 || s.run || !smooth) dir.set(-0.55, -0.68, 0.48).normalize();
   const dist = r / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 0.9;
   camGoal = { target: c, pos: c.clone().addScaledVector(dir, dist), t0: performance.now() };
 }
@@ -281,7 +334,7 @@ renderer.domElement.addEventListener("wheel", () => { camGoal = null; }, { passi
 const labBox = $("labels");
 function labels() {
   labBox.innerHTML = ""; if (!labEl.checked) return;
-  const s = steps[cur]; if (cur === 0 || s.measure) return;
+  const s = steps[cur]; if (cur === 0 || s.measure || s.run) return;
   const W = renderer.domElement.clientWidth, H = renderer.domElement.clientHeight;
   const put = (pos, text, cls) => { const p = pos.clone().project(camera); if (p.z > 1) return;
     const d = document.createElement("div"); d.className = "lab " + cls; d.textContent = text;
@@ -316,7 +369,7 @@ function renderInfo(s) {
   const I = $("info");
   if (cur === 0) {
     I.innerHTML = `<div class="head"><span class="big">★</span><h2>Before you start</h2></div>
-      <p>23 steps. Every step shows the new parts flying into place and every screw driving in along its dashed path. Rotate and zoom freely.</p>
+      <p>${D.steps.length} steps: the column is built on the table first (1–15), the base last (16–19). Every step shows the new parts flying into place and every screw driving in along its dashed path. Rotate and zoom freely.</p>
       ${Object.entries(LV).map(([k, v]) => `<div class="lvl ${k}"><b>${v.label}</b>${v.text}<br><small>Steps: ${D.steps.filter(x => x.level === k).map(x => x.n).join(", ")}</small></div>`).join("")}
       <div class="box"><h3>Do while the precise parts print</h3><ul>${D.while_waiting.map(t => `<li>${t}</li>`).join("")}</ul></div>
       <div class="box fit"><h3>Next: measure first</h3>Before step 1, measure the bought parts, the tolerance gauge and the parts already printed (step <b>M</b>, animated). The precise-fit holes get corrected from those numbers.</div>
@@ -324,6 +377,20 @@ function renderInfo(s) {
     return;
   }
   if (s.measure) { M.info(I); return; }
+  if (s.run) {
+    I.innerHTML = `<div class="head"><span class="big">▶</span><h2>Watch it run</h2></div>
+      <div class="box fit"><h3>Now</h3><b id="runPhase" style="font-size:16px">–</b><br><small id="runJoints"></small></div>
+      <button class="tb" id="runPause" style="width:100%;justify-content:center;padding:9px">❚❚ Pause</button>
+      <div class="box"><h3>What moves what</h3><ul>
+        <li><b>Turntable servo (MG996R)</b> turns the whole column on the 6807 bearing.</li>
+        <li><b>Lift servo (MG90S)</b> swings the crank; the lift link pushes the <b>carriage</b> up and down the 2 rods (on the LM6UU bearings).</li>
+        <li><b>Wrist servo</b> on the arm's end turns the gripper 180° to flip the can.</li>
+        <li><b>Gripper servo (SG90)</b> turns the left gear; the gears turn both fingers together.</li></ul></div>
+      <div class="box"><h3>One cycle</h3>grip → lift → flip → turn → lower → release, then it goes home. Drag to look from any side; the same sequence and angles as the firmware (<code>firmware/concept_a</code>).</div>`;
+    $("runPause").onclick = () => { RUN.paused = !RUN.paused; if (!RUN.paused) RUN.t0 = performance.now() - RUN.tp * 1000;
+      $("runPause").textContent = RUN.paused ? "▶ Play" : "❚❚ Pause"; };
+    return;
+  }
   const lv = LV[s.level];
   const pr = s.new.filter(n => printedSet.has(n)), bo = {};
   for (const n of s.new.filter(n => !printedSet.has(n))) { const k = D.names[n] || n; bo[k] = (bo[k] || 0) + 1; }
@@ -452,7 +519,7 @@ const M = (() => {
   const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   async function info(I) {
     I.innerHTML = `<div class="head"><span class="big">M</span><h2>Measure first: CAD file vs real part</h2></div>
-      <div class="lvl precise"><b>BEFORE STEP 1</b>Send these numbers before the PRECISE FIT steps (1, 5, 6, 7, 8): the holes get corrected and those parts reprinted. EASY steps can go ahead.</div>
+      <div class="lvl precise"><b>BEFORE STEP 1</b>Send these numbers before the PRECISE FIT steps (1, 7, 16, 19): the holes get corrected and those parts reprinted. EASY steps can go ahead.</div>
       <div class="box"><h3>How (watch the animation)</h3><ul>
         <li><b>Hole:</b> small top jaws inside, measure, turn the calipers a quarter turn, measure again: write <b>both</b>.</li>
         <li>Halfway down the hole, not at the bed side.</li>
@@ -500,7 +567,7 @@ $("replay").onclick = () => go(cur); $("fit").onclick = () => frame(steps[cur], 
 [ghostEl, realEl].forEach(e => e.onchange = () => go(cur));
 addEventListener("keydown", e => { if (e.key === "ArrowRight") go(cur + 1); if (e.key === "ArrowLeft") go(cur - 1); });
 const goHash = () => { const h = decodeURIComponent(location.hash.slice(1)).toLowerCase();
-  const i = steps.findIndex(s => String(s.n).toLowerCase() === h || (h === "measure" && s.measure)); go(i < 0 ? 0 : i); };
+  const i = steps.findIndex(s => String(s.n).toLowerCase() === h || (h === "measure" && s.measure) || (h === "run" && s.run)); go(i < 0 ? 0 : i); };
 resize(); goHash();
 addEventListener("hashchange", goHash);
 requestAnimationFrame(tick); requestAnimationFrame(camStep);

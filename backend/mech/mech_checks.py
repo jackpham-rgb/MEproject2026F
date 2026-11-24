@@ -499,6 +499,16 @@ d_r = F_b * L_r ** 3 / (192 * STEEL["E"] * I_r)
 sig_r = F_b * L_r / 8 * (P["rod_d"] / 2) / I_r
 check("Strength", "6 mm rods (bending, fixed-fixed)", f"{sig_r:.2f} MPa, {d_r * 1000:.2f} µm", "≤ 200 MPa", sig_r <= STEEL["sigma_allow"])
 check("Strength", "LM6UU load vs static rating 206 N (EST)", f"{F_b:.2f} N", "≤ 50 N", F_b <= 50)
+# carriage jamming ("drawer rule"): the lift set's weight hangs e_l in front of the rods, so the carriage tilts and
+# presses on the rods at both ends of its guide length b with N = W*e/b each; the friction 2*mu*N must stay below
+# the force that moves it (here the weight itself when lowering), i.e. jam ratio 2*mu*e/b < 1 (keep < 0.5 for margin)
+W_l = m_lift * G
+for label, mu, b_g in (("with 4 LM6UU (ball, mu 0.005 EST, guide 43 mm)", 0.005, span),
+                       ("WITHOUT LM6UU: printed bore only (PETG on steel, mu 0.3 EST, guide 24 mm)", 0.3, P["car_h"] - 2 * P["lm_len"])):
+    jr = 2 * mu * e_l / b_g
+    out(f"   carriage {label}: e = {e_l:.0f} mm, jam ratio {jr:.2f} (1 = jams), friction {2 * mu * W_l * e_l / b_g:.2f} N")
+check("Function", "carriage cannot jam on the rods (LM6UU, drawer rule)", f"{2 * 0.005 * e_l / span:.3f}", "≤ 0.5",
+      2 * 0.005 * e_l / span <= 0.5)
 # turret plate: column moment into the plate at the hub
 m_turret_side = sum(mass[n] for n in TURRET_SET) + m_can
 mats_t = pose_mats(joints(FW["TURN_START"], FW["LIFT_UP"], 180, 95), True)

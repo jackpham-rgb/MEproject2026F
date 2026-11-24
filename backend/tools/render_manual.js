@@ -359,7 +359,7 @@ function bbCenter(n) { let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
   cardPages("A", "M0a", "Measure: bought parts (the real reference sizes)");
   cardPages("B", "M0b", "Measure: tolerance gauge");
   cardPages("C", "M0c", "Measure: parts already printed", `<p style="font-size:14px;margin-top:3mm"><b>Also note:</b> filament, nozzle / bed temperature, settings used.
-    <b>Send the numbers before the PRECISE FIT steps</b> (1, 5, 6, 7, 8): the hole sizes get corrected and those parts reprinted. EASY steps can go ahead.
+    <b>Send the numbers before the PRECISE FIT steps</b> (1, 7, 16, 19): the hole sizes get corrected and those parts reprinted. EASY steps can go ahead.
     The 3D guide (step M) has the same sheet to type into and copy.</p>`);
   const seen = new Set();
   for (const s of steps) {

@@ -1,0 +1,33 @@
+SCREWDRIVER ACCESS: 4 mm shaft, 80 mm behind each screw head, against every part already in place
+
+  step  2 Lift link onto the carriage        #6s into lift_link                FAIL: screw head hits carriage_arm (10 mm3)
+  step  3 Lift servo into the spine           sb into lift_servo_MG90S         PASS
+  step  3 Lift servo into the spine           sb into lift_servo_MG90S         PASS
+  step  4 Crank: horn on the link, then on t  M3 into lift_crank               PASS
+  step  4 Crank: horn on the link, then on t  sb into lift_crank               PASS
+  step  5 Turret plate + turntable horn (on   sb into turret_plate             PASS
+  step  5 Turret plate + turntable horn (on   sb into turret_plate             PASS
+  step  5 Turret plate + turntable horn (on   sb into turret_plate             PASS
+  step  5 Turret plate + turntable horn (on   sb into turret_plate             PASS
+  step  6 Spine onto the turret plate         #6 into spine                    PASS
+  step  6 Spine onto the turret plate         #6 into spine                    FAIL: screwdriver hits spine (26 mm3)
+  step  8 Top cap                             #6 into top_cap                  PASS
+  step  8 Top cap                             #6 into top_cap                  PASS
+  step  9 Gripper frame onto the wrist horn   sb into gripper_frame            PASS
+  step  9 Gripper frame onto the wrist horn   sb into gripper_frame            PASS
+  step  9 Gripper frame onto the wrist horn   sb into gripper_frame            PASS
+  step  9 Gripper frame onto the wrist horn   sb into gripper_frame            PASS
+  step 12 Horn on the left gear, then the gr  sb into gripper_servo_SG90       PASS
+  step 12 Horn on the left gear, then the gr  sb into gripper_servo_SG90       PASS
+  step 12 Horn on the left gear, then the gr  sb into gripper_horn             FAIL: screwdriver hits gripper_horn (1 mm3)
+  step 12 Horn on the left gear, then the gr  sb into gripper_horn             FAIL: screwdriver hits gripper_frame (13 mm3); screw head hits gripper_frame (1 mm3); screwdriver hits gripper_horn (1 mm3)
+  step 13 Wrist servo into the arm            sb into wrist_servo              PASS
+  step 13 Wrist servo into the arm            sb into wrist_servo              PASS
+  step 17 Turntable servo                     #8 into turntable_servo_MG996R   PASS
+  step 17 Turntable servo                     #8 into turntable_servo_MG996R   PASS
+  step 17 Turntable servo                     #8 into turntable_servo_MG996R   PASS
+  step 17 Turntable servo                     #8 into turntable_servo_MG996R   PASS
+  step 22 Tray onto the base                  #6 into electronics_tray         PASS
+  step 22 Tray onto the base                  #6 into electronics_tray         PASS
+
+RESULT: 4 screw(s) blocked

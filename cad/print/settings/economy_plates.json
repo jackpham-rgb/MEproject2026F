@@ -174,12 +174,12 @@
   ]
  ],
  "before": [
-  36.963055555555556,
-  386.30246468256473
+  36.970277777777774,
+  386.1620092095632
  ],
  "after": [
-  23.9175,
-  339.1304421449731
+  23.966944444444444,
+  339.3525194152473
  ],
  "plates": [
   {
@@ -309,8 +309,8 @@
    "letter": "D",
    "img": "docs/print_plates/plate_D.png",
    "ini": "cad/print/settings/plates/plate_D.ini",
-   "time": "5 h 28",
-   "grams": 69,
+   "time": "5 h 31",
+   "grams": 70,
    "profile": "STANDARD",
    "layer": "0.2",
    "walls": "3",

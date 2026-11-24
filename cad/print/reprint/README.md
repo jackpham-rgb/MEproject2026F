@@ -3,20 +3,15 @@
 **Hole sizes corrected from the measurements of 2026-11-23** (docs/17: holes printed ~1.05 mm small). Print these
 with the settings inside the 3MF: the correction is only right for the same layer height, speeds and temperatures.
 
-| File | Parts | Time | PETG | Status |
+| File | Parts | Time | PETG | When |
 |---|---|---|---|---|
-| `reprint_5.3mf` | carriage arm + lift link + turret plate | 6 h 47 | ~66 g | **printed 2026-11-23: fits** |
-| `reprint_2.3mf` | **whole claw: gripper frame + both fingers** | 6 h 52 | ~51 g | next (the new left finger needs the new frame) |
-| `reprint_3.3mf` | base | 7 h 40 | ~131 g | only if the rotary tool can't open the old pocket 46.0 → 47.0 |
-| `reprint_9.3mf` | gripper frame + right finger + base (base keeps 0.28 mm layers) | 12 h 21 | ~167 g | = 8 + 3 in one go: no time saved, over a 10 h window |
-| `reprint_6.3mf` | left finger + gripper frame | 4 h 42 | ~36 g | if the old right finger is kept |
-| `reprint_8.3mf` | right finger + gripper frame | 4 h 40 | ~36 g | if a new left finger is already printed |
-| `reprint_7.3mf` | carriage arm + lift link + left finger + frame | 8 h 34 | ~75 g | (superseded: 5 was printed) |
-| `reprint_1.3mf` | carriage arm + lift link | 3 h 53 | ~40 g | (superseded) |
-| `reprint_4.3mf` | turret plate | 2 h 55 | ~26 g | (superseded) |
+| `reprint_3.3mf` | **base** | 7 h 40 | ~131 g | priority 1 |
+| `reprint_a.3mf` | **carriage arm, on its side** (stronger arm, side gussets, teardrop pockets: no support inside) | 5 h 09 | ~52 g | the old one snapped at the arm |
+| `reprint_8.3mf` | **gripper frame + right finger** (frame with a 16 mm horn opening) | 4 h 40 | ~35 g | goes with the new left finger you printed |
+| `reprint_b.3mf` | a + 8 on one plate | 9 h 44 | ~87 g | only if a 10 h window; PrusaSlicer's command line crashed AFTER slicing it once: if your slicer crashes, print a and 8 separately |
+| `reprint_2.3mf` | whole claw (frame + both fingers) | 6 h 52 | ~51 g | only if the left finger is reprinted too |
 
-Combining the base with the claw on one plate was sliced and is slower (16 h 44 vs 7 h 40 + 6 h 52): one plate prints
-at one layer height, and the claw's slow settings spread to the base. Print them separately.
+Round 1 plates (1, 4, 5, 6, 7, 9; 5 was printed): `archive/reprint_2026-11-23/`.
 
 The top cap is not reprinted: its holes were drilled by hand. The new left finger (horn screwed onto the gear) only works
 with the new gripper frame (servo 4.8 mm higher, 14 mm horn opening), so they always print together. The old right finger

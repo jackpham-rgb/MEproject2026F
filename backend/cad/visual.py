@@ -106,6 +106,7 @@ def round_horn(r, t, hole_r, rings):
 
 SCREW = {"#6": dict(hr=3.3, hh=2.4, sr=1.75, col=C["zinc"]), "#8": dict(hr=4.0, hh=2.8, sr=2.1, col=C["zinc"]),
          "sb": dict(hr=2.0, hh=1.4, sr=1.0, col=C["steel2"]), "M3": dict(hr=2.6, hh=1.6, sr=1.4, col=C["steel2"])}
+SCREW["#6s"] = dict(SCREW["#6"])          # #6 x 1/4" pointed sheet-metal screw (any hardware store)
 
 
 def screw_local(kind, L):
@@ -120,7 +121,7 @@ def screw_local(kind, L):
     head = head.cut(box(-s["hr"] * 0.6, s["hr"] * 0.6, -w / 2, w / 2, -s["hh"] - 1, -s["hh"] * 0.45))
     head = head.cut(box(-w / 2, w / 2, -s["hr"] * 0.6, s["hr"] * 0.6, -s["hh"] - 1, -s["hh"] * 0.45))
     shank = cyl(0, 0, s["sr"] * 0.82, 0, L)
-    pitch = 1.0 if kind in ("#6", "#8") else 0.6
+    pitch = 1.0 if kind in ("#6", "#6s", "#8") else 0.6
     z = 0.6
     while z < L - 0.6:
         shank = shank.union(cyl(0, 0, s["sr"], z, z + pitch * 0.45))
@@ -282,7 +283,7 @@ def build():
         S.append(("top_cap", "#6", (x, -21, p["rod_top"]), (0, 0, -1), 12.7))
     for hz in (ltz - (MICRO_HOLES_X - 13.75), ltz - (MICRO_HOLES_X + 13.75)):
         S.append(("lift_servo_MG90S", "sb", (7.1, lty, hz), (1, 0, 0), 8))
-    S.append(("lift_link", "#6", (-5.5, 12, cz1 + 2), (-1, 0, 0), 12.7))
+    S.append(("lift_link", "#6s", (-5.5, 12, cz1 + 2), (-1, 0, 0), 6.35))      # 1/4": a 1/2" one reaches the left rod
     th0 = math.radians(p["lift_theta0"])
     pin = (lty + p["lift_crank"] * math.cos(th0), ltz + p["lift_crank"] * math.sin(th0))
     S.append(("lift_crank", "M3", (ltx - 2.5, lty, ltz), (1, 0, 0), 6))
@@ -308,7 +309,7 @@ def build():
         "spine": "spine clear Ø3.9 (5/32″) → plate pilot Ø2.9 (7/64″)",
         "top_cap": "cap clear Ø3.9 (5/32″) → spine pilot Ø2.9 (7/64″)",
         "lift_servo_MG90S": "servo tab → bracket pilot Ø1.7 (1/16″)",
-        "lift_link": "link Ø3.9 running (5/32″) → carriage pilot Ø2.9 (7/64″)",
+        "lift_link": "#6 × ¼″ pointed screw · link must turn (5/32″ bit) → carriage pilot (7/64″)",
         "lift_crank": "link hole → drill 3/32″ (2.4 mm), turns · bites the horn",
         "wrist_servo": "servo tab → bracket pilot Ø1.7 (1/16″)",
         "wrist_horn": "horn centre screw (servo bag)",
@@ -325,7 +326,8 @@ def build():
             continue
         nm = f"screw_{i:02d}"
         add(nm, "screw", moved(sh, trsf_axes(head, perp_of(ax), ax)), col)
-        screws.append(dict(name=nm, owner=owner, kind=kind, head=[round(v, 2) for v in head], axis=list(ax), length=L, hole=HOLE.get(owner, "")))
+        screws.append(dict(name=nm, owner=owner, kind=kind, head=[round(v, 2) for v in head], axis=list(ax), length=L, hole=HOLE.get(owner, ""),
+                           head_r=SCREW[kind]["hr"], head_h=SCREW[kind]["hh"]))
 
     # ---- glue + ballast
     glue = []
@@ -348,21 +350,25 @@ def build():
     glue.append(dict(name="glue_bumper", owner="can_bumper", at=[0, py1, gz]))
     cz1 = p["car_z1"]
     callouts = {
-        1: [((23.5, 0, H), "pocket Ø47.1 · press fit: sand the wall")],
-        5: [((17.5, 0, H - 4), "hub Ø34.95 · press fit: sand the hub")],
-        6: [((-rx - 6, ry, cz0 + 9), "pocket Ø12.15 · 12 mm bit / sandpaper on a dowel")],
-        8: [((-rx, ry, tz1 + 6), "blind hole Ø6.0 · 6 mm or 15/64″ bit")],
-        10: [((rx, ry, p["rod_top"]), "blind hole Ø6.0 · 6 mm or 15/64″ bit, 8 mm deep")],
-        12: [((-7, 12, cz1 + 2), "Ø3.9 running · 5/32″ bit")],
-        13: [((-7, pin[0], pin[1]), "drill to 3/32″ (2.4 mm) · must turn")],
-        18: [((pvx, pvy, pt[1]), "Ø3.9 running · 5/32″ bit")],
-        19: [((-pvx + p["ghorn_screw_r"], pvy, p["finger_z"][1]), "horn screws → pilots Ø1.7, 5 mm from centre")],
+        16: [((23.5, 0, H), "pocket ~Ø47.0 printed · sand the wall to fit")],
+        19: [((17.5, 0, H - 4), "hub ~Ø34.9 printed · loose: tape / tight: sand")],
+        1: [((-rx - 6, ry, cz0 + 9), "pocket ~Ø12.25 printed · slides in; loose: tape")],
+        7: [((-rx, ry, tz1 + 6), "blind hole ~Ø5.95 printed · 15/64″ bit if tight")],
+        8: [((rx, ry, p["rod_top"]), "blind hole ~Ø5.95 · 15/64″ bit if tight, 8 mm deep")],
+        2: [((-7, 12, cz1 + 2), "#6 × ¼″ pointed · link must swing (5/32″ bit)")],
+        4: [((-7, pin[0], pin[1]), "drill to 3/32″ (2.4 mm) · must turn")],
+        11: [((pvx, pvy, pt[1]), "Ø3.9 running · 5/32″ bit")],
+        12: [((-pvx + p["ghorn_screw_r"], pvy, p["finger_z"][1]), "horn screws → 2 small holes, 5 mm from centre")],
     }
     return meshes, screws, glue, callouts
 
 
 def main():
     meshes, screws, glue, callouts = build()
+    # the 2 horn centre screws can't be reached once the horn is under its part: not used (spline teeth carry the torque)
+    drop = {x["name"] for x in screws if x["owner"] in ("turntable_horn", "wrist_horn") and x["kind"] == "M3"}
+    screws = [x for x in screws if x["name"] not in drop]
+    meshes = [m for m in meshes if m["owner"] not in drop]
     steps = json.load(open(os.path.join(HERE, "build", "manual_steps.json")))["steps"]
     out_meshes = []
     for m in meshes:
@@ -374,15 +380,15 @@ def main():
     for s in steps:
         for n in s["new"]:
             first.setdefault(n, s["n"])
-    first["ballast"] = 3
+    first["ballast"] = next(s["n"] for s in steps if s["title"].startswith("Weight"))
     st = []
     for s in steps:
         n = s["n"]
         sc = [x for x in screws if first.get(x["owner"]) == n]
         gl = [g for g in glue if first.get(g["owner"]) == n]
-        extra = ["ballast"] if n == 3 else []
+        extra = ["ballast"] if n == first["ballast"] else []
         note = NOTES["steps"].get(str(n), {})
-        base_show = set(s["show"]) | ({"ballast"} if n >= 3 and "base" in s["show"] else set())
+        base_show = set(s["show"]) | ({"ballast"} if n >= first["ballast"] and "base" in s["show"] else set())
         show = base_show | {x["name"] for x in screws if x["owner"] in base_show and first.get(x["owner"], 99) <= n}
         show |= {g["name"] for g in glue if g["owner"] in base_show and first.get(g["owner"], 99) <= n}
         st.append(dict(n=n, title=s["title"], new=s["new"] + extra, show=sorted(show),
@@ -390,7 +396,19 @@ def main():
                        screws=[x["name"] for x in sc], glue=[g["name"] for g in gl], fit=note.get("fit", ""), how=note.get("how", ""),
                        glue_text=note.get("glue", ""), level=note.get("level", "easy"),
                        callouts=[dict(at=[round(v, 2) for v in a], text=t) for a, t in callouts.get(n, [])]))
-    data = dict(meshes=out_meshes, screws=screws, glue=glue, steps=st, printed=sorted({m["owner"] for m in meshes if m["kind"] == "printed"}),
+    # motion: which moving group each owner rides with + the firmware sequence (from export.py), for the "watch it run" step
+    vm = json.load(open(os.path.join(HERE, "build", "viewer_mesh.json")))
+    gof = {x["name"]: g for g, lst in vm["groups"].items() for x in lst}
+    for sc in screws:
+        gof.setdefault(sc["name"], gof.get(sc["owner"], "fixed"))
+    for g in glue:
+        gof.setdefault(g["name"], gof.get(g["owner"], "fixed"))
+    groups = {m["owner"]: gof.get(m["owner"], "fixed") for m in meshes}
+    pv = vm["params"]
+    motion = dict(groups=groups, sequence=vm["sequence"],
+                  params=dict(lift_theta0=pv["lift_theta0"], grip_z=pv["grip_z"], pivot_x=pv["pivot_x"], pivot_y=pv["pivot_y"],
+                              lift_servo_tip=list(M.P["lift_servo_tip"])))
+    data = dict(meshes=out_meshes, screws=screws, glue=glue, steps=st, motion=motion, printed=sorted({m["owner"] for m in meshes if m["kind"] == "printed"}),
                 names=NOTES["names"], screw_names=NOTES["screw_names"], levels=NOTES["levels"], while_waiting=NOTES["while_waiting"])
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(data, open(OUT, "w"), separators=(",", ":"))
