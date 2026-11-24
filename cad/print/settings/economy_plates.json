@@ -174,12 +174,12 @@
   ]
  ],
  "before": [
-  36.970277777777774,
-  386.1620092095632
+  36.719166666666666,
+  380.1833652947347
  ],
  "after": [
-  23.966944444444444,
-  339.3525194152473
+  23.64527777777778,
+  332.3468521298699
  ],
  "plates": [
   {
@@ -216,8 +216,8 @@
    "letter": "B",
    "img": "docs/print_plates/plate_B.png",
    "ini": "cad/print/settings/plates/plate_B.ini",
-   "time": "8 h 17",
-   "grams": 151,
+   "time": "8 h 18",
+   "grams": 152,
    "profile": "DRAFT",
    "layer": "0.28",
    "walls": "3",
@@ -309,8 +309,8 @@
    "letter": "D",
    "img": "docs/print_plates/plate_D.png",
    "ini": "cad/print/settings/plates/plate_D.ini",
-   "time": "5 h 31",
-   "grams": 70,
+   "time": "5 h 37",
+   "grams": 68,
    "profile": "STANDARD",
    "layer": "0.2",
    "walls": "3",
@@ -372,8 +372,8 @@
    "letter": "E",
    "img": "docs/print_plates/plate_E.png",
    "ini": "cad/print/settings/plates/plate_E.ini",
-   "time": "6 h 17",
-   "grams": 60,
+   "time": "5 h 50",
+   "grams": 54,
    "profile": "DETAIL",
    "layer": "0.2",
    "walls": "4",

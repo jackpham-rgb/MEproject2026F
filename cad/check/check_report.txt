@@ -35,4 +35,4 @@ SERVO LOADS FROM CAD MASSES (stall ratings at 5 V: MG996R 9.4, MG90S 1.8, SG90 1
   wrist: 56 g rotating (incl. can), CG 11.2 mm off the roll axis -> 0.06 kg*cm vs micro servo 1.8 -> 29x margin
   turntable: J = 7.5 kg*cm^2, accel torque 0.031 kg*cm vs MG996R 9.4 (weight on the 6807 bearing)
 
-(run time 812 s)
+(run time 779 s)

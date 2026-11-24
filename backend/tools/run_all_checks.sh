@@ -17,4 +17,6 @@ run visual python3.13 backend/cad/visual.py
 run tool_access python3.13 backend/tools/tool_access_check.py
 run reprint python3.13 backend/tools/make_reprint.py
 run manual node backend/tools/render_manual.js
+
+run planb python3.13 backend/cad/planb.py
 echo "=== CHAIN DONE"

@@ -462,6 +462,9 @@ def build_parts():
     #                                                       (and the pivot screw's pan head sits in it, x -5.5..-3.1)
     car = car.union(box(-11.5, -9.0, 8, 16, cz1, cz1 + 6)).cut(
         cyl_dir((-12.5, 12, cz1 + 2), (1, 0, 0), TOL["n6_pilot"] / 2, 5))                 # link pivot: #6-32x1/2 threads in
+    # the pivot boss overhung the left upper LM6UU pocket by ~0.5 mm (the bearing goes in from the top): curved notch,
+    # bearing radius 6 + 0.2, through the boss; 1.7 mm of boss is left round the pivot screw (a 2 N load)
+    car = car.cut(cyl(-rx, ry, 6.2, cz1 - 0.5, cz1 + 7))
     # arm beam + wrist bracket (wrist servo body passes through the bracket window)
     by1 = p["wrist_tip_y"] - 28.5 + 15.9                                                   # tab plane y (45.9)
     beam = box(-p["beam_w"] / 2, p["beam_w"] / 2, cy1 - 1, by1, cz0, cz0 + p["beam_t"])

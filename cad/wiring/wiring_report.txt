@@ -17,7 +17,7 @@ Clearance in each motion pose (min gap from the wire surface to any part):
   RELEASE at target    PASS
 
   closest approach over all poses:
-    SG90 gripper lead (D5)                           0.60 mm
+    SG90 gripper lead (D5)                           0.58 mm
     Wrist servo lead (D6)                            0.79 mm
     MG90S lift lead (D10)                            0.65 mm
     MG996R turntable lead (D9, power on the buck)    1.11 mm

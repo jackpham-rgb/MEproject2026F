@@ -117,9 +117,13 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 (async () => {
 const $ = id => document.getElementById(id);
 let D;
-try { D = await (await fetch("data/assembly.json")).json(); }
+const PLANB = new URLSearchParams(location.search).get("data") === "planb";
+try { D = await (await fetch(PLANB ? "data/planb.json" : "data/assembly.json")).json(); }
 catch (e) { $("loading").textContent = "Couldn't load data/assembly.json. Open this page from the project website (or a local web server), not as a file."; return; }
 $("loading").remove();
+if (D.title) { document.title = D.title; document.querySelector("#steps h1").textContent = D.title; }
+const other = document.querySelector("#steps .sub");
+other.insertAdjacentHTML("beforeend", PLANB ? ' · <a href="assembly.html">Main guide</a>' : ' · <a href="assembly.html?data=planb">Plan B (wooden base)</a>');
 
 // ---------------- scene
 const view = $("view");
@@ -173,7 +177,7 @@ const printedSet = new Set(D.printed);
 // ---------------- step list
 const LV = D.levels;
 const steps = [{ n: 0, title: "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can").concat(["test_can"]), screws: [], glue: [] },
-  { n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }, ...D.steps,
+  ...(D.planb ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
   ...(D.motion ? [{ n: "▶", title: "Watch it run: the whole movement", run: true, level: null, new: [],
     show: Object.keys(owners), screws: [], glue: [] }] : [])];
 const list = $("list");
@@ -368,6 +372,14 @@ function labels() {
 function renderInfo(s) {
   const I = $("info");
   if (cur === 0) {
+    if (D.planb) {
+      I.innerHTML = `<div class="head"><span class="big">★</span><h2>Plan B: wooden base + carriage repair</h2></div>
+        <p>Use this if the base or the carriage print fails. The wooden base keeps every height of the printed one, so the bearing, the turntable servo and the whole column sit exactly where they would on the printed base (checked in CAD: nothing overlaps).</p>
+        <div class="box fit"><h3>Print first</h3>The 1:1 cutting templates: <a href="../docs/planb_templates.pdf">docs/planb_templates.pdf</a> (3 pages, print at 100 %, check the 50 mm bar).</div>
+        <div class="box"><h3>Shopping</h3><ul>${D.while_waiting.map(t => `<li>${t}</li>`).join("")}</ul></div>
+        <div class="box"><h3>Column</h3>Build the column exactly as in the <a href="assembly.html">main guide</a>, steps 1–15; step 8 here drops it onto the wooden base.</div>`;
+      return;
+    }
     I.innerHTML = `<div class="head"><span class="big">★</span><h2>Before you start</h2></div>
       <p>${D.steps.length} steps: the column is built on the table first (1–15), the base last (16–19). Every step shows the new parts flying into place and every screw driving in along its dashed path. Rotate and zoom freely.</p>
       ${Object.entries(LV).map(([k, v]) => `<div class="lvl ${k}"><b>${v.label}</b>${v.text}<br><small>Steps: ${D.steps.filter(x => x.level === k).map(x => x.n).join(", ")}</small></div>`).join("")}
