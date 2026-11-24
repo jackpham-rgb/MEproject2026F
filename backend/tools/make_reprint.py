@@ -63,6 +63,12 @@ PLATES = [   # round 2 (2026-11-24). Round 1 plates 1, 4, 5, 6, 7, 9: archive/re
     ("c  Base + carriage arm, one go (base at its own 0.32 mm layers)", "STANDARD",
      {**FAST, **EASY_SUP, "perimeters": "4", "fill_density": "15%", "fill_pattern": "cubic"},
      ["CA-101", "CA-301"], "3 + a on one plate: the carriage at 0.2 mm (its holes), the base keeps its fast settings per part"),
+    ("d  Base + carriage arm + gripper frame, one go", "STANDARD",
+     {**FAST, **EASY_SUP, "perimeters": "4", "fill_density": "15%", "fill_pattern": "cubic"},
+     ["CA-101", "CA-301", "CA-401"], "c + the gripper frame (the old right finger is reused)"),
+    ("e  Base + carriage arm + gripper frame + right finger, one go", "STANDARD",
+     {**FAST, **EASY_SUP, "perimeters": "4", "fill_density": "15%", "fill_pattern": "cubic"},
+     ["CA-101", "CA-301", "CA-401", "CA-402"], "d + a new right finger"),
     ("2  Whole claw: gripper frame + both fingers", "DETAIL",
      {**FAST, **EASY_SUP, "perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
       "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
@@ -73,7 +79,7 @@ PER_PART = {"CA-301_carriage_arm": {"perimeters": "5", "fill_density": "30%", "f
             "CA-101_base": {**BASE_FAST, "external_perimeter_speed": "45", "perimeter_speed": "60", "infill_speed": "90"},
             "CA-402_finger_R": {"perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
                                 "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
-            "CA-401_gripper_frame": {"perimeters": "4", "fill_density": "20%", "external_perimeter_speed": "25", "perimeter_speed": "35"},
+            "CA-401_gripper_frame": {"perimeters": "4", "fill_density": "20%", "external_perimeter_speed": "35", "perimeter_speed": "50"},   # no gear teeth: normal speed
             "CA-403_finger_L": {"perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
                                 "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"}}
 
