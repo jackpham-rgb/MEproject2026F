@@ -25,12 +25,13 @@ import print_economy as E  # noqa: E402
 
 OUT = os.path.join(ROOT, "cad", "print", "reprint")
 # easy-to-remove supports (docs/19; plus the "thin + hollow" guide: support lines ~half the normal width, sparse base,
-# wide-spaced interface): organic tree from the bed, 0.25 top gap / 0.2 bottom gap
+# spaced interface): organic tree from the bed, 0.2 top / 0.2 bottom gap. Round 2 (after reprint_5's stringy, saggy
+# underside): interface 0.7 -> 0.35 mm apart and top gap 0.25 -> 0.2 (flatter underside), support lines 0.25 -> 0.3
 EASY_SUP = {"support_material": "1", "support_material_auto": "1", "support_material_buildplate_only": "1",
-            "support_material_style": "organic", "support_material_contact_distance": "0.25",
+            "support_material_style": "organic", "support_material_contact_distance": "0.2",
             "support_material_bottom_contact_distance": "0.2", "support_material_interface_layers": "3",
-            "support_material_bottom_interface_layers": "2", "support_material_interface_spacing": "0.7",
-            "support_material_spacing": "2.5", "support_material_extrusion_width": "0.25",
+            "support_material_bottom_interface_layers": "2", "support_material_interface_spacing": "0.35",
+            "support_material_spacing": "2.5", "support_material_extrusion_width": "0.3",
             "support_material_xy_spacing": "60%", "support_material_threshold": "50"}
 BRIM = {"brim_width": "3", "brim_separation": "0.3", "brim_type": "outer_only"}   # outer only, 0.3 gap: peels off
 FAST = {"perimeter_speed": "50", "external_perimeter_speed": "35", "infill_speed": "80", "solid_infill_speed": "60",
@@ -57,6 +58,10 @@ PLATES = [
      {**FAST, **EASY_SUP, "perimeters": "4", "fill_density": "15%", "fill_pattern": "cubic"},
      ["CA-301", "CA-302", "CA-403", "CA-401"],
      "all 0.2 mm layers; the claw parts keep their own walls / infill / slow outer wall as per-part settings"),
+    ("8  Right finger + gripper frame (when the new left finger is already printed)", "DETAIL",
+     {**FAST, **EASY_SUP, "perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
+      "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
+     ["CA-402", "CA-401"], "right finger + frame"),
     ("2  Claw spare: gripper frame + 2 fingers", "DETAIL",
      {**FAST, **EASY_SUP, "perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
       "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
@@ -73,6 +78,10 @@ PLATES = [
      "hub 34.3 in CAD (print ~34.9), rod holes 7.05 (print ~5.95)"),
 ]
 PER_PART = {"CA-302_lift_link": {"perimeters": "3", "fill_density": "0%", **BRIM},       # tiny: walls fill it
+            "CA-101_base": {"perimeters": "3", "top_solid_layers": "4", "bottom_solid_layers": "4", "fill_density": "12%",
+                            "fill_pattern": "cubic", "external_perimeter_speed": "45", "perimeter_speed": "60", "infill_speed": "90"},
+            "CA-402_finger_R": {"perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
+                                "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
             "CA-401_gripper_frame": {"perimeters": "4", "fill_density": "20%", "external_perimeter_speed": "25", "perimeter_speed": "35"},
             "CA-403_finger_L": {"perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
                                 "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"}}

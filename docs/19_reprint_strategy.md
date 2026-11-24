@@ -24,10 +24,10 @@ Not reprinted: top cap (drilled by hand), spine, tray (screw holes only: a drill
 |---|---|---|
 | Style | **Organic** (Cura: Tree) | Prusa: organic supports are easy to remove, don't scar the surface and are fast and cheap to print [1] |
 | Placement | build plate only | nothing grows on the part's own surfaces |
-| Support line width | **0.25 mm** (0.34 on the 0.28 mm base) | about half the 0.45 mm part line: thin lines bond weakly and crush off [7]. PrusaSlicer refuses a line thinner than the layer height, hence 0.34 at 0.28 mm |
-| Top contact Z distance | **0.25 mm** | the default 0.1 is reported as too tight; 0.2–0.25 is the common "breaks away cleanly" value, PETG needs the upper end [2][3][7] |
+| Support line width | **0.3 mm** (round 1: 0.25; 0.34 on the 0.28 mm base) | about half the 0.45 mm part line: thin lines bond weakly and crush off [7]. PrusaSlicer refuses a line thinner than the layer height, hence 0.34 at 0.28 mm |
+| Top contact Z distance | **0.2 mm** (round 1: 0.25) | the default 0.1 is reported as too tight; 0.2–0.25 is the common "breaks away cleanly" value, PETG needs the upper end [2][3][7] |
 | Bottom contact Z distance | 0.2 mm | [7] |
-| Interface layers | 3 top, spaced **0.7 mm** (not solid); 2 bottom | a sparse interface still gives a flat underside but doesn't fuse into one sheet [7] |
+| Interface layers | 3 top, spaced **0.35 mm** (round 1: 0.7, from the guide); 2 bottom | a sparse interface still gives a flat underside but doesn't fuse into one sheet [7] |
 | Base spacing | 2.5 mm | sparse body [7]; Bambu's "hollow" base pattern has no PrusaSlicer equivalent: organic branches are already hollow |
 | XY separation | 60 % | keeps support off the side walls |
 | Overhang threshold | 50° | supports only where really needed |
@@ -37,6 +37,12 @@ Checked by slicing (PrusaSlicer 2.7): the thin supports use ~4 % less filament a
 thinner lines). The guide [7] was written for PLA+ on a Bambu printer; for PETG the same idea holds (PETG sticks to
 itself more, so the wide gaps matter even more), but it is a user report, not a test: check the first plate.
 Let the part cool completely before removing supports.
+
+**Round 2 (after reprint_5):** the round-1 values came off easily but the supported underside sagged and strung: with
+the interface lines 0.7 mm apart the first layer over them droops into the gaps (more so with this printer's
+over-extrusion and PETG's oozing). Interface 0.35 mm apart and a 0.2 mm gap give a flatter underside for a little more
+effort to remove. Strings over supports also come from wet PETG and over-extrusion: drying the spool and the flow /
+retraction calibration (docs/18) fix those at the source, after the arm is done.
 
 Plus: a part that needs no support (top cap) has supports switched off for it. If one spot still needs help,
 paint it in PrusaSlicer (right-click the part › Add support enforcer / blocker) instead of raising the density.
