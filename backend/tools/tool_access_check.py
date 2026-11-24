@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.join(ROOT, "backend", "cad"))
 import model as M  # noqa: E402
 
 SHAFT_R, SHAFT_L, TOL_MM3 = 2.0, 80.0, 1.5      # a #1 / #2 Phillips screwdriver: ~4 mm shaft
+SHAFT_R_BY_KIND = {"sb": 1.5, "M3": 1.5}         # servo-bag screws take a small precision screwdriver (~3 mm shaft)
 TILTS = [0.0, 4.0]                               # a screwdriver can lean a few degrees: straight first, then 4 deg x 8 ways
 # the screw body is allowed inside the parts it clamps / threads into (by screw owner)
 BITES = {"turntable_servo_MG996R": ["base"], "turntable_horn": ["turntable_servo_MG996R"],
@@ -42,7 +43,7 @@ def main():
     for s in A["steps"]:
         for n in s["screws"]:
             first[n] = s["n"]
-    lines, bad = ["SCREWDRIVER ACCESS: 4 mm shaft, 80 mm behind each screw head, against every part already in place", ""], 0
+    lines, bad = ["SCREWDRIVER ACCESS: 4 mm shaft (3 mm precision driver for servo-bag screws), 80 mm behind each screw head, against every part already in place", ""], 0
     for s in steps:
         here = [sc for sc in A["screws"] if first.get(sc["name"]) == s["n"]]
         if not here:
@@ -54,12 +55,13 @@ def main():
             back = [-a for a in ax]
             hh = sc.get("head_h", 2.0)
             start = [h[i] + back[i] * (hh + 0.3) for i in range(3)]
-            shafts = [rod(start, back, SHAFT_L, SHAFT_R)]
+            sr = SHAFT_R_BY_KIND.get(sc["kind"], SHAFT_R)
+            shafts = [rod(start, back, SHAFT_L, sr)]
             b = cq.Vector(*back); u = b.cross(cq.Vector(1, 0, 0) if abs(back[0]) < 0.9 else cq.Vector(0, 1, 0)).normalized(); w = b.cross(u)
             for k in range(8):
                 a = math.radians(45 * k)
                 dvec = b + (u * math.cos(a) + w * math.sin(a)) * math.tan(math.radians(TILTS[1]))
-                shafts.append(rod(start, (dvec.x, dvec.y, dvec.z), SHAFT_L, SHAFT_R))
+                shafts.append(rod(start, (dvec.x, dvec.y, dvec.z), SHAFT_L, sr))
             head = rod([h[i] + back[i] * 0.2 for i in range(3)], back, hh, sc.get("head_r", 2.0))  # the head itself
             body = rod(h, ax, sc["length"], 1.5)
             hits = []
