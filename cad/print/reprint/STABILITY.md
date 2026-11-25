@@ -47,6 +47,17 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | +Y face down | 620 | 44 | 1.8 | 3067 | 0 of 0 |  |
 | -Y face down | 3224 | 44 | 0.8 | 402 | 0 of 0 |  |
 
+## CA-302 Lift link
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 0 | 16 | 16.2 | 0 | 0 of 0 |  |
+| +Z (upside down, top face down) | 0 | 16 | 16.2 | 0 | 0 of 0 |  |
+| +X face down | 89 | 3 | 0.3 | 0 | 0 of 0 | **used** |
+| -X face down | 89 | 3 | 0.3 | 0 | 0 of 0 |  |
+| +Y face down | 0 | 13 | 13.4 | 0 | 0 of 0 |  |
+| -Y face down | 0 | 13 | 13.4 | 0 | 0 of 0 |  |
+
 ## CA-301 Carriage + arm
 
 | Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
@@ -80,6 +91,17 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | +Y face down | 246 | 33 | 2.1 | 921 | 0 of 0 |  |
 | -Y face down | 1091 | 33 | 1.0 | 75 | 0 of 0 | **used** |
 
+## CA-302 Lift link
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 0 | 16 | 16.2 | 0 | 0 of 0 |  |
+| +Z (upside down, top face down) | 0 | 16 | 16.2 | 0 | 0 of 0 |  |
+| +X face down | 89 | 3 | 0.3 | 0 | 0 of 0 | **used** |
+| -X face down | 89 | 3 | 0.3 | 0 | 0 of 0 |  |
+| +Y face down | 0 | 13 | 13.4 | 0 | 0 of 0 |  |
+| -Y face down | 0 | 13 | 13.4 | 0 | 0 of 0 |  |
+
 ## CA-101 Base
 
 | Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
@@ -101,6 +123,17 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | -X face down | 1240 | 52 | 1.5 | 576 | 0 of 0 |  |
 | +Y face down | 620 | 44 | 1.8 | 3067 | 0 of 0 |  |
 | -Y face down | 3224 | 44 | 0.8 | 402 | 0 of 0 |  |
+
+## CA-302 Lift link
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 0 | 16 | 16.2 | 0 | 0 of 0 |  |
+| +Z (upside down, top face down) | 0 | 16 | 16.2 | 0 | 0 of 0 |  |
+| +X face down | 89 | 3 | 0.3 | 0 | 0 of 0 | **used** |
+| -X face down | 89 | 3 | 0.3 | 0 | 0 of 0 |  |
+| +Y face down | 0 | 13 | 13.4 | 0 | 0 of 0 |  |
+| -Y face down | 0 | 13 | 13.4 | 0 | 0 of 0 |  |
 
 ## CA-101 Base
 
@@ -135,6 +168,17 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | +Y face down | 246 | 33 | 2.1 | 921 | 0 of 0 |  |
 | -Y face down | 1091 | 33 | 1.0 | 75 | 0 of 0 | **used** |
 
+## CA-302 Lift link
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 0 | 16 | 16.2 | 0 | 0 of 0 |  |
+| +Z (upside down, top face down) | 0 | 16 | 16.2 | 0 | 0 of 0 |  |
+| +X face down | 89 | 3 | 0.3 | 0 | 0 of 0 | **used** |
+| -X face down | 89 | 3 | 0.3 | 0 | 0 of 0 |  |
+| +Y face down | 0 | 13 | 13.4 | 0 | 0 of 0 |  |
+| -Y face down | 0 | 13 | 13.4 | 0 | 0 of 0 |  |
+
 ## CA-101 Base
 
 | Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
@@ -167,6 +211,17 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | -X face down | 105 | 62 | 6.0 | 406 | 0 of 0 |  |
 | +Y face down | 246 | 33 | 2.1 | 921 | 0 of 0 |  |
 | -Y face down | 1091 | 33 | 1.0 | 75 | 0 of 0 | **used** |
+
+## CA-302 Lift link
+
+| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |
+|---|---:|---:|---:|---:|---|---|
+| -Z (as modelled, bottom down) | 0 | 16 | 16.2 | 0 | 0 of 0 |  |
+| +Z (upside down, top face down) | 0 | 16 | 16.2 | 0 | 0 of 0 |  |
+| +X face down | 89 | 3 | 0.3 | 0 | 0 of 0 | **used** |
+| -X face down | 89 | 3 | 0.3 | 0 | 0 of 0 |  |
+| +Y face down | 0 | 13 | 13.4 | 0 | 0 of 0 |  |
+| -Y face down | 0 | 13 | 13.4 | 0 | 0 of 0 |  |
 
 ## CA-402 Finger, right
 
@@ -215,4 +270,5 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 ## Brims added
 
 - CA-402_finger_R: contact 251 mm², tip 2.5 → 3 mm brim (0.3 mm gap)
+- CA-302_lift_link: contact 89 mm², tip 0.3 → 3 mm brim (0.3 mm gap)
 - CA-403_finger_L: contact 251 mm², tip 2.5 → 3 mm brim (0.3 mm gap)

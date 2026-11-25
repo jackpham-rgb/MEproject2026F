@@ -30,7 +30,7 @@
 const int TURN_START  = 135;   // arm pointing at the start spot
 const int TURN_TARGET = 45;    // 90 degrees later, pointing at the target spot
 const int LIFT_DOWN   = 30;    // gripper at can mid-height (2.41 in, Coke can)
-const int LIFT_UP     = 75;    // about 0.6 in higher
+const int LIFT_UP     = 98;    // 68 deg swing: 0.62 in higher with the bagged horn's last hole (14 mm crank)
 const int WRIST_UP    = 0;     // can upright
 const int WRIST_FLIP  = 180;   // can upside down
 const int GRIP_OPEN   = 20;

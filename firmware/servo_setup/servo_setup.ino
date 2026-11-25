@@ -18,7 +18,7 @@ const int PIN_TURN = 9, PIN_LIFT = 10, PIN_WRIST = 6, PIN_GRIP = 5;
 const int WRIST_MIN_US = 500, WRIST_MAX_US = 2500;
 
 // HOME pose and working angles, same as concept_a.ino
-const int TURN_START = 135, TURN_TARGET = 45, LIFT_DOWN = 30, LIFT_UP = 75;
+const int TURN_START = 135, TURN_TARGET = 45, LIFT_DOWN = 30, LIFT_UP = 98;
 const int WRIST_UP = 0, WRIST_FLIP = 180, GRIP_OPEN = 20, GRIP_CLOSED = 95;
 
 Servo sv[4];

@@ -131,7 +131,9 @@ def main():
     # base's, so the tip-over margin is the same
     zf = IN / 2
     sec2 = loc.intersect(box(-200, 200, -200, 200, 0.2, zf - 0.2).val()).BoundingBox()
-    slot2 = box(sec2.xmin - 1, sec2.xmax + 1, sec2.ymin - 1, sec2.ymax + 1, -1, zf + 1).val().rotate((0, 0, 0), (0, 0, 1), ang)
+    # the MG996R lead leaves the far end face ~8 mm above the table (wiring.py EX_TURN), i.e. inside the floor board:
+    # the floor slot runs 10 mm past that end so the lead can bend up into the gap between the boards
+    slot2 = box(sec2.xmin - 1, sec2.xmax + 11, sec2.ymin - 1, sec2.ymax + 1, -1, zf + 1).val().rotate((0, 0, 0), (0, 0, 1), ang)
     floor = slab(0, zf).cut(cq.Workplane("XY").add(slot2)).cut(box(-200, 200, -200, -66, -1, zf + 1))
     legs = [floor] + [box(x - 15, x + 15, y - 15, y + 15, zf, zb0) for x, y in ((-58, -48), (42, -50), (-60, 15))]
     sand = box(-20, 20, -64, -40, zf, zf + 18)
@@ -279,11 +281,11 @@ def main():
                             params=dict(lift_theta0=pv["lift_theta0"], grip_z=pv["grip_z"], pivot_x=pv["pivot_x"], pivot_y=pv["pivot_y"],
                                         lift_servo_tip=list(P["lift_servo_tip"]))))
     json.dump(data, open(OUT, "w"), separators=(",", ":"))
-    def corners(sec_, a_deg):
+    def corners(sec_, a_deg, ext=0):
         r = math.radians(a_deg)
         return [(x * math.cos(r) - y * math.sin(r), x * math.sin(r) + y * math.cos(r))
-                for x, y in ((sec_.xmin - 1, sec_.ymin - 1), (sec_.xmax + 1, sec_.ymin - 1), (sec_.xmax + 1, sec_.ymax + 1), (sec_.xmin - 1, sec_.ymax + 1))]
-    templates([f.outerWire() for f in tops], 47.6, [corners(sec, ang), corners(sec2, ang)],
+                for x, y in ((sec_.xmin - 1, sec_.ymin - 1), (sec_.xmax + 1 + ext, sec_.ymin - 1), (sec_.xmax + 1 + ext, sec_.ymax + 1), (sec_.xmin - 1, sec_.ymax + 1))]
+    templates([f.outerWire() for f in tops], 47.6, [corners(sec, ang), corners(sec2, ang, 10)],
               [(-58, -48), (42, -50), (-60, 15)], ((-20, 20), (-64, -40)), os.path.join(ROOT, "docs", "planb_templates.pdf"))
     print(f"wrote viewer/data/planb.json: {len(out_meshes)} meshes, {len(steps)} steps, {os.path.getsize(OUT) // 1024} KB; {slot_txt}")
 

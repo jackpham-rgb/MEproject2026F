@@ -8,7 +8,7 @@ loop shape = drape with the real cable length, resting on parts it meets (contac
      slack used (worst frame): Wrist loop (1) 29 %, Lift loop (3) 70 %, Turn loop (6) 54 %
      tied runs, closest part: 1.9 mm (SG90 gripper lead / base)
      loops (draped), closest part: 0.5 mm (SG90 gripper lead / base)  = resting on it
-2. LIFT     MG90S lift (D10)            30° ->    75°   PASS
+2. LIFT     MG90S lift (D10)            30° ->    98°   PASS
      slack used (worst frame): Wrist loop (1) 29 %, Lift loop (3) 70 %, Turn loop (6) 54 %
      tied runs, closest part: 1.9 mm (SG90 gripper lead / base)
      loops (draped), closest part: 0.5 mm (SG90 gripper lead / base)  = resting on it
@@ -20,7 +20,7 @@ loop shape = drape with the real cable length, resting on parts it meets (contac
      slack used (worst frame): Wrist loop (1) 69 %, Lift loop (3) 63 %, Turn loop (6) 75 %
      tied runs, closest part: 1.9 mm (SG90 gripper lead / base)
      loops (draped), closest part: 0.5 mm (MG90S lift lead / base)  = resting on it
-5. LOWER    MG90S lift (D10)            75° ->    30°   PASS
+5. LOWER    MG90S lift (D10)            98° ->    30°   PASS
      slack used (worst frame): Wrist loop (1) 69 %, Lift loop (3) 70 %, Turn loop (6) 75 %
      tied runs, closest part: 1.9 mm (SG90 gripper lead / base)
      loops (draped), closest part: 0.5 mm (SG90 gripper lead / gripper_frame)  = resting on it

@@ -20,9 +20,9 @@
   "rod_L": "6 mm steel rod",
   "rod_R": "6 mm steel rod",
   "lift_servo_MG90S": "MG90S servo (lift)",
-  "lift_crank": "Single-arm horn, cut to 20 mm",
+  "lift_crank": "Single-arm horn, from the bag, last hole",
   "wrist_servo": "MG90S servo (wrist)",
-  "wrist_horn": "Round servo horn (micro)",
+  "wrist_horn": "Cross horn (micro, from the bag)",
   "gripper_servo_SG90": "SG90 servo (gripper)",
   "axle_R": "#6-32 screw as the axle",
   "can_bumper": "Rubber pad 9 x 13.5 mm",
@@ -35,7 +35,7 @@
   "dc_jack": "DC jack / terminal tip",
   "ballast": "~100 g washers (ballast)",
   "test_can": "Coke can",
-  "gripper_horn": "SG90 round horn, trimmed to Ø12 mm"
+  "gripper_horn": "SG90 double-arm horn, arms cut to 7 mm"
  },
  "screw_names": {
   "#6": "#6-32 x 1/2\" pan head",
@@ -61,8 +61,8 @@
   },
   "4": {
    "level": "try",
-   "fit": "<b>The link must turn on the crank screw.</b> Open the link's small hole to <b>3/32″ (2.4 mm)</b> so the screw only bites the horn.",
-   "how": "Do it in this order, everything still on the table: 1) Set the lift servo to 30° (laptop panel). 2) Take the single-arm horn (trimmed to a 20 mm hole radius) and screw the link's small hole onto it: a servo-bag screw through the link into the horn's hole at 20 mm. 3) Hold the carriage + link + horn up to the spine and press the horn onto the servo spline. 4) The small centre screw through the horn into the spline. Now spine, servo, crank, link and carriage hang together."
+   "fit": "<b>The link must turn on the crank screw.</b> Open the link's small hole to <b>3/32″ (2.4 mm)</b> so the screw only bites the horn. The servo now swings 68° (LIFT_UP 98): the carriage rises 15.7 mm.",
+   "how": "Do it in this order, everything still on the table: 1) Set the lift servo to 30° (laptop panel). 2) Take the <b>single-arm horn</b> from the servo bag (don't cut it) and screw the link's small hole onto its <b>LAST hole</b> (~14 mm from the centre): a servo-bag screw through the link into the horn. 3) Hold the carriage + link + horn up to the spine and press the horn onto the servo spline with the arm pointing toward the rods, <b>tilted ~34° below horizontal</b> (the nearest spline tooth; fine-tune LIFT_DOWN / LIFT_UP in the laptop panel). 4) The small centre screw through the horn into the spline. Now spine, servo, crank, link and carriage hang together."
   },
   "6": {
    "how": "Stand the spine (with the lift servo, crank, link and carriage hanging on it) on the turret plate behind the 2 rod holes. 2 × #6-32 from ABOVE through the spine's foot into the plate. Each screw head sits in a small half-round notch in the spine wall (old spine without the notch: file or Dremel a 1.5 mm half-round notch next to each hole, or use a #6 screw with a smaller head).",
@@ -86,7 +86,7 @@
   "12": {
    "level": "try",
    "fit": "<b>Horn trimmed to Ø12 mm, flat on the gear.</b> Cut the SG90 round horn down to Ø12 mm (flush cutters, then sand), keeping its 2 holes 5 mm from the centre (or drill 1.5 mm through the horn using the gear's pilots as the guide). A full-size horn hits the servo post. The spline must slide into the hub without force.",
-   "how": "1) Open both fingers the same amount. Lay the trimmed SG90 round horn (Ø12) flat on the left finger's gear, hub UP, and drive 2 servo-bag screws through it into the gear's 2 pilots. 2) Gripper servo at 20° first (laptop panel). 3) Lower the servo so its spline goes into the horn hub, then 2 servo-bag screws through its tabs into the frame's posts. The finger can't drop off: it sits 0.5 mm above the bottom plate and the spline is 2.5 mm deep in the hub. Same idea as the earlier prototype gripper."
+   "how": "Take the <b>double-arm horn</b> from the SG90 bag and cut both arms off <b>7 mm from the centre</b> (flush cutters or the rotary tool's cut-off disc): it must turn inside the frame's 16 mm opening. Lay it flat on the left gear, hub up and centred; drill <b>1/16″ pilots through its 2 remaining holes</b> into the gear and drive 2 servo-bag screws. Then the SG90: its spline goes down into the horn's hub, 2 tab screws into the posts."
   },
   "13": {
    "how": "Body through the arm's bracket from the front, 2 servo-bag screws through the tabs.",
@@ -135,7 +135,7 @@
   },
   "9": {
    "level": "easy",
-   "how": "On the table: the wrist servo's round horn flat on the gripper frame's flange, its 4 holes on the flange's 4 holes. 4 servo-bag screws through the flange into the horn (open the flange holes to 3/32″ / 2.4 mm first). Doing this on the table means the screwdriver can reach all 4 screws, including the 2 near the top edge."
+   "how": "On the table: the wrist servo's <b>cross horn</b> (4 arms, from the bag) flat on the gripper frame's flange, hub centred on the flange. Drill <b>1/16″ pilots through 4 of the horn's holes</b> (one per arm, ~6 mm from the centre) into the flange, then 4 servo-bag screws. Using the horn as the drill guide means the holes always line up, whatever horn you have."
   },
   "14": {
    "level": "easy",
@@ -168,7 +168,7 @@
   "Electronics bench test (PART E) and set the buck to 5.8 V",
   "Set every servo to its angle (laptop panel) before it gets its horn",
   "Cut the 2 rods to 112 mm, file the ends",
-  "Cut a single-arm horn to a 20 mm hole radius (step 4)",
+  "Find the horns in the servo bags: single-arm (lift, step 4), cross (wrist, step 9), double-arm cut to 7 mm (gripper, step 12)",
   "Cut the rubber pad 9 x 13.5 mm (step 15)",
   "Build the whole column on the table (steps 1-15) while the base prints: it goes onto the base in step 19",
   "Electronics on the tray (steps 20-21)"

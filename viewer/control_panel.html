@@ -103,7 +103,7 @@ kbd{font:12px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-b
 const $ = id => document.getElementById(id);
 // Calibration constants and laptop-move limits: defaults = concept_a.ino; replaced by what the firmware
 // reports ("= NAME value ..." line, sent at power-up and on "c").
-const CFG = {TURN_START:135, TURN_TARGET:45, LIFT_DOWN:30, LIFT_UP:75, WRIST_UP:0, WRIST_FLIP:180,
+const CFG = {TURN_START:135, TURN_TARGET:45, LIFT_DOWN:30, LIFT_UP:98, WRIST_UP:0, WRIST_FLIP:180,
              GRIP_OPEN:20, GRIP_CLOSED:95, GRIP_RELEASE:70, LIM_t:[35,145], LIM_l:[25,80], LIM_w:[0,180], LIM_g:[10,100]};
 const SERVOS = [
   {k:"t", name:"Base (turntable)", part:"MG996R · D9", presets:[["START","TURN_START"],["TARGET","TURN_TARGET"]]},

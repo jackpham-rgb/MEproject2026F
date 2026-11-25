@@ -39,7 +39,10 @@ P = dict(
     lm_od=12.0, lm_len=19.0,
     car_x=26.0, car_y0=2.0, car_y1=22.0, car_z0=69.0, car_h=62.0,
     beam_w=20.0, beam_t=10.0,
-    lift_crank=20.0, lift_theta0=-22.5, lift_span=45.0,             # crank +-22.5 deg -> 15.3 mm
+    lift_crank=14.0, lift_theta0=-34.0, lift_span=68.0,             # crank -34 .. +34 deg -> 15.7 mm (>= 15.2 required);
+    #   symmetric so the crank top stays 0.7 mm under the top cap (a 65 deg swing from -22.5 hit it).
+    #   14 = the LAST hole of the SG90/MG90S single-arm horn in the bag (was 20 mm with a 45 deg swing: no bagged horn
+    #   reaches 20 mm). Firmware LIFT_UP 75 -> 98.
     lift_servo_tip=(-3.0, -6.0, 150.0),
     wrist_tip_y=58.5,
     plate_x=31.0, plate_y1=91.0, plate_bot=(68.5, 72.5), plate_top=(79.5, 82.0),
@@ -61,8 +64,28 @@ P["base_top_z"] = P["base_h"]
 P["turret_z0"] = 53.0                                                 # servo tip 50 + 3 mm horn
 P["turret_z1"] = P["turret_z0"] + P["turret_t"]                       # 59
 P["car_z1"] = P["car_z0"] + P["car_h"]                                # 129
-P["lift_stroke"] = P["lift_crank"] * (math.sin(math.radians(P["lift_theta0"] + P["lift_span"]))
-                                      - math.sin(math.radians(P["lift_theta0"])))
+# lift = slider-crank: crank pin on the servo horn, a straight link to the carriage's pivot (y 12, 2 mm over its top).
+# The link length makes h = 0 at theta0 (the can is gripped at its middle, so it is set down level after the flip).
+LIFT_PIVOT = (12.0, P["car_z1"] + 2.0)                                # (y, z) of the link's carriage end at h = 0
+
+
+def lift_pin(th_deg):
+    _, ly, lz = P["lift_servo_tip"]
+    t = math.radians(th_deg)
+    return ly + P["lift_crank"] * math.cos(t), lz + P["lift_crank"] * math.sin(t)
+
+
+_p0 = lift_pin(P["lift_theta0"])
+P["lift_link_len"] = math.dist(_p0, LIFT_PIVOT)                       # 20 mm crank: 9.35; 14 mm crank: 12.7
+
+
+def lift_h(th_deg):
+    """Carriage height above its lowest point for crank angle th (exact slider-crank, vertical slide at y = 12)."""
+    py, pz = lift_pin(th_deg)
+    return pz - math.sqrt(P["lift_link_len"] ** 2 - (LIFT_PIVOT[0] - py) ** 2) - LIFT_PIVOT[1]
+
+
+P["lift_stroke"] = lift_h(P["lift_theta0"] + P["lift_span"]) - lift_h(P["lift_theta0"])
 
 # 3D-print tolerances (PETG, 0.4 mm nozzle). Every hole below is sized from this table.
 # Print tolerance_coupon.stl first and adjust if your printer runs tight or loose.
@@ -100,7 +123,7 @@ if _os.environ.get("CA_NOMINAL_HOLES"):
                rod_press=6.0, lm_press=12.15, run_bore=3.9, peg=2.8, bear_shaft=34.95, bear_housing=47.1)
 
 # Firmware angles (kept equal to firmware/concept_a/concept_a.ino)
-FW = dict(TURN_START=135, TURN_TARGET=45, LIFT_DOWN=30, LIFT_UP=75, WRIST_UP=0, WRIST_FLIP=180,
+FW = dict(TURN_START=135, TURN_TARGET=45, LIFT_DOWN=30, LIFT_UP=98, WRIST_UP=0, WRIST_FLIP=180,
           GRIP_OPEN=20, GRIP_CLOSED=95, GRIP_RELEASE=70)   # release opens only 25 deg (gripper is upside down there)
 
 COLORS = dict(print="#3d7be0", print2="#e0a33d", tpu="#2f2f2f", servo="#1f2329", steel="#b8bcc2",
@@ -445,7 +468,7 @@ def build_parts():
         [(lty, ltz - 3.5), (pin[0], pin[1] - 3.5), (pin[0], pin[1] + 3.5), (lty, ltz + 3.5)]).close().extrude(2.5)
     crank2d = crank2d.union(cq.Workplane("XY").center(lty, ltz).circle(5).extrude(2.5))
     crank = moved(crank2d, trsf_axes((ltx - 2.5, 0, 0), (0, 1, 0), (1, 0, 0)))
-    add("lift_crank", "crank", crank, "buy", mass=1.0, note="MG90S single-arm horn, trimmed to a 20 mm pin radius")
+    add("lift_crank", "crank", crank, "buy", mass=1.0, note="MG90S single-arm horn (from the bag): the link on its LAST hole, ~14 mm from the centre")
 
     # ---------------- lift ----------------
     cx_, cy0, cy1, cz0, cz1 = p["car_x"], p["car_y0"], p["car_y1"], p["car_z0"], p["car_z1"]
@@ -485,8 +508,15 @@ def build_parts():
         for i, (z0, z1) in enumerate(lm_z):
             lm = cyl(sx * rx, ry, p["lm_od"] / 2, z0, z1).cut(cyl(sx * rx, ry, 3.0, z0 - 1, z1 + 1))
             add(f"LM6UU_{'L' if sx < 0 else 'R'}{i + 1}", "lift", lm, "buy", mass=8.0)
-    link = box(-8.5, -5.5, pin[0] - 3.5, pin[0] + 3.5, cz1 + 2 - 3.5, pin[1] + 3.5)
-    link = link.cut(cyl_dir((-9, 12, cz1 + 2), (1, 0, 0), TOL["n6_clear"] / 2, 4)).cut(cyl_dir((-9, pin[0], pin[1]), (1, 0, 0), TOL["servo_run"] / 2, 4))
+    # straight link from the carriage pivot to the crank pin (it leans when the pin is off the y = 12 line)
+    pv = LIFT_PIVOT
+    wp = lambda: cq.Workplane("YZ").workplane(offset=-8.5)                                 # noqa: E731  x -8.5 .. -5.5
+    ang_l = math.degrees(math.atan2(pin[1] - pv[1], pin[0] - pv[0]))
+    link = wp().center(*pv).circle(3.5).extrude(3.0).union(wp().center(*pin).circle(3.5).extrude(3.0)).union(
+        wp().center((pv[0] + pin[0]) / 2, (pv[1] + pin[1]) / 2).transformed(rotate=(0, 0, ang_l))
+        .rect(math.dist(pv, pin), 7.0).extrude(3.0))
+    link = cq.Workplane("XY").add(link.val())
+    link = link.cut(cyl_dir((-9, pv[0], pv[1]), (1, 0, 0), TOL["n6_clear"] / 2, 4)).cut(cyl_dir((-9, pin[0], pin[1]), (1, 0, 0), TOL["servo_run"] / 2, 4))
     add("lift_link", "lift", link, "PETG", note="Link crank -> carriage. Carriage end: #6-32x1/2 pivot (3.9 mm running hole). "
         "Crank end: 2.4 mm running hole, servo-bag screw from outside through the link into the horn (the link turns on it).")
     wsrv = moved(micro_servo_local(), trsf_axes((0, p["wrist_tip_y"], gz), (0, 0, -1), (0, 1, 0)))
@@ -589,7 +619,7 @@ def build_parts():
 def joints_from_commands(turn, lift, wrist, grip, wrist_range=180):
     psi = -(FW["TURN_START"] - turn)                          # deg about +Z (0 at START, -90 at TARGET)
     th = P["lift_theta0"] + (lift - FW["LIFT_DOWN"]) * P["lift_span"] / (FW["LIFT_UP"] - FW["LIFT_DOWN"])
-    h = P["lift_crank"] * (math.sin(math.radians(th)) - math.sin(math.radians(P["lift_theta0"])))
+    h = lift_h(th)
     phi = wrist * 180.0 / wrist_range * (wrist_range / 180.0)
     alpha = max(0.0, (FW["GRIP_CLOSED"] - grip) / (FW["GRIP_CLOSED"] - FW["GRIP_OPEN"]) * P["grip_open_angle"])
     return dict(psi=psi, theta=th, h=h, phi=phi, alpha=alpha)

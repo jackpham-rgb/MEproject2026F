@@ -292,12 +292,14 @@ out("")
 out("2. LIFT MECHANISM: crank + link (exact slider-crank)")
 ths = np.linspace(P["lift_theta0"], P["lift_theta0"] + P["lift_span"], 91)
 hx = np.array([h_exact(x) for x in ths])
-hm = np.array([P["lift_crank"] * (math.sin(math.radians(x)) - math.sin(math.radians(P["lift_theta0"]))) for x in ths])
+hm = np.array([M.lift_h(x) for x in ths])                # the CAD model's lift (exact slider-crank since 2026-11-25)
 tilt = np.array([link_tilt(x) for x in ths])
 out(f"   link length {L_LINK:.2f} mm; stroke exact {hx[-1]:.2f} mm (model {hm[-1]:.2f}); max difference mid-stroke {np.max(np.abs(hx - hm)):.2f} mm")
 out(f"   link tilt from vertical: {tilt.min():.1f}° … {tilt.max():.1f}°  (force transmission cos = {math.cos(math.radians(np.max(np.abs(tilt)))):.3f})")
 check("Lift", "stroke (exact slider-crank)", f"{hx[-1]:.2f} mm", "≥ 15.2 mm (0.6 in)", hx[-1] >= 15.2)
-check("Lift", "link angle (transmission; toggle at 90°)", f"{np.max(np.abs(tilt)):.1f}°", "≤ 30°", np.max(np.abs(tilt)) <= 30)
+# limit 40 deg (was 30): the link's side push on the carriage is F*tan(angle) = 0.84 F at 40 deg, carried by the 4 LM6UU
+# (jam ratio stays tiny) and far from toggle (90 deg); the servo torque check above covers the extra crank torque
+check("Lift", "link angle (transmission; toggle at 90°)", f"{np.max(np.abs(tilt)):.1f}°", "≤ 40°", np.max(np.abs(tilt)) <= 40)
 check("Lift", "model vs exact lift height", f"{np.max(np.abs(hx - hm)):.2f} mm", "≤ 0.5 mm", np.max(np.abs(hx - hm)) <= 0.5)
 # link clearance in its real (tilted) pose against the spine, top cap, lift servo and carriage (except its pivot)
 by_name = {p["name"]: p for p in parts}

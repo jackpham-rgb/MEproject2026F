@@ -17,13 +17,13 @@ rod_R,turret,buy,3.1,24.9,17.0,12.0,111.0
 spine,turret,PETG,27.9,21.3,0.5,-20.4,114.7
 top_cap,turret,PETG,13.6,10.4,-0.0,-2.1,165.0
 lift_servo_MG90S,turret,buy,6.9,13.4,13.4,-6.0,144.8
-lift_crank,crank,buy,0.4,1.0,-4.2,0.3,147.3
+lift_crank,crank,buy,0.3,1.0,-4.2,-2.9,147.8
 carriage_arm,lift,PETG,57.0,43.5,0.0,14.9,96.2
 LM6UU_L1,lift,buy,1.6,8.0,-17.0,12.0,78.5
 LM6UU_L2,lift,buy,1.6,8.0,-17.0,12.0,121.5
 LM6UU_R1,lift,buy,1.6,8.0,17.0,12.0,78.5
 LM6UU_R2,lift,buy,1.6,8.0,17.0,12.0,121.5
-lift_link,lift,PETG,0.3,0.2,-7.0,12.6,138.1
+lift_link,lift,PETG,0.3,0.2,-7.0,8.5,138.0
 wrist_servo,lift,buy,6.9,13.0,0.0,42.1,55.9
 wrist_horn,wrist,buy,0.8,1.0,0.0,57.2,61.1
 gripper_frame,wrist,PETG,11.2,8.5,-2.3,70.4,72.8
