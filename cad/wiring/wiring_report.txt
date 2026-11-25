@@ -17,10 +17,10 @@ Clearance in each motion pose (min gap from the wire surface to any part):
   RELEASE at target    PASS
 
   closest approach over all poses:
-    SG90 gripper lead (D5)                           0.58 mm
+    SG90 gripper lead (D5)                           0.67 mm
     Wrist servo lead (D6)                            0.79 mm
-    MG90S lift lead (D10)                            0.65 mm
-    MG996R turntable lead (D9, power on the buck)    1.11 mm
+    MG90S lift lead (D10)                            0.63 mm
+    MG996R turntable lead (D9, power on the buck)    0.42 mm
     MG996R + to buck OUT+                            2.90 mm
     MG996R - to buck OUT-                            2.90 mm
     MG996R signal to D9                              2.30 mm
@@ -47,10 +47,10 @@ Service loops (loop length between the last rigid points on each side):
   MG90S lift lead (D10)    turn 90°         loop    87 mm, motion needs    46 mm -> 1.89x PASS (>= 1.25x so it never pulls tight)
 
 Lead length (servo exit -> breadboard header, along the route):
-  SG90 gripper lead (D5)                           518 mm; SG90 lead 250 + 500 mm extension = 735 mm -> PASS (217 mm spare, tuck the spare in the tray)
+  SG90 gripper lead (D5)                           521 mm; SG90 lead 250 + 500 mm extension = 735 mm -> PASS (214 mm spare, tuck the spare in the tray)
   Wrist servo lead (D6)                            416 mm; MG90S lead 250 + 300 mm extension = 535 mm -> PASS (119 mm spare, tuck the spare in the tray)
-  MG90S lift lead (D10)                            345 mm; MG90S lead 250 + 300 mm extension = 535 mm -> PASS (190 mm spare, tuck the spare in the tray)
-  MG996R turntable lead (D9, power on the buck)    191 mm; MG996R lead 300 + 300 mm extension = 585 mm -> PASS (394 mm spare, tuck the spare in the tray)
+  MG90S lift lead (D10)                            346 mm; MG90S lead 250 + 300 mm extension = 535 mm -> PASS (189 mm spare, tuck the spare in the tray)
+  MG996R turntable lead (D9, power on the buck)    195 mm; MG996R lead 300 + 300 mm extension = 585 mm -> PASS (390 mm spare, tuck the spare in the tray)
 
   (stock lead lengths are the usual 250 / 300 mm  VERIFY on the servos you get)
 

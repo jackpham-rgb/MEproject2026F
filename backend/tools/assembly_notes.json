@@ -104,7 +104,8 @@
   },
   "17": {
    "how": "4 x #8-32 screws from UNDERNEATH: through the 4 holes in the servo's tabs, up into the 2 printed blocks inside the base. They cut their own thread in the plastic: snug, don't over-tighten (it strips).",
-   "level": "easy"
+   "level": "easy",
+   "fit": "<b>Spline height.</b> A base printed before 25 Nov has its 2 servo mounting blocks <b>5 mm too long</b> (the CAD had the MG996R 5 mm too tall): sand 5 mm off the blocks' bottom faces, both equally, so the spline reaches the horn under the turret plate. New base files are already corrected."
   },
   "18": {
    "glue": "Hot glue or tape the washers into the 2 back pockets: the pockets are open underneath, loose weight just stays on the table.",

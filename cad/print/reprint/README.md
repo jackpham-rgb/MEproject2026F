@@ -38,3 +38,5 @@ Why and sources: `docs/19_reprint_strategy.md`.
 
 **2026-11-25:** the lift crank now uses the single-arm horn from the servo bag (its last hole, 14 mm), so a new, longer lift link
 (11.2 mm between holes) is on the carriage plates (a, b, c, d, e). Firmware LIFT_UP 75 -> 98 (68 deg swing, 15.7 mm lift).
+
+**2026-11-25 (servo datasheets):** MG996R modelled at its real 42.9 mm overall height (the spline was 5 mm too high): the base's 2 servo blocks are 5 mm shorter. **A base printed before this: sand 5 mm off the 2 blocks' bottom faces.** MG90S/SG90 bodies modelled at 32.7 mm: the wrist servo sits 3.5 mm further out on the arm (it reached the base tower), so the carriage arm is 3.5 mm longer and the gripper frame 3.5 mm shorter (both on plate d).

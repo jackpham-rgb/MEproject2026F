@@ -44,7 +44,7 @@ P = dict(
     #   14 = the LAST hole of the SG90/MG90S single-arm horn in the bag (was 20 mm with a 45 deg swing: no bagged horn
     #   reaches 20 mm). Firmware LIFT_UP 75 -> 98.
     lift_servo_tip=(-3.0, -6.0, 150.0),
-    wrist_tip_y=58.5,
+    wrist_tip_y=62.0,        # 58.5 -> 62: the real MG90S body (32.7 overall) reached the base tower (r 28) at the bottom of the lift
     plate_x=31.0, plate_y1=91.0, plate_bot=(68.5, 72.5), plate_top=(79.5, 82.0),
     pivot_x=8.1, pivot_y=83.0, gear_r=8.0, finger_z=(73.0, 79.0),
     gear_z=16, gear_m=1.0, gear_pa=20.0, gear_x=0.10, gear_thin=0.10,   # involute spur gears on the fingers:
@@ -218,8 +218,8 @@ def micro_servo_local(mounting_holes=True):
     body along +X from the shaft (shaft 5.95 from the body end)."""
     L, W, Hb = 22.8, 12.2, 22.7
     x0, x1 = -5.95, L - 5.95
-    body = box(x0, x1, -W / 2, W / 2, -28.5, -5.8)
-    flange_z = -28.5 + 15.9
+    body = box(x0, x1, -W / 2, W / 2, -32.7, -5.8)        # datasheet (Miuzei MG90S): 32.7 overall, spline 10.2 over the tabs
+    flange_z = -12.6                                       # tab underside (top -10.1): unchanged, matches the datasheet
     tabs = box(x0 - 4.85, x1 + 4.85, -W / 2, W / 2, flange_z, flange_z + 2.5)
     if mounting_holes:
         cx = (x0 + x1) / 2
@@ -233,14 +233,14 @@ def micro_servo_local(mounting_holes=True):
 def mg996r_local():
     """MG996R. Local: spline tip at origin along +Z, body along +X (shaft 10.2 from the end)."""
     x0, x1 = -10.2, 30.5
-    body = box(x0, x1, -9.85, 9.85, -47.9, -5.0)
-    fz = -47.9 + 26.5
+    body = box(x0, x1, -9.85, 9.85, -42.9, -4.8)          # datasheet: 40.7 x 19.7 x 42.9 OVERALL (case 38.1 + spline 4.8);
+    fz = -42.9 + 26.5                                      # the old model had 42.9 as the case alone: spline 5 mm too high
     tabs = box(x0 - 6.9, x1 + 6.9, -9.85, 9.85, fz, fz + 2.5)
     cx = (x0 + x1) / 2
     for hx in (cx - 24.75, cx + 24.75):
         for hy in (-5, 5):
             tabs = tabs.cut(cyl(hx, hy, 2.3, fz - 1, fz + 4))
-    spline = cyl(0, 0, 3.0, -5.0, 0.0)
+    spline = cyl(0, 0, 3.0, -4.8, 0.0)
     return body.union(tabs).union(spline)
 
 
@@ -318,7 +318,7 @@ def build_parts():
         return wp.rotate((0, 0, 0), (0, 0, 1), p["servo_ang"])
 
     srv_tip_z = p["turret_z0"] - 3.0                      # 50: horn sits 3 mm under the turret plate
-    flange_top = srv_tip_z - 47.9 + 26.5 + 2.5            # 31.1
+    flange_top = srv_tip_z - 42.9 + 26.5 + 2.5            # 36.1 (was 31.1 with the wrong MG996R height: sand 5 mm off)
     base = box(-half, half, -half, half, 0, H).cut(sector(rt, p["sweep_a0"], p["sweep_a1"], -1, H + 1))
     cavity = box(-half + wall, half - wall, -half + wall, half - wall, 0, H - top).cut(
         sector(rt - wall, p["sweep_a0"] - 3, p["sweep_a1"] + 3, -1, H + 1))

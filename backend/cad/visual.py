@@ -60,7 +60,7 @@ def micro_servo_vis(body_col, spline_col):
     L, W = 22.8, 12.2
     x0, x1 = -5.95, L - 5.95
     fz = -28.5 + 15.9
-    body = rbox(x0, x1, -W / 2, W / 2, -28.5, -5.8, 0.8)
+    body = rbox(x0, x1, -W / 2, W / 2, -32.7, -5.8, 0.8)
     tabs = rbox(x0 - 4.85, x1 + 4.85, -W / 2, W / 2, fz, fz + 2.5, 0.6)
     cx = (x0 + x1) / 2
     for s in (-1, 1):
@@ -76,8 +76,8 @@ def micro_servo_vis(body_col, spline_col):
 
 def mg996r_vis():
     x0, x1 = -10.2, 30.5
-    fz = -47.9 + 26.5
-    body = rbox(x0, x1, -9.85, 9.85, -47.9, -5.0, 1.2)
+    fz = -42.9 + 26.5
+    body = rbox(x0, x1, -9.85, 9.85, -42.9, -4.8, 1.2)
     tabs = rbox(x0 - 6.9, x1 + 6.9, -9.85, 9.85, fz, fz + 2.5, 1.0)
     cx = (x0 + x1) / 2
     for s in (-1, 1):
@@ -274,7 +274,7 @@ def build():
     for bx in (-14.6, 34.9):                                        # MG996R tabs, #8 up into the base blocks
         for by in (-5, 5):
             a = math.radians(p["servo_ang"])
-            S.append(("turntable_servo_MG996R", "#8", (bx * math.cos(a) - by * math.sin(a), bx * math.sin(a) + by * math.cos(a), srv_tip_z - 47.9 + 26.5), (0, 0, 1), 12.7))
+            S.append(("turntable_servo_MG996R", "#8", (bx * math.cos(a) - by * math.sin(a), bx * math.sin(a) + by * math.cos(a), srv_tip_z - 42.9 + 26.5), (0, 0, 1), 12.7))
     S.append(("turntable_horn", "M3", (0, 0, tz0 - 0.8), (0, 0, -1), 8))
     for a in (45, 135, 225, 315):                                   # turret plate -> horn
         S.append(("turret_plate", "sb", (8 * math.cos(math.radians(a)), 8 * math.sin(math.radians(a)), tz1), (0, 0, -1), 8))

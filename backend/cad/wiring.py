@@ -92,9 +92,9 @@ PANEL_IN = ty0 + 3
 
 
 def micro_exit(origin, xdir, zdir):
-    """Lead exit of an SG90/MG90S: far end face (local x = 16.85), near the bottom (local z = -25)."""
+    """Lead exit of an SG90/MG90S: far end face (local x = 16.85), near the bottom (local z = -29; body bottom -32.7)."""
     t = M.trsf_axes(origin, xdir, zdir)
-    p = gp_Pnt(16.85, 0, -25).Transformed(t)
+    p = gp_Pnt(16.85, 0, -29).Transformed(t)
     return (p.X(), p.Y(), p.Z())
 
 
@@ -103,7 +103,7 @@ EX_LIFT = micro_exit(lt, (0, 0, -1), (-1, 0, 0))
 EX_WRIST = micro_exit((0, P["wrist_tip_y"], P["grip_z"]), (0, 0, -1), (0, 1, 0))
 EX_GRIP = micro_exit((-P["pivot_x"], P["pivot_y"], P["grip_spline_tip"]), (-1, 0, 0), (0, 0, -1))
 a = math.radians(P["servo_ang"])                             # MG996R: far end face, 8 mm off the table
-EX_TURN = (30.5 * math.cos(a), 30.5 * math.sin(a), 50.0 - 42.0)
+EX_TURN = (30.5 * math.cos(a), 30.5 * math.sin(a), 50.0 - 36.9)       # 6 mm above the case bottom (50 - 42.9)
 
 
 def k_off(trunk, k):

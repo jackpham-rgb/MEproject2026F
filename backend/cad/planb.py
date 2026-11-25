@@ -7,7 +7,7 @@ The wooden base keeps every height of the printed base, so the bearing, the turn
 exactly where the CAD has them:
   top board  1/4" (6.35 mm) plywood, 1-7/8" (47.6 mm) hole: the 6807 (47.0 x 7) drops in, 0.65 mm proud
   bottom board 1/2" (12.7 mm): the pocket floor (= the bearing's underside, z 45); the MG996R comes up through a slot
-             and its tabs screw to the underside, with washers (~1.2 mm) as spacers
+             and its tabs screw to the underside (3/8" board: the tabs meet it within ~0.6 mm, one washer if needed)
   4 legs     1-1/2" (38 mm) square blocks, 32.3 mm tall; a sandbag under the bottom board between the front legs
 The carriage repair: epoxy in the crack + a 1/2" steel corner brace on top of the arm and up the carriage's front face,
 4 x #6 x 1/4" pointed screws (the arm's top is the side in tension, where the brace helps most).
@@ -47,8 +47,8 @@ def templates(outline_wires, hole_d, slots, blocks, sand_xy, path):
         pts = [w.positionAt(i / 600) for i in range(601)]          # along the wire, in order
         return [p.x for p in pts], [p.y for p in pts]
     pages = [("TOP board: 1/4\" (6 mm) plywood. Drill the hole with a 1-7/8\" (47.6 mm) hole saw", "top"),
-             ("BOTTOM board: 1/2\" (12 mm) plywood. Cut the servo slot (drill the corners, saw, file)", "bottom"),
-             ("FLOOR board: 1/2\" (12 mm) plywood. Servo slot + 3 spacer blocks (3/4\" wood, 30 x 30) + sandbag", "floor")]
+             ("BOTTOM board: 3/8\" (9-10 mm) plywood. Cut the servo slot (drill the corners, saw, file)", "bottom"),
+             ("FLOOR board: 1/2\" (12 mm) plywood. Servo slot + 3 spacer blocks (23 mm tall, 30 x 30) + sandbag", "floor")]
     with PdfPages(path) as pdf:
         for title, kind in pages:
             fig = plt.figure(figsize=(W / IN, H / IN))
@@ -64,6 +64,9 @@ def templates(outline_wires, hole_d, slots, blocks, sand_xy, path):
                 t = [i / 90 * 2 * math.pi for i in range(91)]
                 ax.plot([hole_d / 2 * math.cos(a) for a in t], [hole_d / 2 * math.sin(a) for a in t], color="#c00000", lw=1.4)
                 ax.text(0, -hole_d / 2 - 6, f"hole {hole_d} mm (1-7/8\")", ha="center", va="top", color="#c00000", fontsize=9)
+                c = slots[0]                                  # the servo case reaches into this board too: same slot
+                ax.fill([p[0] for p in c], [p[1] for p in c], color="#c00000", alpha=0.15)
+                ax.plot([p[0] for p in c] + [c[0][0]], [p[1] for p in c] + [c[0][1]], color="#c00000", lw=1.0, ls="--")
             else:
                 c = slots[0 if kind == "bottom" else 1]
                 ax.fill([p[0] for p in c], [p[1] for p in c], color="#c00000", alpha=0.25)
@@ -114,15 +117,16 @@ def main():
         return cq.Workplane("XY").add(sol)
     top = slab(zb_top, zb_top + IN / 4).cut(
         cq.Workplane("XY").circle(47.6 / 2).extrude(20).translate((0, 0, zb_top - 5)))
-    zb0 = zb_top - IN / 2                           # bottom board 32.3 .. 45
+    zb0 = 36.2                                      # bottom board 36.2 .. 45 = 8.8 mm: 3/8" plywood (sold ~8.7-9.1 mm); the MG996R tabs top out at 36.1
     srv = parts["turntable_servo_MG996R"]["shape"].val()
     ang = P["servo_ang"]
     # the servo body where it passes the bottom board, measured in the servo's own frame -> slot = that + 1 mm
     loc = srv.rotate((0, 0, 0), (0, 0, 1), -ang)
-    sec = loc.intersect(box(-200, 200, -200, 200, zb0 + 0.5, zb_top - 0.5).val()).BoundingBox()
+    sec = loc.intersect(box(-200, 200, -200, 200, 36.6, zb_top + 1.0).val()).BoundingBox()   # body above the tabs (top 36.1)
     slot_l = box(sec.xmin - 1, sec.xmax + 1, sec.ymin - 1, sec.ymax + 1, zb0 - 1, zb_top + 1).val()
     slot = slot_l.rotate((0, 0, 0), (0, 0, 1), ang)
     bottom = slab(zb0, zb_top).cut(cq.Workplane("XY").add(slot))
+    top = top.cut(cq.Workplane("XY").add(slot))                  # the MG996R case top (45.2) reaches into the top board
     sc = slot.Center()
     slot_txt = (f"slot {sec.xmax - sec.xmin + 2:.0f} × {sec.ymax - sec.ymin + 2:.0f} mm, at {ang - 180:.0f}° (diagonal); "
                 f"its centre {math.hypot(sc.x, sc.y):.0f} mm from the hole centre")
@@ -216,7 +220,7 @@ def main():
              "<b>The 6807 is 47.0 mm:</b> the hole is 0.6 mm bigger. One wrap of electrical tape round the bearing makes it snug.",
              callouts=[((23.8, 0, 51.35), "Ø47.6 · 1‑7/8″ hole saw, right through")]),
         step(2, "Bottom board: cut the servo slot", ["wood_bottom"], [], None, 0, "try",
-             "½″ (12 mm) plywood, same outline (template page 2). Cut the slot for the MG996R's body (drill the 4 corners, saw between, file): "
+             "⅜″ (9–10 mm) plywood, same outline (template page 2). Cut the slot for the MG996R's body (drill the 4 corners, saw between, file): "
              "the servo's <b>spline must end up exactly under the hole centre</b>. Hold the servo under the board and mark round it "
              "before cutting; the spline is off-centre on the servo.",
              "Test: the servo body slides up through the slot until its tabs touch the board.",
@@ -229,12 +233,12 @@ def main():
              "Loose: one wrap of electrical tape round the bearing. It should sit flat and stand 0.6 mm above the top board."),
         step(5, "Turntable servo up through the slot", ["turntable_servo_MG996R"], base_set + ["bearing_6807"], [0, 0, -1], 60, "try",
              "Servo at 135° first (laptop panel). From underneath, push the MG996R up through the slot, spline up, until the "
-             "spline is centred in the bearing. 4 screws through the tabs up into the bottom board, with <b>2 washers (~1.2 mm) "
+             "spline is centred in the bearing. 4 screws through the tabs up into the bottom board, with <b>a washer if there is a gap "
              "between each tab and the board</b> so the spline tip ends 2 mm under the bearing's top.",
              "Check: the spline is in the middle of the bearing's hole when you look down.", scr=trs, badge=["MG996R", "135°"]),
         step(6, "Floor board, spacers + weight", legsn + ["sandbag"], base_set + ["bearing_6807", "turntable_servo_MG996R"] + trs, [0, 0, -1], 40, "easy",
              "A third ½″ board, same outline (template page 3) but 10 mm shorter at the front so the tray slides under, with a "
-             "slot for the bottom of the servo. Glue 3 blocks of ¾″ wood (30 × 30 mm) between it and the bottom board (where "
+             "slot for the bottom of the servo. Glue 3 blocks of wood 23 mm tall (¾″ wood + a 4 mm shim, 30 × 30 mm) between it and the bottom board (where "
              "the template marks them), and a small bag of sand (~150 g) on the floor board at the front. The base then stands "
              "on the same footprint as the printed one, so it is just as hard to tip over."),
         step(7, "Repair the carriage arm (if it snapped)", ["brace"],
@@ -267,7 +271,7 @@ def main():
     pv = vm["params"]
     notes = json.load(open(os.path.join(ROOT, "backend", "tools", "assembly_notes.json")))
     names = dict(notes["names"], wood_top="Top board (¼″ plywood)", wood_bottom="Bottom board (½″ plywood)", sandbag="Sandbag",
-                 brace="Steel corner brace ½″", leg_1="Floor board (½″ plywood)", **{f"leg_{i}": "Spacer block (¾″ wood)" for i in range(2, 5)})
+                 brace="Steel corner brace ½″", leg_1="Floor board (½″ plywood)", **{f"leg_{i}": "Spacer block (23 mm)" for i in range(2, 5)})
     levels = json.loads(json.dumps(notes["levels"]))
     levels["precise"]["text"] = "A fit that decides whether the robot works: test it with the real part; tape if loose, sand or file if tight."
     levels["easy"]["text"] = "Simple wood work or screws: any careful job works."
