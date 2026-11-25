@@ -34,7 +34,8 @@ EASY_SUP = {"support_material": "1", "support_material_auto": "1", "support_mate
             "support_material_spacing": "2.5", "support_material_extrusion_width": "0.3",
             "support_material_xy_spacing": "60%", "support_material_threshold": "50"}
 BRIM = {"brim_width": "3", "brim_separation": "0.3", "brim_type": "outer_only"}   # outer only, 0.3 gap: peels off
-FAST = {"perimeter_speed": "50", "external_perimeter_speed": "35", "infill_speed": "80", "solid_infill_speed": "60",
+FAST = {"fan_always_on": "1",   # the spool says "Fan: ON": 30-50 % on every layer (was only on short layers), 100 % bridges
+        "perimeter_speed": "50", "external_perimeter_speed": "35", "infill_speed": "80", "solid_infill_speed": "60",
         "top_solid_infill_speed": "40", "support_material_speed": "60", "gap_fill_speed": "35", "travel_speed": "150",
         "only_retract_when_crossing_perimeters": "1", "thick_bridges": "1"}
 FAST_DRAFT = {**FAST, "perimeter_speed": "60", "external_perimeter_speed": "45", "infill_speed": "90"}   # 0.28 mm: keep the draft speeds
