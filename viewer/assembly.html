@@ -72,6 +72,9 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 .mrow input,.mrow select{width:100%;min-width:0;font:14px system-ui,sans-serif;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--ground);color:var(--ink)}
 .mrow input.opt::placeholder{font-style:italic;font-size:12px}
 #info h4{margin:14px 0 2px;font-size:15px}
+.tabs{display:flex;gap:4px;padding:0 12px 8px}
+.tab{flex:1;text-align:center;font:700 12.5px system-ui,sans-serif;padding:6px 4px;border:1px solid var(--line);border-radius:7px;color:var(--ink);text-decoration:none}
+.tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
 #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted)}
 @media (max-width:900px){
   #app{grid-template-columns:1fr;grid-template-rows:auto 52vh 1fr;height:auto;min-height:100dvh}
@@ -117,13 +120,18 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 (async () => {
 const $ = id => document.getElementById(id);
 let D;
-const PLANB = new URLSearchParams(location.search).get("data") === "planb";
-try { D = await (await fetch(PLANB ? "data/planb.json" : "data/assembly.json")).json(); }
+const DATA = new URLSearchParams(location.search).get("data");
+const PLANB = DATA === "planb", FIXES = DATA === "fixes";
+try { D = await (await fetch(PLANB ? "data/planb.json" : FIXES ? "data/fixes.json" : "data/assembly.json")).json(); }
 catch (e) { $("loading").textContent = "Couldn't load data/assembly.json. Open this page from the project website (or a local web server), not as a file."; return; }
 $("loading").remove();
 if (D.title) { document.title = D.title; document.querySelector("#steps h1").textContent = D.title; }
 const other = document.querySelector("#steps .sub");
-other.insertAdjacentHTML("beforeend", PLANB ? ' · <a href="assembly.html">Main guide</a>' : ' · <a href="assembly.html?data=planb">Plan B (wooden base)</a>');
+document.querySelector("#steps h1").insertAdjacentHTML("afterend", `<div class="tabs">
+  <a class="tab ${!PLANB && !FIXES ? "on" : ""}" href="assembly.html">Assembly</a>
+  <a class="tab ${FIXES ? "on" : ""}" href="assembly.html?data=fixes">Proposed fixes</a>
+  <a class="tab ${PLANB ? "on" : ""}" href="assembly.html?data=planb">Plan B</a></div>`);
+if (FIXES) $("legend").insertAdjacentHTML("beforeend", '<span><i class="sw" style="background:#e0352b;opacity:.45"></i> OLD part (what you printed before)</span>');
 
 // ---------------- scene
 const view = $("view");
@@ -176,10 +184,10 @@ const printedSet = new Set(D.printed);
 
 // ---------------- step list
 const LV = D.levels;
-const steps = [{ n: 0, title: "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can").concat(["test_can"]), screws: [], glue: [] },
-  ...(D.planb ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
+const steps = [{ n: 0, title: D.fixes ? "What changed, and why" : "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can" && !n.startsWith("old_")).concat(["test_can"]), screws: [], glue: [] },
+  ...(D.planb || D.fixes ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
   ...(D.motion ? [{ n: "▶", title: "Watch it run: the whole movement", run: true, level: null, new: [],
-    show: Object.keys(owners), screws: [], glue: [] }] : [])];
+    show: Object.keys(owners).filter(n => !n.startsWith("old_")), screws: [], glue: [] }] : [])];
 const list = $("list");
 steps.forEach((s, i) => {
   const b = document.createElement("button"); b.className = "st"; b.dataset.i = i;
@@ -205,6 +213,7 @@ function styleOwner(n, isNew) {
   const ghost = ghostEl.checked && !isNew && cur > 0;
   for (const it of o.items) {
     let c = it.base.clone();
+    if (it.kind === "old") { it.mesh.material.color.copy(c); it.mesh.material.opacity = 0.32; it.mesh.material.depthWrite = false; continue; }
     if (it.kind === "printed") c = realEl.checked ? new THREE.Color(0x8fa3b8) : PRINTED_COL.clone();
     if (ghost) c.lerp(new THREE.Color(dark ? 0x2a3038 : 0xffffff), 0.55);
     it.mesh.material.color.copy(c);
@@ -372,6 +381,13 @@ function labels() {
 function renderInfo(s) {
   const I = $("info");
   if (cur === 0) {
+    if (D.fixes) {
+      I.innerHTML = `<div class="head"><span class="big">★</span><h2>Proposed fixes: new vs old</h2></div>
+        <p>Every change since the parts you printed on 23 Nov. In each step the <b>new</b> part is in its normal colour and the <b>old</b> one is a <b style="color:#e0352b">red ghost</b>, so you see exactly what moved or changed. All of it passed the full check (collisions in every pose, can landing, 55 engineering checks, wiring, assembly order, screwdriver access).</p>
+        <div class="box"><h3>The fixes</h3><ol style="margin:4px 0;padding-left:20px">${D.steps.map(x => `<li>${x.title}</li>`).join("")}</ol></div>
+        <div class="box fit"><h3>Print</h3>All new parts are on <a href="https://github.com/jackpham-rgb/MEproject2026F/raw/claude/awesome-brahmagupta-i4dvbh/cad/print/reprint/reprint_d.3mf">reprint_d</a> (base + carriage + gripper frame + lift link). Already-printed parts: the steps say what to sand or file.</div>`;
+      return;
+    }
     if (D.planb) {
       I.innerHTML = `<div class="head"><span class="big">★</span><h2>Plan B: wooden base + carriage repair</h2></div>
         <p>Use this if the base or the carriage print fails. The wooden base keeps every height of the printed one, so the bearing, the turntable servo and the whole column sit exactly where they would on the printed base (checked in CAD: nothing overlaps).</p>
