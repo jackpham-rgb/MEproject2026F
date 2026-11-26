@@ -481,6 +481,9 @@ def build_parts():
         car = car.cut(teardrop_z(sx * rx, ry, 3.6, cz0 - 1, cz1 + 1, up=up, cap=cx_ + sx * rx - 1.6))       # rod clearance
         for z0, z1 in lm_z:
             car = car.cut(teardrop_z(sx * rx, ry, TOL["lm_press"] / 2, z0, z1, up=up, cap=cx_ + sx * rx - 1.6))  # LM6UU
+    # lightening window through the body between the upper and lower bearing pockets (2 mm clear of them, 5.7 mm from
+    # the rod holes' points): ~8 % less plastic; its top prints as a 20 mm bridge (no support)
+    car = car.cut(box(-7.0, 5.0, cy0 - 1, cy1 + 1, cz0 + p["lm_len"] + 2, cz1 - p["lm_len"] - 2))
     car = car.cut(box(-9.0, -1.0, 6.5, 17.5, cz1 - 3.5, cz1 + 1))                       # relief: the link end swings here
     #                                                       (and the pivot screw's pan head sits in it, x -5.5..-3.1)
     car = car.union(box(-11.5, -9.0, 8, 16, cz1, cz1 + 6)).cut(

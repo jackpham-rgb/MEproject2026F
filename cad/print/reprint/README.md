@@ -10,6 +10,7 @@ with the settings inside the 3MF: the correction is only right for the same laye
 | `reprint_8.3mf` | **gripper frame + right finger** (frame: 16 mm horn opening, unused plate wings cut off: −27 % plastic) | 4 h 05 | ~30 g | goes with the new left finger you printed |
 | `reprint_b.3mf` | a + 8 on one plate | 9 h 20 | ~81 g | only if a 10 h window; PrusaSlicer's command line crashed AFTER slicing it once: if your slicer crashes, print a and 8 separately |
 | `reprint_c.3mf` | **base + carriage arm** on one plate (base keeps 0.32 mm layers, carriage 0.2 mm) | 10 h 50 | ~164 g | only with an 11 h window: same time as 3 + a apart |
+| **`reprint_f.3mf`** | **carriage arm + gripper frame + lift link: everything that must be reprinted** (base reused: sand its 2 servo blocks 5 mm) | **6 h 52** | ~65 g | **recommended** |
 | `reprint_d.3mf` | **base + carriage arm + gripper frame + new lift link** (14 mm crank) on one plate (old right finger reused) | **12 h 46** | ~179 g | **the one-go plate (≤ 13 h)** |
 | `reprint_e.3mf` | d + a new right finger | 14 h 49 | ~194 g | over 13 h: print the finger separately if needed (`reprint_8` has frame + finger) |
 | `reprint_2.3mf` | whole claw (frame + both fingers) | 6 h 27 | ~45 g | only if the left finger is reprinted too |
@@ -40,3 +41,5 @@ Why and sources: `docs/19_reprint_strategy.md`.
 (11.2 mm between holes) is on the carriage plates (a, b, c, d, e). Firmware LIFT_UP 75 -> 98 (68 deg swing, 15.7 mm lift).
 
 **2026-11-25 (servo datasheets):** MG996R modelled at its real 42.9 mm overall height (the spline was 5 mm too high): the base's 2 servo blocks are 5 mm shorter. **A base printed before this: sand 5 mm off the 2 blocks' bottom faces.** MG90S/SG90 bodies modelled at 32.7 mm: the wrist servo sits 3.5 mm further out on the arm (it reached the base tower), so the carriage arm is 3.5 mm longer and the gripper frame 3.5 mm shorter (both on plate d).
+
+**Reuse, don't reprint:** base (sand the 2 servo blocks 5 mm), turret plate, spine (file 2 screw-head notches), top cap, both fingers. The carriage now has a lightening window between its bearing pockets (−8 % plastic); the gripper frame is already trimmed (−27 %).

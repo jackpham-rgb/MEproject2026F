@@ -4,7 +4,7 @@ ENGINEERING CHECKS: 55 checks, 55 PASS, 0 FAIL
    area       check                                                      value                          limit                    result
    Servos     SG90 (grip): torque demand / torque available              44.9%                          ≤ 50%                    PASS
    Servos     SG90 (grip): peak speed / no-load speed                    29.3%                          ≤ 70%                    PASS
-   Servos     MG90S (lift): torque demand / torque available             15.0%                          ≤ 50%                    PASS
+   Servos     MG90S (lift): torque demand / torque available             14.6%                          ≤ 50%                    PASS
    Servos     MG90S (lift): peak speed / no-load speed                   21.2%                          ≤ 70%                    PASS
    Servos     MG90S (wrist): torque demand / torque available            30.7%                          ≤ 50%                    PASS
    Servos     MG90S (wrist): peak speed / no-load speed                  37.5%                          ≤ 70%                    PASS
@@ -28,18 +28,18 @@ ENGINEERING CHECKS: 55 checks, 55 PASS, 0 FAIL
    Can        SG90 can't crush the can even at stall                     1.78 N/arm max                 < 8 N                    PASS
    Can        set down, not dropped (bottom height after LOWER, CAD)     -0.00 mm, 0 mm/s               |z| ≤ 0.5 mm             PASS
    Can        inverted can tips only past                                24.3°                          ≥ 3 × wrist tolerance (3°) PASS
-   Stability  tip-over (dynamic ZMP margin, all moves)                   37.8 mm                        ≥ 20 mm                  PASS
+   Stability  tip-over (dynamic ZMP margin, all moves)                   38.0 mm                        ≥ 20 mm                  PASS
    Stability  base sliding: inertial force / foot friction               0.39%                          ≤ 20 %                   PASS
-   Stability  turntable reaction torque / foot friction torque           0.83%                          ≤ 20 %                   PASS
+   Stability  turntable reaction torque / foot friction torque           0.84%                          ≤ 20 %                   PASS
    Strength   finger arm bending at SG90 stall                           3.8 MPa                        ≤ 20 MPa                 PASS
    Strength   finger arm deflection at SG90 stall                        0.71 mm                        ≤ 1.5 mm                 PASS
    Strength   carriage arm (2× dynamic load)                             0.11 MPa, 2.7 µm               ≤ 20 MPa                 PASS
    Strength   6 mm rods (bending, fixed-fixed)                           0.87 MPa, 0.75 µm              ≤ 200 MPa                PASS
    Strength   LM6UU load vs static rating 206 N (EST)                    1.31 N                         ≤ 50 N                   PASS
-   Function   carriage cannot jam on the rods (LM6UU, drawer rule)       0.009                          ≤ 0.5                    PASS
+   Function   carriage cannot jam on the rods (LM6UU, drawer rule)       0.010                          ≤ 0.5                    PASS
    Strength   turret plate at the hub (2× dynamic)                       0.40 MPa                       ≤ 20 MPa                 PASS
-   Strength   6807 bearing: load vs static rating (EST 3.5 kN)           5.3 N + 146 N·mm               ≤ 10 % of rating         PASS
-   Strength   lift link: buckling load / max link force                  715×                           ≥ 10×                    PASS
+   Strength   6807 bearing: load vs static rating (EST 3.5 kN)           5.2 N + 145 N·mm               ≤ 10 % of rating         PASS
+   Strength   lift link: buckling load / max link force                  733×                           ≥ 10×                    PASS
    Strength   SG90 horn screws: pilot-wall bearing at stall              2.05 MPa                       ≤ 20 MPa                 PASS
    Strength   #6/#8 screws in PETG: pull-out / worst load                615 N vs 19 N                  ≥ 10×                    PASS
    Power      peak servo current vs XL4015 rating 5 A                    0.65 A                         ≤ 2.5 A (50 %)           PASS
@@ -48,11 +48,11 @@ ENGINEERING CHECKS: 55 checks, 55 PASS, 0 FAIL
    Power      Uno regulator (own 9 V battery, 59 mA)                     0.19 W                         ≤ 1 W (SOT-223)          PASS
    Power      9 V battery life (Uno + LED, 59 mA, ~550 mAh)              9 h                            ≥ 4 h (a day of testing) PASS
    Proto v1   Adeept 996R: stall needed for 2× margin (VERIFY ≥ this)    ≥ 0.1 kg·cm                    MG996R class 9.4         PASS
-   Proto v1   Miuzei MG90S (lift): listed 2.0 kg·cm vs needed            0.54 kg·cm needed              ≤ 2.0 listed             PASS
+   Proto v1   Miuzei MG90S (lift): listed 2.0 kg·cm vs needed            0.53 kg·cm needed              ≤ 2.0 listed             PASS
    Proto v1   Miuzei MG90S (wrist): listed 2.0 kg·cm vs needed           1.10 kg·cm needed              ≤ 2.0 listed             PASS
    Proto v1   household pad rubber (μ 0.35): squeeze margin              3.8× the minimum               ≥ 2×                     PASS
    Proto v1   pad rubber 2.0 mm: release gap to the can                  11.3 mm                        ≥ 5 mm                   PASS
-   Proto v1   tip-over with NO ballast (ballast is not in the model)     37.8 mm                        ≥ 20 mm                  PASS
+   Proto v1   tip-over with NO ballast (ballast is not in the model)     38.0 mm                        ≥ 20 mm                  PASS
    Proto v1   LIZVOR 2 A adapter: current in a normal run                0.36 A                         ≤ 1.0 A (50 %)           PASS
    Proto v1   LIZVOR 2 A adapter: MG996R stalled (worst case)            1.54 A                         ≤ 2.0 A                  PASS
    Proto v1   jumper chain on the gripper lead: voltage drop at SG90 stall 0.19 V                         ≤ 0.3 V (5 %)            PASS
@@ -62,16 +62,16 @@ DETAILS
 
 1. SERVO DUTY: inverse dynamics along the firmware's eased moves (ratings at 4.8 V: conservative)
    GRIP     SG90   peak torque   70.40 N·mm (44.9% of stall), peak speed  175.8 °/s (29.3%), worst torque/available 44.9%   [J (both arms, 1:1 gears) = 469.52 kg·mm²]
-   LIFT     MG90S  peak torque   24.35 N·mm (13.8% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 15.0%   [moving mass 144 g, CG 40 mm in front of the rods]
+   LIFT     MG90S  peak torque   23.74 N·mm (13.4% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 14.6%   [moving mass 140 g, CG 41 mm in front of the rods]
    FLIP     MG90S  peak torque    6.08 N·mm ( 3.4% of stall), peak speed  225.0 °/s (37.5%), worst torque/available  5.5%   [J = 0.675 kg·cm², CG 11.4 mm off the roll axis]
-   TURN     MG996R peak torque    3.27 N·mm ( 0.4% of stall), peak speed   67.5 °/s (19.1%), worst torque/available  0.4%   [J = 8.16 kg·cm²]
-   LOWER    MG90S  peak torque   24.19 N·mm (13.7% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 14.9%   [moving mass 144 g, CG -13 mm in front of the rods]
+   TURN     MG996R peak torque    3.26 N·mm ( 0.4% of stall), peak speed   67.5 °/s (19.1%), worst torque/available  0.4%   [J = 8.16 kg·cm²]
+   LOWER    MG90S  peak torque   23.58 N·mm (13.4% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 14.5%   [moving mass 140 g, CG -13 mm in front of the rods]
    RELEASE  SG90   peak torque    2.00 N·mm ( 1.3% of stall), peak speed   78.1 °/s (13.0%), worst torque/available  1.4%   [J (both arms, 1:1 gears) = 2853.28 kg·mm²]
-   H-LIFT   MG90S  peak torque   21.55 N·mm (12.2% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 13.2%   [moving mass 129 g, CG -13 mm in front of the rods]
+   H-LIFT   MG90S  peak torque   20.94 N·mm (11.9% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 12.9%   [moving mass 125 g, CG -13 mm in front of the rods]
    H-CLOSE  SG90   peak torque    1.12 N·mm ( 0.7% of stall), peak speed   58.6 °/s ( 9.8%), worst torque/available  0.7%   [J (both arms, 1:1 gears) = 2853.28 kg·mm²]
    H-WRIST  MG90S  peak torque   42.67 N·mm (24.2% of stall), peak speed  225.0 °/s (37.5%), worst torque/available 30.7%   [J = 4.355 kg·cm², CG 100.0 mm off the roll axis]
    H-TURN   MG996R peak torque    2.90 N·mm ( 0.3% of stall), peak speed   67.5 °/s (19.1%), worst torque/available  0.4%   [J = 5.66 kg·cm²]
-   H-LOWER  MG90S  peak torque   21.77 N·mm (12.3% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 13.2%   [moving mass 129 g, CG 31 mm in front of the rods]
+   H-LOWER  MG90S  peak torque   21.16 N·mm (12.0% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 12.8%   [moving mass 125 g, CG 32 mm in front of the rods]
    H-OPEN   SG90   peak torque    0.55 N·mm ( 0.4% of stall), peak speed  175.8 °/s (29.3%), worst torque/available  0.4%   [J (both arms, 1:1 gears) = 469.52 kg·mm²]
    gripper hold: 2 × 0.8 N × 44 mm = 70.4 N·mm = 45% of SG90 stall
 
@@ -91,17 +91,17 @@ DETAILS
    inverted on its top rim (r 27.6 mm), CG 61.1 mm up: tips at 24.3°; wrist error budget ±3°
 
 5. ROBOT STABILITY: zero-moment point (dynamic tip-over), sliding, turning reaction
-   dynamic ZMP stays ≥ 37.8 mm inside the support footprint in every pose of the run and homing
+   dynamic ZMP stays ≥ 38.0 mm inside the support footprint in every pose of the run and homing
 
 6. STRENGTH AND STIFFNESS (worst-case loads; PETG allowable 20 MPa = UTS 50 / 2.5)
    finger arm: 1.78 N at 53 mm → σ 3.8 MPa, deflection 0.71 mm
-   carriage with 4 LM6UU (ball, mu 0.005 EST, guide 43 mm): e = 40 mm, jam ratio 0.01 (1 = jams), friction 0.01 N
-   carriage WITHOUT LM6UU: printed bore only (PETG on steel, mu 0.3 EST, guide 24 mm): e = 40 mm, jam ratio 1.00 (1 = jams), friction 1.41 N
+   carriage with 4 LM6UU (ball, mu 0.005 EST, guide 43 mm): e = 41 mm, jam ratio 0.01 (1 = jams), friction 0.01 N
+   carriage WITHOUT LM6UU: printed bore only (PETG on steel, mu 0.3 EST, guide 24 mm): e = 41 mm, jam ratio 1.02 (1 = jams), friction 1.41 N
 
 7. POWER AND HEAT
-   peak mechanical power: MG996R (turn) 0.003 W, MG90S (lift) 0.045 W, MG90S (wrist) 0.115 W, SG90 (grip) 0.011 W
+   peak mechanical power: MG996R (turn) 0.003 W, MG90S (lift) 0.044 W, MG90S (wrist) 0.115 W, SG90 (grip) 0.011 W
    peak electrical (servo rail, ngspice model): 0.65 A × 5.8 V = 3.77 W; buck loss (10 %) 0.42 W
-   mechanical energy per run (all servos, run + homing): 0.190 J
+   mechanical energy per run (all servos, run + homing): 0.188 J
 
 8. PROTOTYPE v1: the purchased parts and the household swaps (docs/11_bom_prototype_v1.md)
    pad rubber 1.0 mm instead of 1.6: closed angle shifts -0.8° (re-set GRIP_CLOSED with servo_setup), release gap 12.3 mm

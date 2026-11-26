@@ -18,7 +18,7 @@ spine,turret,PETG,27.9,21.3,0.5,-20.4,114.7
 top_cap,turret,PETG,13.6,10.4,-0.0,-2.1,165.0
 lift_servo_MG90S,turret,buy,8.0,13.4,15.5,-6.0,144.7
 lift_crank,crank,buy,0.3,1.0,-4.2,-2.9,147.8
-carriage_arm,lift,PETG,57.7,44.0,0.0,15.4,95.9
+carriage_arm,lift,PETG,52.9,40.3,0.1,15.7,95.5
 LM6UU_L1,lift,buy,1.6,8.0,-17.0,12.0,78.5
 LM6UU_L2,lift,buy,1.6,8.0,-17.0,12.0,121.5
 LM6UU_R1,lift,buy,1.6,8.0,17.0,12.0,78.5
