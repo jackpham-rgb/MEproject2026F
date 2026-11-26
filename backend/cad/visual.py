@@ -93,6 +93,20 @@ def mg996r_vis():
             + list(zip(wires, (C["brown"], C["red"], C["orange_w"]))))
 
 
+def arm_horn(arms, t, holes, hole_r=0.6):
+    """Bagged micro horn: arms [(angle_deg, length, root_width, tip_width)] in the XY plane 0..t, hub boss under it,
+    holes [(angle_deg, radius)]."""
+    d = cyl(0, 0, 3.8, 0, t).union(cyl(0, 0, 3.4, -2.2, 0))
+    for a, L, w0, w1 in arms:
+        bar = cq.Workplane("XY").polyline([(0, -w0 / 2), (L - w1 / 2, -w1 / 2), (L - w1 / 2, w1 / 2), (0, w0 / 2)]).close().extrude(t)
+        bar = bar.union(cyl(L - w1 / 2, 0, w1 / 2, 0, t))
+        d = d.union(bar.rotate((0, 0, 0), (0, 0, 1), a))
+    d = d.cut(cyl(0, 0, 1.3, -3, t + 1))
+    for a, rr in holes:
+        d = d.cut(cyl(rr * math.cos(math.radians(a)), rr * math.sin(math.radians(a)), hole_r, -1, t + 1))
+    return d
+
+
 def round_horn(r, t, hole_r, rings):
     """Disc horn: disc 0..t along +Z, hub under it, rings of holes [(radius, count, start_deg)]."""
     d = cyl(0, 0, r, 0, t).union(cyl(0, 0, min(4.5, r * 0.4), -1.5, 0))
@@ -188,10 +202,13 @@ def build():
 
     # ---- horns (holes line up with the screws below)
     add("turntable_horn", "bought", moved(round_horn(12.5, 3.0, 0.9, [(8.0, 4, 45), (10.5, 8, 22.5)]), trsf_axes((0, 0, tz0 - 3), (1, 0, 0), (0, 0, 1))), C["white"])
-    add("wrist_horn", "bought", moved(round_horn(10.0, 2.5, 0.7, [(7.0, 4, 45), (4.5, 4, 0)]), trsf_axes((0, wy - 2.5, gz), (1, 0, 0), (0, 1, 0))), C["white"])
+    cross = arm_horn([(0, 11, 5.5, 4.0), (180, 11, 5.5, 4.0), (90, 8.5, 5.0, 4.0), (270, 8.5, 5.0, 4.0)], 2.5,
+                     [(0, 5.8), (0, 7.7), (0, 9.6), (180, 5.8), (180, 7.7), (180, 9.6), (90, 6.0), (270, 6.0)])
+    add("wrist_horn", "bought", moved(cross, trsf_axes((0, wy - 2.5, gz), (1, 0, 0), (0, 1, 0))), C["white"])   # bagged cross horn, long arms cut to 11
     add("lift_crank", "bought", parts["lift_crank"]["shape"], C["white"])
     ghz = p["finger_z"][1] + p["ghorn_gap"]                    # SG90 round horn flat on the left gear, hub up into the servo
-    add("gripper_horn", "bought", moved(round_horn(p["ghorn_r"], p["ghorn_disc"], 0.7, [(p["ghorn_screw_r"], 2, 0), (8.0, 4, 45)]),
+    dbl = arm_horn([(90, 7, 5.5, 5.0), (270, 7, 5.5, 5.0)], p["ghorn_disc"], [(90, p["ghorn_screw_r"]), (270, p["ghorn_screw_r"])])
+    add("gripper_horn", "bought", moved(dbl,
                                         trsf_axes((-pvx, pvy, ghz + p["ghorn_disc"]), (1, 0, 0), (0, 0, -1))), C["white"])
 
     # ---- electronics
@@ -291,15 +308,15 @@ def build():
     for hz in (gz - (MICRO_HOLES_X - 13.75), gz - (MICRO_HOLES_X + 13.75)):
         S.append(("wrist_servo", "sb", (0, wy - 28.5 + 15.9 + 2.5, hz), (0, -1, 0), 8))
     S.append(("wrist_horn", "M3", (0, wy - 0.6, gz), (0, -1, 0), 5))
-    for a in (45, 135, 225, 315):
-        S.append(("gripper_frame", "sb", (7 * math.cos(math.radians(a)), wy + 3, gz + 7 * math.sin(math.radians(a))), (0, -1, 0), 6))
+    for hx, hz in ((7.7, 0), (-7.7, 0), (0, 6.0), (0, -6.0)):            # on the cross horn's arms
+        S.append(("gripper_frame", "sb", (hx, wy + 3, gz + hz), (0, -1, 0), 6))
     S.append(("axle_R", "#6", (pvx, pvy, pt[1]), (0, 0, -1), 12.7))
     tab_z = p["grip_spline_tip"] + 10.1
     gs_cx = -pvx - MICRO_HOLES_X
     for hx in (gs_cx - 13.75, gs_cx + 13.75):
         S.append(("gripper_servo_SG90", "sb", (hx, pvy, tab_z + 2.5), (0, 0, -1), 8))
     for sx in (-1, 1):                                          # horn -> left gear
-        S.append(("gripper_horn", "sb", (-pvx + sx * p["ghorn_screw_r"], pvy, p["finger_z"][1] + p["ghorn_gap"] + p["ghorn_disc"]), (0, 0, -1), 6))
+        S.append(("gripper_horn", "sb", (-pvx, pvy + sx * p["ghorn_screw_r"], p["finger_z"][1] + p["ghorn_gap"] + p["ghorn_disc"]), (0, 0, -1), 6))
     for x in (-50, 50):
         S.append(("electronics_tray", "#6", (x, -half + p["base_wall"] + 4, 0.0), (0, 0, 1), 12.7))
     HOLE = {  # what the screw passes through / bites, with the drill bit to use by hand if it is tight

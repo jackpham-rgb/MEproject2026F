@@ -77,9 +77,9 @@ def main():
              "off (−27 % plastic). Old right finger and the new left finger both fit.", "", "easy"),
         step(6, "Horns from the servo bags", ["lift_crank", "wrist_horn", "gripper_horn"],
              ["gripper_frame", "finger_L", "finger_R", "wrist_servo", "carriage_arm", "spine", "lift_servo_MG90S", "lift_link"],
-             "<b>Lift:</b> single-arm horn, link on its last hole. <b>Wrist:</b> cross horn, drill 1/16″ through 4 of its holes "
-             "into the frame flange. <b>Gripper:</b> double-arm horn with the arms cut to 7 mm, drill 1/16″ through its 2 holes into "
-             "the left gear. The horn is its own drill guide, so the holes always line up.", "", "easy"),
+             "<b>Lift:</b> single-arm horn, link on its last hole. <b>Wrist:</b> cross horn, long arms cut to 11 mm, 4 screws through "
+             "its arm holes into 4 pilots in the frame flange. <b>Gripper:</b> double-arm horn, arms cut to 7 mm, hub up on the left gear, "
+             "2 screws; the SG90's spline goes down into its hub. Where a hole doesn't line up, drill 1/16″ through the horn.", "", "easy"),
         step(7, "Spine: room for the screw heads", ["spine"], ["turret_plate", "old_spine"],
              "The #6 pan heads (Ø6.6) hit the spine wall 2 mm from the holes: a half-round notch beside each hole.",
              "<b>Spine already printed:</b> file or Dremel a 1.5 mm half-round notch next to each of the 2 holes.", "easy"),

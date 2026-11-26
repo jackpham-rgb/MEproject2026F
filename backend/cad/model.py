@@ -527,13 +527,15 @@ def build_parts():
 
     # ---------------- wrist (rotates about the Y line x=0, z=grip_z) ----------------
     wy = p["wrist_tip_y"]
-    horn = cyl_dir((0, wy - 2.5, gz), (0, 1, 0), 10, 2.5)
-    add("wrist_horn", "wrist", horn, "buy", mass=1.0, note="micro-servo round horn")
+    # bagged CROSS horn (no round horn in the SG90/MG90S bag): long arms trimmed to 11 mm, short arms 8.5 mm, 2.5 thick
+    horn = box(-11, 11, wy - 2.5, wy, gz - 2.75, gz + 2.75).union(box(-2.5, 2.5, wy - 2.5, wy, gz - 8.5, gz + 8.5)).union(
+        cyl_dir((0, wy - 2.5, gz), (0, 1, 0), 3.8, 2.5))
+    add("wrist_horn", "wrist", horn, "buy", mass=1.0, note="micro-servo CROSS horn from the bag, long arms trimmed to 11 mm")
     px, py1 = p["plate_x"], p["plate_y1"]
     pb, pt = p["plate_bot"], p["plate_top"]
     gr = box(-14, 14, wy, wy + 3, gz - 13, pb[1])                                         # flange on the horn
-    for a in (45, 135, 225, 315):
-        gr = gr.cut(cyl_dir((7 * math.cos(math.radians(a)), wy - 1, gz + 7 * math.sin(math.radians(a))), (0, 1, 0), 0.85, 6))
+    for hx, hz in ((7.7, 0), (-7.7, 0), (0, 6.0), (0, -6.0)):                           # pilots on the cross horn's arms
+        gr = gr.cut(cyl_dir((hx, wy - 1, gz + hz), (0, 1, 0), TOL["servo_pilot"] / 2, 6))
     gr = gr.union(box(-px, px, wy, py1, pb[0], pb[1]))                                    # bottom plate (4 mm: axle thread)
     gr = gr.union(box(-px, px, wy, py1, pt[0], pt[1]))                                    # top plate
     # trim (2026-11-24): nothing touches the plate wings in front of the back strip. Top plate keeps its left side
@@ -587,15 +589,17 @@ def build_parts():
     fR = arm.union(pad).union(gear_R).cut(cyl(pvx, pvy, TOL["run_bore"] / 2, fz0 - 1, fz1 + 1))
     fL = arm.union(pad).mirror("YZ").union(gear_L)
     for sx in (-1, 1):                                                                     # 2 pilots: horn screws into the gear
-        fL = fL.cut(cyl(-pvx + sx * p["ghorn_screw_r"], pvy, TOL["servo_pilot"] / 2, fz0 + 1.5, fz1 + 1))
+        fL = fL.cut(cyl(-pvx, pvy + sx * p["ghorn_screw_r"], TOL["servo_pilot"] / 2, fz0 + 1.5, fz1 + 1))
     add("finger_R", "finger_R", fR, "PETG", note="Involute gear (16T, m1, 20 deg, +0.1 profile shift, 0.2 mm backlash) + arm + can pad. Print "
         "flat. Runs on a #6-32 axle (3.9 mm bore). Line the pad with the 1/16 in (1.6 mm) silicone sheet: 32 x 40 mm.")
     add("finger_L", "finger_L", fL, "PETG", note="Mirror of finger_R (gear turned half a tooth so the two mesh). The SG90 round horn is "
         "screwed flat on its gear (2 servo-bag screws into 1.7 mm pilots, 5 mm from the centre); the spline goes into the horn.")
     hz0 = fz1 + p["ghorn_gap"]
-    ghorn = cyl(-pvx, pvy, p["ghorn_r"], hz0, hz0 + p["ghorn_disc"]).union(
+    # bagged DOUBLE-ARM horn, arms cut to 7 mm from the centre (14 long, 5.5 wide); turns inside the 16 mm opening
+    # arms front-to-back (along y): along x its end would clip the servo post beside the opening on the way in
+    ghorn = box(-pvx - 2.75, -pvx + 2.75, pvy - 7, pvy + 7, hz0, hz0 + p["ghorn_disc"]).union(
         cyl(-pvx, pvy, p["ghorn_hub_r"], hz0 + p["ghorn_disc"], hz0 + p["ghorn_disc"] + p["ghorn_hub_h"]))
-    add("gripper_horn", "finger_L", ghorn, "buy", mass=1.0, note="SG90 round horn (in the servo bag) trimmed to Ø12, screwed to the left gear")
+    add("gripper_horn", "finger_L", ghorn, "buy", mass=1.0, note="SG90 double-arm horn (in the bag), arms cut to 7 mm, screwed to the left gear")
 
     # ---------------- tolerance test coupon (print first; not part of the assembly) ----------------
     cp = box(0, 70, 0, 22, 0, 8)

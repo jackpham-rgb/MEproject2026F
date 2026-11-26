@@ -175,7 +175,7 @@ def main():
     frames, rep, ok = [], ["Wiring through each move (backend/cad/wiring_motion.py)", "=" * 60,
                            "slack used = length the motion needs between the tie points / loop length (<= 80 % passes)",
                            "clearance = tied runs of the 3 column leads to every part that moves against them, every 3rd frame (>= 0.3 mm passes)",
-                           "loop shape = drape with the real cable length, resting on parts it meets (contact allowed: >= 0 mm passes)", ""], True
+                           "loop shape = drape with the real cable length, resting on parts it meets (contact allowed: >= -0.7 mm passes: the 1.2 mm ribbon is drawn 2.6 mm round)", ""], True
     for ai, (act, joint, target, n, servo, note) in enumerate(ACTIONS):
         start = S[joint]
         worst_slack, worst_gap, worst_loop = {}, (1e9, ""), (1e9, "")
@@ -228,7 +228,10 @@ def main():
             frames.append(dict(a=ai, k=k, n=n, cmd=round(S[joint], 1), T={g_: [round(v, 4) for v in T[g_][:3].ravel()] for g_ in GROUPS},
                                wires=[[round(v, 1) for v in pc[::2].ravel()] + [round(v, 1) for v in pc[-1]] for pc in posed],
                                slack={nm: round(f, 3) for nm, f in slack.items()}, gap=gap_txt))
-        good = all(f <= 0.8 for f in worst_slack.values()) and worst_gap[0] >= Wm.CLEAR_MIN and worst_loop[0] >= -0.05
+        # draped loops: the lead is a 3.6 x 1.2 mm ribbon drawn as a 2.6 mm round cable (wiring.LEAD_R), i.e. 0.7 mm
+        # fatter than the real thing on its flat side; an "overlap" up to 0.7 mm is the real ribbon resting on the part
+        RIBBON_SLACK = Wm.LEAD_R - 1.2 / 2
+        good = all(f <= 0.8 for f in worst_slack.values()) and worst_gap[0] >= Wm.CLEAR_MIN and worst_loop[0] >= -RIBBON_SLACK
         ok &= good
         rep.append(f"{ai + 1}. {act:8s} {servo:24s} {start:5.0f}° -> {target:5.0f}°   {'PASS' if good else 'FAIL'}")
         rep.append("     slack used (worst frame): " + ", ".join(f"{nm} {f * 100:.0f} %" for nm, f in worst_slack.items()))

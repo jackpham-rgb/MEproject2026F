@@ -15,12 +15,12 @@ SCREWDRIVER ACCESS: 4 mm shaft (3 mm precision driver for servo-bag screws), 80 
   step  8 Top cap                             #6 into top_cap                  PASS
   step  9 Gripper frame onto the wrist horn   sb into gripper_frame            PASS
   step  9 Gripper frame onto the wrist horn   sb into gripper_frame            PASS
-  step  9 Gripper frame onto the wrist horn   sb into gripper_frame            PASS
+  step  9 Gripper frame onto the wrist horn   sb into gripper_frame            PASS (screwdriver leaned 4°)
   step  9 Gripper frame onto the wrist horn   sb into gripper_frame            PASS
   step 12 Horn on the left gear, then the gr  sb into gripper_servo_SG90       PASS
   step 12 Horn on the left gear, then the gr  sb into gripper_servo_SG90       PASS
   step 12 Horn on the left gear, then the gr  sb into gripper_horn             PASS
-  step 12 Horn on the left gear, then the gr  sb into gripper_horn             PASS (screwdriver leaned 4°)
+  step 12 Horn on the left gear, then the gr  sb into gripper_horn             PASS
   step 13 Wrist servo into the arm            sb into wrist_servo              PASS
   step 13 Wrist servo into the arm            sb into wrist_servo              PASS
   step 17 Turntable servo                     #8 into turntable_servo_MG996R   PASS

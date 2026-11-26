@@ -6,7 +6,7 @@ The pictures show each plate as it sits on the bed: put the parts on the bed the
 
 **No settings file and no changed 3D files:** import the unchanged STLs from `cad/print/stl/` (already turned to their best side: don't rotate them, except flat on the bed) and type the numbers below into your slicer. The parts are grouped so that **each plate uses one setting for the whole plate**: nothing to set per part.
 
-**Result (every plate sliced): 36 h 24 → 23 h 22 of printing (−36 %), 377 g → 330 g of PETG (−13 %).** Less heating time = less energy.
+**Result (every plate sliced): 36 h 25 → 23 h 23 of printing (−36 %), 377 g → 330 g of PETG (−13 %).** Less heating time = less energy.
 
 ## Same on every plate
 
@@ -36,7 +36,7 @@ The pictures show each plate as it sits on the bed: put the parts on the bed the
 | **C  Electronics tray** (DRAFT) | CA-102 Electronics tray | 0.28 mm | 2 | 3 / 3 | 10% grid | 45 / 60 / 90 | off | skirt | 3 h 01 | 50 g |
 | **D  Turret plate + carriage arm** (STANDARD) | CA-201 Turret plate, CA-301 Carriage + arm | 0.2 mm | 3 | 4 / 4 | 20% gyroid | 35 / 50 / 70 | **on**, Normal, lines 15 % | skirt | 5 h 36 | 68 g |
 | **E  Claw: 2 fingers + gripper frame** (DETAIL) | CA-402 Finger, right, CA-403 Finger, left, CA-401 Gripper frame | 0.2 mm | 4 | 5 / 5 | 100% lines | 25 / 35 / 50 | **on**, Tree / organic | skirt | 5 h 42 | 53 g |
-| **Total** | | | | | | | | | **23 h 22** | **330 g** |
+| **Total** | | | | | | | | | **23 h 23** | **330 g** |
 
 **Plate A**
 

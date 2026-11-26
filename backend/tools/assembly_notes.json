@@ -22,7 +22,7 @@
   "lift_servo_MG90S": "MG90S servo (lift)",
   "lift_crank": "Single-arm horn, from the bag, last hole",
   "wrist_servo": "MG90S servo (wrist)",
-  "wrist_horn": "Cross horn (micro, from the bag)",
+  "wrist_horn": "Cross horn (from the bag), long arms cut to 11 mm",
   "gripper_servo_SG90": "SG90 servo (gripper)",
   "axle_R": "#6-32 screw as the axle",
   "can_bumper": "Rubber pad 9 x 13.5 mm",
@@ -35,7 +35,7 @@
   "dc_jack": "DC jack / terminal tip",
   "ballast": "~100 g washers (ballast)",
   "test_can": "Coke can",
-  "gripper_horn": "SG90 double-arm horn, arms cut to 7 mm"
+  "gripper_horn": "Double-arm horn (from the bag), arms cut to 7 mm"
  },
  "screw_names": {
   "#6": "#6-32 x 1/2\" pan head",
@@ -75,7 +75,7 @@
   },
   "10": {
    "fit": "<b>Gear mesh: try it on.</b> Teeth engage with a little play and no binding over the full swing. <u>Never sand or file gear teeth.</u> Printers rarely print teeth exactly, so the file is made to be edited: if they bind, print the <b>looser</b> pair (cad/print/stl/finger_variants/, gear_thin 0.18 or 0.25); if they rattle, the <b>tighter</b> pair (0.00). Or set gear_thin in backend/cad/model.py and run backend/cad/finger_variants.py.",
-   "how": "Slide both fingers in together between the plates, both opened by the same angle, so the teeth mesh symmetrically.",
+   "how": "<b>Before this step:</b> lay the cut double-arm horn (step 12) on the left gear, hub up, centred, arms pointing front-to-back (toward the can and away from it), and drill 1/16″ pilots through its 2 holes into the gear; take the horn off again. Slide both fingers in together between the plates, both opened by the same angle, so the teeth mesh symmetrically.",
    "level": "try"
   },
   "11": {
@@ -86,7 +86,7 @@
   "12": {
    "level": "try",
    "fit": "<b>Horn trimmed to Ø12 mm, flat on the gear.</b> Cut the SG90 round horn down to Ø12 mm (flush cutters, then sand), keeping its 2 holes 5 mm from the centre (or drill 1.5 mm through the horn using the gear's pilots as the guide). A full-size horn hits the servo post. The spline must slide into the hub without force.",
-   "how": "Take the <b>double-arm horn</b> from the SG90 bag and cut both arms off <b>7 mm from the centre</b> (flush cutters or the rotary tool's cut-off disc): it must turn inside the frame's 16 mm opening. Lay it flat on the left gear, hub up and centred; drill <b>1/16″ pilots through its 2 remaining holes</b> into the gear and drive 2 servo-bag screws. Then the SG90: its spline goes down into the horn's hub, 2 tab screws into the posts."
+   "how": "1) The <b>double-arm horn</b> from the SG90 bag, both arms cut to <b>7 mm</b> from the centre (14 mm long): it then turns inside the frame's 16 mm opening. 2) Turn the left finger so the horn's arms point <b>front-to-back</b> (toward the can) and drop it through the opening onto the gear, <b>hub up</b> (sideways it catches the servo post next to the opening), its 2 holes over the pilots you drilled before step 10, and drive the 2 small servo-bag screws (the shortest ones in the bag) through the horn into the gear. 3) SG90 at 20° (laptop panel). Hold the SG90 upside down over the frame so its spline points down into the horn's hub and the body lies over the 2 posts; press the spline fully in (turn the finger a little until the teeth engage). 4) 2 servo-bag screws through the SG90 tabs into the posts. Check: the fingers open and close together when you turn the servo by hand (unpowered)."
   },
   "13": {
    "how": "Body through the arm's bracket from the front, 2 servo-bag screws through the tabs.",
@@ -136,7 +136,7 @@
   },
   "9": {
    "level": "easy",
-   "how": "On the table: the wrist servo's <b>cross horn</b> (4 arms, from the bag) flat on the gripper frame's flange, hub centred on the flange. Drill <b>1/16″ pilots through 4 of the horn's holes</b> (one per arm, ~6 mm from the centre) into the flange, then 4 servo-bag screws. Using the horn as the drill guide means the holes always line up, whatever horn you have."
+   "how": "On the table. Take the wrist servo's <b>cross horn</b> from the bag and cut its two <b>long arms to 11 mm</b> from the centre (flush with the frame's 28 mm flange). Lay it on the flange with the hub facing AWAY from the frame (toward the servo), long arms horizontal, centre on the flange's centre. The flange has 4 pilots on the arms (2 on the long arms ~7.7 mm out, 2 on the short arms ~6 mm out): drive 4 servo-bag screws through the horn's holes into them. A hole that doesn't line up: drill 1/16″ through the horn hole into the flange."
   },
   "14": {
    "level": "easy",

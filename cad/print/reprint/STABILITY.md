@@ -33,8 +33,8 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | +Z (upside down, top face down) | 43 | 43 | 6.6 | 2187 | 0 of 0 |  |
 | +X face down | 39 | 62 | 9.9 | 449 | 0 of 0 |  |
 | -X face down | 96 | 62 | 6.3 | 392 | 0 of 0 |  |
-| +Y face down | 246 | 29 | 1.9 | 921 | 0 of 0 |  |
-| -Y face down | 1091 | 29 | 0.9 | 75 | 0 of 0 | **used** |
+| +Y face down | 246 | 29 | 1.9 | 907 | 0 of 0 |  |
+| -Y face down | 1077 | 29 | 0.9 | 75 | 0 of 0 | **used** |
 
 ## CA-301 Carriage + arm
 
@@ -88,8 +88,8 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | +Z (upside down, top face down) | 43 | 43 | 6.6 | 2187 | 0 of 0 |  |
 | +X face down | 39 | 62 | 9.9 | 449 | 0 of 0 |  |
 | -X face down | 96 | 62 | 6.3 | 392 | 0 of 0 |  |
-| +Y face down | 246 | 29 | 1.9 | 921 | 0 of 0 |  |
-| -Y face down | 1091 | 29 | 0.9 | 75 | 0 of 0 | **used** |
+| +Y face down | 246 | 29 | 1.9 | 907 | 0 of 0 |  |
+| -Y face down | 1077 | 29 | 0.9 | 75 | 0 of 0 | **used** |
 
 ## CA-302 Lift link
 
@@ -165,8 +165,8 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | +Z (upside down, top face down) | 43 | 43 | 6.6 | 2187 | 0 of 0 |  |
 | +X face down | 39 | 62 | 9.9 | 449 | 0 of 0 |  |
 | -X face down | 96 | 62 | 6.3 | 392 | 0 of 0 |  |
-| +Y face down | 246 | 29 | 1.9 | 921 | 0 of 0 |  |
-| -Y face down | 1091 | 29 | 0.9 | 75 | 0 of 0 | **used** |
+| +Y face down | 246 | 29 | 1.9 | 907 | 0 of 0 |  |
+| -Y face down | 1077 | 29 | 0.9 | 75 | 0 of 0 | **used** |
 
 ## CA-302 Lift link
 
@@ -209,8 +209,8 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | +Z (upside down, top face down) | 43 | 43 | 6.6 | 2187 | 0 of 0 |  |
 | +X face down | 39 | 62 | 9.9 | 449 | 0 of 0 |  |
 | -X face down | 96 | 62 | 6.3 | 392 | 0 of 0 |  |
-| +Y face down | 246 | 29 | 1.9 | 921 | 0 of 0 |  |
-| -Y face down | 1091 | 29 | 0.9 | 75 | 0 of 0 | **used** |
+| +Y face down | 246 | 29 | 1.9 | 907 | 0 of 0 |  |
+| -Y face down | 1077 | 29 | 0.9 | 75 | 0 of 0 | **used** |
 
 ## CA-302 Lift link
 
@@ -253,8 +253,8 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | +Z (upside down, top face down) | 43 | 43 | 6.6 | 2187 | 0 of 0 |  |
 | +X face down | 39 | 62 | 9.9 | 449 | 0 of 0 |  |
 | -X face down | 96 | 62 | 6.3 | 392 | 0 of 0 |  |
-| +Y face down | 246 | 29 | 1.9 | 921 | 0 of 0 |  |
-| -Y face down | 1091 | 29 | 0.9 | 75 | 0 of 0 | **used** |
+| +Y face down | 246 | 29 | 1.9 | 907 | 0 of 0 |  |
+| -Y face down | 1077 | 29 | 0.9 | 75 | 0 of 0 | **used** |
 
 ## CA-302 Lift link
 
@@ -297,8 +297,8 @@ over by the nozzle). Overhang = flat area printed in the air (needs support). Th
 | +Z (upside down, top face down) | 43 | 43 | 6.6 | 2187 | 0 of 0 |  |
 | +X face down | 39 | 62 | 9.9 | 449 | 0 of 0 |  |
 | -X face down | 96 | 62 | 6.3 | 392 | 0 of 0 |  |
-| +Y face down | 246 | 29 | 1.9 | 921 | 0 of 0 |  |
-| -Y face down | 1091 | 29 | 0.9 | 75 | 0 of 0 | **used** |
+| +Y face down | 246 | 29 | 1.9 | 907 | 0 of 0 |  |
+| -Y face down | 1077 | 29 | 0.9 | 75 | 0 of 0 | **used** |
 
 ## Brims added
 

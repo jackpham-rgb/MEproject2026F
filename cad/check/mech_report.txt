@@ -39,7 +39,7 @@ ENGINEERING CHECKS: 55 checks, 55 PASS, 0 FAIL
    Function   carriage cannot jam on the rods (LM6UU, drawer rule)       0.010                          ≤ 0.5                    PASS
    Strength   turret plate at the hub (2× dynamic)                       0.40 MPa                       ≤ 20 MPa                 PASS
    Strength   6807 bearing: load vs static rating (EST 3.5 kN)           5.2 N + 145 N·mm               ≤ 10 % of rating         PASS
-   Strength   lift link: buckling load / max link force                  733×                           ≥ 10×                    PASS
+   Strength   lift link: buckling load / max link force                  734×                           ≥ 10×                    PASS
    Strength   SG90 horn screws: pilot-wall bearing at stall              2.05 MPa                       ≤ 20 MPa                 PASS
    Strength   #6/#8 screws in PETG: pull-out / worst load                615 N vs 19 N                  ≥ 10×                    PASS
    Power      peak servo current vs XL4015 rating 5 A                    0.65 A                         ≤ 2.5 A (50 %)           PASS
@@ -62,14 +62,14 @@ DETAILS
 
 1. SERVO DUTY: inverse dynamics along the firmware's eased moves (ratings at 4.8 V: conservative)
    GRIP     SG90   peak torque   70.40 N·mm (44.9% of stall), peak speed  175.8 °/s (29.3%), worst torque/available 44.9%   [J (both arms, 1:1 gears) = 469.52 kg·mm²]
-   LIFT     MG90S  peak torque   23.74 N·mm (13.4% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 14.6%   [moving mass 140 g, CG 41 mm in front of the rods]
+   LIFT     MG90S  peak torque   23.73 N·mm (13.4% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 14.6%   [moving mass 140 g, CG 41 mm in front of the rods]
    FLIP     MG90S  peak torque    6.08 N·mm ( 3.4% of stall), peak speed  225.0 °/s (37.5%), worst torque/available  5.5%   [J = 0.675 kg·cm², CG 11.4 mm off the roll axis]
    TURN     MG996R peak torque    3.26 N·mm ( 0.4% of stall), peak speed   67.5 °/s (19.1%), worst torque/available  0.4%   [J = 8.16 kg·cm²]
    LOWER    MG90S  peak torque   23.58 N·mm (13.4% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 14.5%   [moving mass 140 g, CG -13 mm in front of the rods]
    RELEASE  SG90   peak torque    2.00 N·mm ( 1.3% of stall), peak speed   78.1 °/s (13.0%), worst torque/available  1.4%   [J (both arms, 1:1 gears) = 2853.28 kg·mm²]
-   H-LIFT   MG90S  peak torque   20.94 N·mm (11.9% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 12.9%   [moving mass 125 g, CG -13 mm in front of the rods]
+   H-LIFT   MG90S  peak torque   20.93 N·mm (11.9% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 12.9%   [moving mass 125 g, CG -13 mm in front of the rods]
    H-CLOSE  SG90   peak torque    1.12 N·mm ( 0.7% of stall), peak speed   58.6 °/s ( 9.8%), worst torque/available  0.7%   [J (both arms, 1:1 gears) = 2853.28 kg·mm²]
-   H-WRIST  MG90S  peak torque   42.67 N·mm (24.2% of stall), peak speed  225.0 °/s (37.5%), worst torque/available 30.7%   [J = 4.355 kg·cm², CG 100.0 mm off the roll axis]
+   H-WRIST  MG90S  peak torque   42.65 N·mm (24.2% of stall), peak speed  225.0 °/s (37.5%), worst torque/available 30.7%   [J = 4.353 kg·cm², CG 100.0 mm off the roll axis]
    H-TURN   MG996R peak torque    2.90 N·mm ( 0.3% of stall), peak speed   67.5 °/s (19.1%), worst torque/available  0.4%   [J = 5.66 kg·cm²]
    H-LOWER  MG90S  peak torque   21.16 N·mm (12.0% of stall), peak speed  127.5 °/s (21.2%), worst torque/available 12.8%   [moving mass 125 g, CG 32 mm in front of the rods]
    H-OPEN   SG90   peak torque    0.55 N·mm ( 0.4% of stall), peak speed  175.8 °/s (29.3%), worst torque/available  0.4%   [J (both arms, 1:1 gears) = 469.52 kg·mm²]
