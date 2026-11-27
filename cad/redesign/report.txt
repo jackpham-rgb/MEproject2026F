@@ -1,0 +1,8 @@
+CAN LANDING: centre (127.0, 0.0), upside down 180.0 deg, bottom z -0.0 -> PASS
+COLLISIONS through the firmware sequence (every 4th of 289 poses): PASS (none)
+SHOULDER (MG996R): lifted mass 74 g, CG 85 mm out -> 1.26 kg*cm with 2x dynamic vs 9.4 stall: 13 % -> PASS
+TURNTABLE (MG90S): J 6.8 kg*cm^2, accel torque 0.019 kg*cm vs 1.8 stall: 1.1 % -> PASS (the 6807 carries the weight)
+TIP-OVER (all parts + can + 2 x 60 g ballast in the cups): CG -0 mm toward the front edge at 38, 18 mm toward the side edge at 60 with the arm swung sideways -> PASS
+LIFT: arm +7.1 deg -> can +15.7 mm (>= 15.2), can tilt 7.081821249348071 deg while lifted, level again when lowered at the same angle -> PASS
+PRINT TIME, same profile for both: Concept A body base 11h 31m 48s, turret_plate 3h 34m 44s, spine 1h 46m 47s, top_cap 43m 59s, carriage_arm 4h 15m 53s, lift_link 4m 32s = 21 h 53
+PRINT TIME, Concept A2 body base 4h 37m 3s, turret 3h 27m 56s, arm 59m 13s = 9 h 03 (59 % less; claw parts are the same in both)

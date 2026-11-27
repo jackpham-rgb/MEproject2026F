@@ -121,16 +121,17 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 const $ = id => document.getElementById(id);
 let D;
 const DATA = new URLSearchParams(location.search).get("data");
-const PLANB = DATA === "planb", FIXES = DATA === "fixes";
-try { D = await (await fetch(PLANB ? "data/planb.json" : FIXES ? "data/fixes.json" : "data/assembly.json")).json(); }
+const PLANB = DATA === "planb", FIXES = DATA === "fixes", REDES = DATA === "redesign";
+try { D = await (await fetch(PLANB ? "data/planb.json" : FIXES ? "data/fixes.json" : REDES ? "data/redesign.json" : "data/assembly.json")).json(); }
 catch (e) { $("loading").textContent = "Couldn't load data/assembly.json. Open this page from the project website (or a local web server), not as a file."; return; }
 $("loading").remove();
 if (D.title) { document.title = D.title; document.querySelector("#steps h1").textContent = D.title; }
 const other = document.querySelector("#steps .sub");
 document.querySelector("#steps h1").insertAdjacentHTML("afterend", `<div class="tabs">
-  <a class="tab ${!PLANB && !FIXES ? "on" : ""}" href="assembly.html">Assembly</a>
+  <a class="tab ${!PLANB && !FIXES && !REDES ? "on" : ""}" href="assembly.html">Assembly</a>
   <a class="tab ${FIXES ? "on" : ""}" href="assembly.html?data=fixes">Proposed fixes</a>
-  <a class="tab ${PLANB ? "on" : ""}" href="assembly.html?data=planb">Plan B</a></div>`);
+  <a class="tab ${PLANB ? "on" : ""}" href="assembly.html?data=planb">Plan B</a>
+  <a class="tab ${REDES ? "on" : ""}" href="assembly.html?data=redesign">Redesign</a></div>`);
 if (FIXES) $("legend").insertAdjacentHTML("beforeend", '<span><i class="sw" style="background:#e0352b;opacity:.45"></i> OLD part (what you printed before)</span>');
 
 // ---------------- scene
@@ -184,8 +185,8 @@ const printedSet = new Set(D.printed);
 
 // ---------------- step list
 const LV = D.levels;
-const steps = [{ n: 0, title: D.fixes ? "What changed, and why" : "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can" && !n.startsWith("old_")).concat(["test_can"]), screws: [], glue: [] },
-  ...(D.planb || D.fixes ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
+const steps = [{ n: 0, title: D.fixes ? "What changed, and why" : D.redesign ? "The idea, and what it saves" : "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can" && !n.startsWith("old_")).concat(["test_can"]), screws: [], glue: [] },
+  ...(D.planb || D.fixes || D.redesign ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
   ...(D.motion ? [{ n: "▶", title: "Watch it run: the whole movement", run: true, level: null, new: [],
     show: Object.keys(owners).filter(n => !n.startsWith("old_")), screws: [], glue: [] }] : [])];
 const list = $("list");
@@ -260,7 +261,9 @@ function mats4(q) {
   const P = MO.params, L = P.lift_servo_tip, T = { fixed: new THREE.Matrix4() };
   T.turret = rotAbout([0, 0, 0], [0, 0, 1], q.psi);
   T.crank = T.turret.clone().multiply(rotAbout([0, L[1], L[2]], [1, 0, 0], q.theta - P.lift_theta0));
-  T.lift = T.turret.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0, q.h));
+  T.lift = MO.kind === "shoulder"     // redesign: the arm tilts about the shoulder axis (along X) so the can rises q.h
+    ? T.turret.clone().multiply(rotAbout([0, P.shoulder[0], P.shoulder[1]], [1, 0, 0], Math.asin(Math.max(0, Math.min(1, q.h / P.can_y))) / D2R))
+    : T.turret.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0, q.h));
   T.wrist = T.lift.clone().multiply(rotAbout([0, 0, P.grip_z], [0, 1, 0], q.phi));
   T.finger_R = T.wrist.clone().multiply(rotAbout([P.pivot_x, P.pivot_y, 0], [0, 0, 1], -q.alpha));
   T.finger_L = T.wrist.clone().multiply(rotAbout([-P.pivot_x, P.pivot_y, 0], [0, 0, 1], q.alpha));
@@ -280,8 +283,9 @@ const RT = (() => { if (!MO) return null;
     canM.push(Tc.clone());
   });
   return { SEQ, times, canM, end: t + 1.2 }; })();
-const PHASE = { HOME: "Home: arm down, claw open", GRIP: "Grip: the fingers close on the can", LIFT: "Lift: the carriage slides up the rods",
-  FLIP: "Flip: the wrist turns the can upside down", TURN: "Turn: the turret swings to the drop spot", LOWER: "Lower: the carriage slides down",
+const SHO = MO && MO.kind === "shoulder";
+const PHASE = { HOME: "Home: arm down, claw open", GRIP: "Grip: the fingers close on the can", LIFT: SHO ? "Lift: the shoulder tilts the arm up" : "Lift: the carriage slides up the rods",
+  FLIP: "Flip: the wrist turns the can upside down", TURN: "Turn: the turret swings to the drop spot", LOWER: SHO ? "Lower: the arm tilts back down, can level" : "Lower: the carriage slides down",
   RELEASE: "Release: the fingers open, the can stands inverted", "H-LIFT": "Return: lift", "H-CLOSE": "Return: claw closes",
   "H-WRIST": "Return: wrist back", "H-TURN": "Return: turret back", "H-LOWER": "Return: lower", "H-OPEN": "Return: claw open, ready" };
 function runPose(now) {
@@ -294,7 +298,7 @@ function runPose(now) {
     if (g === "can") o.group.visible = !q.label.startsWith("H-");
   }
   const ph = $("runPhase"); if (ph) ph.textContent = PHASE[q.label] || q.label;
-  const jt = $("runJoints"); if (jt) jt.textContent = `turret ${q.turn.toFixed(0)}° · lift servo ${q.lift.toFixed(0)}° (carriage +${q.h.toFixed(0)} mm) · wrist ${q.wrist.toFixed(0)}° · claw ${q.grip.toFixed(0)}°`;
+  const jt = $("runJoints"); if (jt) jt.textContent = `turret ${q.turn.toFixed(0)}° · ${SHO ? `shoulder +${(Math.asin(q.h / MO.params.can_y) / D2R).toFixed(1)}° (can +${q.h.toFixed(0)} mm)` : `lift servo ${q.lift.toFixed(0)}° (carriage +${q.h.toFixed(0)} mm)`} · wrist ${q.wrist.toFixed(0)}° · claw ${q.grip.toFixed(0)}°`;
 }
 function tick(now) {
   if (RUN.t0 !== null && RT) runPose(now);
@@ -388,6 +392,21 @@ function renderInfo(s) {
         <div class="box fit"><h3>Print</h3>All new parts are on <a href="https://github.com/jackpham-rgb/MEproject2026F/raw/claude/awesome-brahmagupta-i4dvbh/cad/print/reprint/reprint_d.3mf">reprint_d</a> (base + carriage + gripper frame + lift link). Already-printed parts: the steps say what to sand or file.</div>`;
       return;
     }
+    if (D.redesign) {
+      const T = D.times, R = D.report.map(r => `<li>${r.replace(/PASS/g, '<b style="color:#1f7a45">PASS</b>')}</li>`).join("");
+      I.innerHTML = `<div class="head"><span class="big">★</span><h2>Redesign from scratch: Concept A2</h2></div>
+        <p>The same job, the same 4 servos, the same 6807 bearing and the same claw, but with fewer parts and much less printing. <b>Concept only:</b> it passes the checks in CAD and has not been built.</p>
+        <div class="box fit"><h3>The big change: a shoulder instead of a slide</h3>The <b>MG996R</b> becomes a shoulder: it tilts the whole arm up ${MO.params.lift_deg.toFixed(1)}°, so the can 127 mm out rises ${MO.params.h_max.toFixed(1)} mm, the same lift as now. Gone: 2 rods, 4 LM6UU, carriage, spine, top cap, crank and link (the parts that jammed and snapped). The small <b>MG90S</b> turns the turret; the bearing carries the weight, so it only has to overcome inertia.</div>
+        <div class="box"><h3>Print time (same slicer profile for both)</h3><table style="width:100%;border-collapse:collapse;font-size:13px">
+          <tr><th style="text-align:left">Now (Concept A)</th><th style="text-align:left">Redesign (A2)</th></tr>
+          <tr><td style="vertical-align:top">${Object.entries(T.old).map(([k, v]) => `${k.replace(/_/g, " ")}: ${v}`).join("<br>")}</td>
+              <td style="vertical-align:top">${Object.entries(T.new).map(([k, v]) => `${k}: ${v}`).join("<br>")}</td></tr>
+          <tr><td><b>${T.old_total}</b> (6 parts)</td><td><b>${T.new_total}</b> (3 parts)</td></tr></table>
+          <small>Gripper frame and fingers are the same in both, so they're left out.</small></div>
+        <div class="box"><h3>Checks</h3><ul style="padding-left:18px;margin:4px 0">${R}</ul></div>
+        <div class="box"><h3>Trade-offs</h3><ul style="padding-left:18px;margin:4px 0"><li>The can tilts ${MO.params.lift_deg.toFixed(1)}° while it's up. It's level again when it's put down, because the arm returns to the same angle.</li><li>The MG996R sits on its side in a printed cradle. The cradle has to be stiff, so it gets gussets.</li><li>Same firmware and wiring: only the lift angles get re-taught (LIFT_DOWN / LIFT_UP).</li></ul></div>`;
+      return;
+    }
     if (D.planb) {
       I.innerHTML = `<div class="head"><span class="big">★</span><h2>Plan B: wooden base + carriage repair</h2></div>
         <p>Use this if the base or the carriage print fails. The wooden base keeps every height of the printed one, so the bearing, the turntable servo and the whole column sit exactly where they would on the printed base (checked in CAD: nothing overlaps).</p>
@@ -409,11 +428,15 @@ function renderInfo(s) {
     I.innerHTML = `<div class="head"><span class="big">▶</span><h2>Watch it run</h2></div>
       <div class="box fit"><h3>Now</h3><b id="runPhase" style="font-size:16px">–</b><br><small id="runJoints"></small></div>
       <button class="tb" id="runPause" style="width:100%;justify-content:center;padding:9px">❚❚ Pause</button>
-      <div class="box"><h3>What moves what</h3><ul>
+      <div class="box"><h3>What moves what</h3><ul>${SHO ? `
+        <li><b>Turntable servo (MG90S)</b> turns the turret on the 6807 bearing.</li>
+        <li><b>Shoulder servo (MG996R)</b> tilts the whole arm up ${MO.params.lift_deg.toFixed(1)}° to lift the can.</li>
+        <li><b>Wrist servo</b> on the arm's end turns the gripper 180° to flip the can.</li>
+        <li><b>Gripper servo (SG90)</b> turns the left gear; the gears turn both fingers together.</li></ul></div>` : `
         <li><b>Turntable servo (MG996R)</b> turns the whole column on the 6807 bearing.</li>
         <li><b>Lift servo (MG90S)</b> swings the crank; the lift link pushes the <b>carriage</b> up and down the 2 rods (on the LM6UU bearings).</li>
         <li><b>Wrist servo</b> on the arm's end turns the gripper 180° to flip the can.</li>
-        <li><b>Gripper servo (SG90)</b> turns the left gear; the gears turn both fingers together.</li></ul></div>
+        <li><b>Gripper servo (SG90)</b> turns the left gear; the gears turn both fingers together.</li></ul></div>`}
       <div class="box"><h3>One cycle</h3>grip → lift → flip → turn → lower → release, then it goes home. Drag to look from any side; the same sequence and angles as the firmware (<code>firmware/concept_a</code>).</div>`;
     $("runPause").onclick = () => { RUN.paused = !RUN.paused; if (!RUN.paused) RUN.t0 = performance.now() - RUN.tp * 1000;
       $("runPause").textContent = RUN.paused ? "▶ Play" : "❚❚ Pause"; };
