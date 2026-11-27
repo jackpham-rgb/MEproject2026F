@@ -72,8 +72,8 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 .mrow input,.mrow select{width:100%;min-width:0;font:14px system-ui,sans-serif;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--ground);color:var(--ink)}
 .mrow input.opt::placeholder{font-style:italic;font-size:12px}
 #info h4{margin:14px 0 2px;font-size:15px}
-.tabs{display:flex;gap:4px;padding:0 12px 8px}
-.tab{flex:1;text-align:center;font:700 12.5px system-ui,sans-serif;padding:6px 4px;border:1px solid var(--line);border-radius:7px;color:var(--ink);text-decoration:none}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;padding:0 12px 8px}
+.tab{flex:1 0 30%;text-align:center;font:700 12.5px system-ui,sans-serif;padding:6px 4px;border:1px solid var(--line);border-radius:7px;color:var(--ink);text-decoration:none}
 .tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
 #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted)}
 @media (max-width:900px){
@@ -121,17 +121,18 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 const $ = id => document.getElementById(id);
 let D;
 const DATA = new URLSearchParams(location.search).get("data");
-const PLANB = DATA === "planb", FIXES = DATA === "fixes", REDES = DATA === "redesign";
-try { D = await (await fetch(PLANB ? "data/planb.json" : FIXES ? "data/fixes.json" : REDES ? "data/redesign.json" : "data/assembly.json")).json(); }
+const PLANB = DATA === "planb", FIXES = DATA === "fixes", REDES = DATA === "redesign", HYB = DATA === "hybrid";
+try { D = await (await fetch(PLANB ? "data/planb.json" : FIXES ? "data/fixes.json" : REDES ? "data/redesign.json" : HYB ? "data/hybrid.json" : "data/assembly.json")).json(); }
 catch (e) { $("loading").textContent = "Couldn't load data/assembly.json. Open this page from the project website (or a local web server), not as a file."; return; }
 $("loading").remove();
 if (D.title) { document.title = D.title; document.querySelector("#steps h1").textContent = D.title; }
 const other = document.querySelector("#steps .sub");
 document.querySelector("#steps h1").insertAdjacentHTML("afterend", `<div class="tabs">
-  <a class="tab ${!PLANB && !FIXES && !REDES ? "on" : ""}" href="assembly.html">Assembly</a>
+  <a class="tab ${!PLANB && !FIXES && !REDES && !HYB ? "on" : ""}" href="assembly.html">Assembly</a>
   <a class="tab ${FIXES ? "on" : ""}" href="assembly.html?data=fixes">Proposed fixes</a>
   <a class="tab ${PLANB ? "on" : ""}" href="assembly.html?data=planb">Plan B</a>
-  <a class="tab ${REDES ? "on" : ""}" href="assembly.html?data=redesign">Redesign</a></div>`);
+  <a class="tab ${REDES ? "on" : ""}" href="assembly.html?data=redesign">Redesign</a>
+  <a class="tab ${HYB ? "on" : ""}" href="assembly.html?data=hybrid">Hybrid</a></div>`);
 if (FIXES) $("legend").insertAdjacentHTML("beforeend", '<span><i class="sw" style="background:#e0352b;opacity:.45"></i> OLD part (what you printed before)</span>');
 
 // ---------------- scene
@@ -185,8 +186,8 @@ const printedSet = new Set(D.printed);
 
 // ---------------- step list
 const LV = D.levels;
-const steps = [{ n: 0, title: D.fixes ? "What changed, and why" : D.redesign ? "The idea, and what it saves" : "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can" && !n.startsWith("old_")).concat(["test_can"]), screws: [], glue: [] },
-  ...(D.planb || D.fixes || D.redesign ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
+const steps = [{ n: 0, title: D.fixes ? "What changed, and why" : D.redesign || D.hybrid ? "The idea, and what it saves" : "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can" && !n.startsWith("old_")).concat(["test_can"]), screws: [], glue: [] },
+  ...(D.planb || D.fixes || D.redesign || D.hybrid ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
   ...(D.motion ? [{ n: "▶", title: "Watch it run: the whole movement", run: true, level: null, new: [],
     show: Object.keys(owners).filter(n => !n.startsWith("old_")), screws: [], glue: [] }] : [])];
 const list = $("list");
@@ -261,6 +262,12 @@ function mats4(q) {
   const P = MO.params, L = P.lift_servo_tip, T = { fixed: new THREE.Matrix4() };
   T.turret = rotAbout([0, 0, 0], [0, 0, 1], q.psi);
   T.crank = T.turret.clone().multiply(rotAbout([0, L[1], L[2]], [1, 0, 0], q.theta - P.lift_theta0));
+  if (MO.kind === "parallel") {   // hybrid: parallelogram, links swing -a0..+a0, the coupler translates (stays level)
+    const a = Math.asin(Math.max(-1, Math.min(1, q.h / P.link_len - Math.sin(P.a0 * D2R)))), da = a / D2R + P.a0;
+    T.linkA = T.turret.clone().multiply(rotAbout([0, P.pa[0], P.pa[1]], [1, 0, 0], da));
+    T.linkB = T.turret.clone().multiply(rotAbout([0, P.pb[0], P.pb[1]], [1, 0, 0], da));
+    T.lift = T.turret.clone().multiply(new THREE.Matrix4().makeTranslation(0, P.link_len * (Math.cos(a) - Math.cos(P.a0 * D2R)), q.h));
+  } else
   T.lift = MO.kind === "shoulder"     // redesign: the arm tilts about the shoulder axis (along X) so the can rises q.h
     ? T.turret.clone().multiply(rotAbout([0, P.shoulder[0], P.shoulder[1]], [1, 0, 0], Math.asin(Math.max(0, Math.min(1, q.h / P.can_y))) / D2R))
     : T.turret.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0, q.h));
@@ -283,9 +290,9 @@ const RT = (() => { if (!MO) return null;
     canM.push(Tc.clone());
   });
   return { SEQ, times, canM, end: t + 1.2 }; })();
-const SHO = MO && MO.kind === "shoulder";
-const PHASE = { HOME: "Home: arm down, claw open", GRIP: "Grip: the fingers close on the can", LIFT: SHO ? "Lift: the shoulder tilts the arm up" : "Lift: the carriage slides up the rods",
-  FLIP: "Flip: the wrist turns the can upside down", TURN: "Turn: the turret swings to the drop spot", LOWER: SHO ? "Lower: the arm tilts back down, can level" : "Lower: the carriage slides down",
+const SHO = MO && MO.kind === "shoulder", PAR = MO && MO.kind === "parallel";
+const PHASE = { HOME: "Home: arm down, claw open", GRIP: "Grip: the fingers close on the can", LIFT: PAR ? "Lift: the parallelogram raises the can, level" : SHO ? "Lift: the shoulder tilts the arm up" : "Lift: the carriage slides up the rods",
+  FLIP: "Flip: the wrist turns the can upside down", TURN: "Turn: the turret swings to the drop spot", LOWER: PAR ? "Lower: the parallelogram lowers the can" : SHO ? "Lower: the arm tilts back down, can level" : "Lower: the carriage slides down",
   RELEASE: "Release: the fingers open, the can stands inverted", "H-LIFT": "Return: lift", "H-CLOSE": "Return: claw closes",
   "H-WRIST": "Return: wrist back", "H-TURN": "Return: turret back", "H-LOWER": "Return: lower", "H-OPEN": "Return: claw open, ready" };
 function runPose(now) {
@@ -298,7 +305,7 @@ function runPose(now) {
     if (g === "can") o.group.visible = !q.label.startsWith("H-");
   }
   const ph = $("runPhase"); if (ph) ph.textContent = PHASE[q.label] || q.label;
-  const jt = $("runJoints"); if (jt) jt.textContent = `turret ${q.turn.toFixed(0)}° · ${SHO ? `shoulder +${(Math.asin(q.h / MO.params.can_y) / D2R).toFixed(1)}° (can +${q.h.toFixed(0)} mm)` : `lift servo ${q.lift.toFixed(0)}° (carriage +${q.h.toFixed(0)} mm)`} · wrist ${q.wrist.toFixed(0)}° · claw ${q.grip.toFixed(0)}°`;
+  const jt = $("runJoints"); if (jt) jt.textContent = `turret ${q.turn.toFixed(0)}° · ${PAR ? `links ${(Math.asin(q.h / MO.params.link_len - Math.sin(MO.params.a0 * D2R)) / D2R).toFixed(1)}° (can +${q.h.toFixed(0)} mm, level)` : SHO ? `shoulder +${(Math.asin(q.h / MO.params.can_y) / D2R).toFixed(1)}° (can +${q.h.toFixed(0)} mm)` : `lift servo ${q.lift.toFixed(0)}° (carriage +${q.h.toFixed(0)} mm)`} · wrist ${q.wrist.toFixed(0)}° · claw ${q.grip.toFixed(0)}°`;
 }
 function tick(now) {
   if (RUN.t0 !== null && RT) runPose(now);
@@ -407,6 +414,27 @@ function renderInfo(s) {
         <div class="box"><h3>Trade-offs</h3><ul style="padding-left:18px;margin:4px 0"><li>The can tilts ${MO.params.lift_deg.toFixed(1)}° while it's up. It's level again when it's put down, because the arm returns to the same angle.</li><li>The MG996R sits on its side in a printed cradle. The cradle has to be stiff, so it gets gussets.</li><li>Same firmware and wiring: only the lift angles get re-taught (LIFT_DOWN / LIFT_UP).</li></ul></div>`;
       return;
     }
+    if (D.hybrid) {
+      const T = D.times, R = D.report.map(r => `<li>${r.replace(/PASS/g, '<b style="color:#1f7a45">PASS</b>')}</li>`).join(""), Pm = MO.params;
+      const col = (o, tot, n) => `<td style="vertical-align:top">${Object.entries(o).map(([k, v]) => `${k.replace(/_/g, " ")}: ${v.replace(/ \d+s$/, "")}`).join("<br>")}<br><b>${tot}</b> (${n} parts)</td>`;
+      I.innerHTML = `<div class="head"><span class="big">★</span><h2>Hybrid: printed + metal (Concept A3)</h2></div>
+        <p>Built from existing designs: the <b>EEZYbotARM</b>'s parallelogram arm, metal hardware where the loads are, and printing only for the custom shapes. <b>Concept only:</b> it passes the checks in CAD and has not been built.</p>
+        <div class="box fit"><h3>What it borrows and changes</h3><ul style="padding-left:18px;margin:4px 0">
+          <li><b>EEZYbotARM parallelogram.</b> Two equal links keep the claw level. Here they're aluminium flat bar, and the swing is symmetric (${(-Pm.a0).toFixed(1)}° to +${Pm.a0.toFixed(1)}°), so the can goes almost straight up ${Pm.h_max.toFixed(1)} mm with <b>no tilt</b> (the redesign tilted it ${Pm.a2_tilt.toFixed(1)}°).</li>
+          <li><b>Lower servo load.</b> With a parallelogram the MG996R only feels the load times the pin distance, about half the redesign's lever arm.</li>
+          <li><b>Hobby-arm practice:</b> the big servo on the joint that carries the load, the micro servos elsewhere, and a PCA9685 servo board with its own 6 V supply as the electronics upgrade.</li>
+          <li><b>Pour-arm rule:</b> one servo moves at a time. Our firmware already does this.</li></ul></div>
+        <div class="box"><h3>Metal and bought parts</h3><ul style="padding-left:18px;margin:4px 0">${D.bom.map(b => `<li><b>${b.f}</b>: ${b.part}</li>`).join("")}
+          <li><b>every pivot</b>: brass M3 heat-set inserts (melted in with a soldering iron)</li>
+          <li><b>option</b>: brass or steel module-1, 16-tooth spur gears for the claw (same size as the printed ones)</li></ul></div>
+        <div class="box"><h3>Print time (same slicer profile)</h3><table style="width:100%;border-collapse:collapse;font-size:12px">
+          <tr><th style="text-align:left">A (as built)</th><th style="text-align:left">A2 redesign</th><th style="text-align:left">A3 hybrid</th></tr>
+          <tr>${col(T.a, T.a_total, 6)}${col(T.a2, T.a2_total, 3)}${col(T.new, T.new_total, 4)}</tr></table>
+          <small>The claw is the same in all three, so it's left out. A3 includes the drill jig.</small></div>
+        <div class="box"><h3>Checks</h3><ul style="padding-left:18px;margin:4px 0">${R}</ul></div>
+        <div class="box"><h3>Why it scales</h3><ul style="padding-left:18px;margin:4px 0"><li>Loads and precise fits are on catalogue metal parts, which come out the same every time.</li><li>The printed drill jig makes every link identical, so you don't need a CNC machine.</li><li>One screw size (M3) with brass threads: it can be taken apart and rebuilt without wearing out.</li><li>A failed print costs one small part, not the robot.</li></ul></div>`;
+      return;
+    }
     if (D.planb) {
       I.innerHTML = `<div class="head"><span class="big">★</span><h2>Plan B: wooden base + carriage repair</h2></div>
         <p>Use this if the base or the carriage print fails. The wooden base keeps every height of the printed one, so the bearing, the turntable servo and the whole column sit exactly where they would on the printed base (checked in CAD: nothing overlaps).</p>
@@ -428,7 +456,11 @@ function renderInfo(s) {
     I.innerHTML = `<div class="head"><span class="big">▶</span><h2>Watch it run</h2></div>
       <div class="box fit"><h3>Now</h3><b id="runPhase" style="font-size:16px">–</b><br><small id="runJoints"></small></div>
       <button class="tb" id="runPause" style="width:100%;justify-content:center;padding:9px">❚❚ Pause</button>
-      <div class="box"><h3>What moves what</h3><ul>${SHO ? `
+      <div class="box"><h3>What moves what</h3><ul>${PAR ? `
+        <li><b>Turntable servo (MG90S)</b> turns the turret on the 6807 bearing.</li>
+        <li><b>Shoulder servo (MG996R)</b> swings aluminium link A; link B follows, and the coupler with the claw rises <b>without tilting</b>.</li>
+        <li><b>Wrist servo</b> on the coupler turns the gripper 180° to flip the can.</li>
+        <li><b>Gripper servo (SG90)</b> turns the left gear; the gears turn both fingers together.</li></ul></div>` : SHO ? `
         <li><b>Turntable servo (MG90S)</b> turns the turret on the 6807 bearing.</li>
         <li><b>Shoulder servo (MG996R)</b> tilts the whole arm up ${MO.params.lift_deg.toFixed(1)}° to lift the can.</li>
         <li><b>Wrist servo</b> on the arm's end turns the gripper 180° to flip the can.</li>

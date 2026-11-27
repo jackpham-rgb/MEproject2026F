@@ -1,0 +1,8 @@
+CAN LANDING: centre (127.0, 0.0), upside down 180.0 deg, bottom z -0.0 -> PASS
+COLLISIONS through the firmware sequence (every 4th of 289 poses): PASS (none)
+LIFT: links swing -10.7 -> +10.7 deg, can +15.7 mm (>= 15.2), can tilt while lifted 0.00 deg (A2: 7.1), forward drift 0.74 mm mid-stroke, 0.00 at the top -> PASS
+SHOULDER (MG996R): load 71 g; a parallelogram's driven link only sees the load x the pin distance (41 mm), not the CG's (90 mm): 0.64 kg*cm with 2x dynamic vs 9.4 stall: 7 % -> PASS
+PIVOT LOAD: the overhang moment goes into the links as push/pull: 0.9 N per pin (91 g) vs ~600 N an M3 shoulder screw in aluminium takes -> PASS
+TURNTABLE (MG90S): 0.020 kg*cm to accelerate vs 1.8 stall: 1.1 % -> PASS
+TIP-OVER (with the 2 x 60 g washer stacks): CG -2 mm toward the front edge at 38, 15 mm toward the side edge at 60 -> PASS
+PRINT TIME, same profile: A (as built) 21 h 53, A2 (redesign) 9 h 03, A3 (hybrid) tower 3h 19m 15s, turret 3h 26m 22s, coupler 44m 4s, link_jig 35m 44s = 8 h 04 (63 % less than A; claw the same in all three)
