@@ -1,0 +1,57 @@
+SCREWS (hybrid build)
+  hs_01 M3x6 tower                    into tower                  bite   9.2 mm3  PASS
+  hs_02 M3x6 tower                    into tower                  bite   9.2 mm3  PASS
+  hs_03 M3x6 tower                    into tower                  bite   9.2 mm3  PASS
+  hs_04 M3x6 tower                    into tower                  bite   9.2 mm3  PASS
+  hs_05   M6 ballast_L                into ballast_L              bite 254.5 mm3  PASS
+  hs_06   M6 ballast_R                into ballast_R              bite 254.5 mm3  PASS
+  hs_07   sb turntable_servo_MG90S    into tower                  bite  52.1 mm3  PASS
+  hs_08   sb turntable_servo_MG90S    into tower                  bite  52.1 mm3  PASS
+  hs_09   sb turntable_horn           into turret                 bite  42.8 mm3  PASS
+  hs_10   sb turntable_horn           into turret                 bite  42.8 mm3  PASS
+  hs_11   sb turntable_horn           into turret                 bite  42.8 mm3  PASS
+  hs_12   sb turntable_horn           into turret                 bite  42.8 mm3  PASS
+  hs_13   #8 shoulder_servo_MG996R    into turret                 bite  73.2 mm3  PASS
+  hs_14   #8 shoulder_servo_MG996R    into turret                 bite  73.2 mm3  PASS
+  hs_15   #8 shoulder_servo_MG996R    into turret                 bite 283.2 mm3  PASS
+  hs_16   #8 shoulder_servo_MG996R    into turret                 bite 283.2 mm3  PASS
+  hs_17 M3x6 link_A                   into shoulder_horn          bite  44.7 mm3  PASS
+  hs_18 M3x6 link_A                   into shoulder_horn          bite  44.7 mm3  PASS
+  hs_19   M3 shoulder_horn            into shoulder_servo_MG996R  bite  41.7 mm3  PASS
+  hs_20   sh pivot_B_screw            into turret                 bite  78.0 mm3  PASS
+  hs_21   sh pivot_A2_screw           into coupler                bite  50.1 mm3  PASS
+  hs_22   sh pivot_B2_screw           into coupler                bite  50.1 mm3  PASS
+RESULT: every screw reaches its part and hits nothing else
+SCREWDRIVER ACCESS (80 mm shaft behind each head, vs the parts in place at that step)
+  step  2 hs_05   M6 ballast_L              PASS
+  step  2 hs_06   M6 ballast_R              PASS
+  step  4 hs_01 M3x6 tower                  PASS
+  step  4 hs_02 M3x6 tower                  PASS
+  step  4 hs_03 M3x6 tower                  PASS
+  step  4 hs_04 M3x6 tower                  PASS
+  step  5 hs_07   sb turntable_servo_MG90S  PASS
+  step  5 hs_08   sb turntable_servo_MG90S  PASS
+  step  7 hs_09   sb turntable_horn         PASS
+  step  7 hs_10   sb turntable_horn         PASS
+  step  7 hs_11   sb turntable_horn         PASS
+  step  7 hs_12   sb turntable_horn         PASS
+  step  9 hs_13   #8 shoulder_servo_MG996R  PASS
+  step  9 hs_14   #8 shoulder_servo_MG996R  PASS
+  step  9 hs_15   #8 shoulder_servo_MG996R  PASS
+  step  9 hs_16   #8 shoulder_servo_MG996R  PASS
+  step 10 hs_17 M3x6 link_A                 PASS
+  step 10 hs_18 M3x6 link_A                 PASS
+  step 10 hs_19   M3 shoulder_horn          PASS
+  step 11 hs_20   sh pivot_B_screw          PASS
+  step 12 hs_21   sh pivot_A2_screw         PASS
+  step 12 hs_22   sh pivot_B2_screw         PASS
+  step 13 screw_18   sb wrist_servo            PASS
+  step 13 screw_19   sb wrist_servo            PASS
+  step 14 screw_21   sb gripper_frame          PASS
+  step 14 screw_22   sb gripper_frame          PASS
+  step 14 screw_23   sb gripper_frame          PASS
+  step 14 screw_24   sb gripper_frame          PASS
+  step 17 screw_26   sb gripper_servo_SG90     PASS
+  step 17 screw_27   sb gripper_servo_SG90     PASS
+  step 17 screw_28   sb gripper_horn           PASS
+  step 17 screw_29   sb gripper_horn           PASS

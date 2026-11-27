@@ -45,6 +45,9 @@ CA = (PA[0] + L * math.cos(math.radians(A0)), PA[1] - L * math.sin(math.radians(
 CB = (CA[0], CA[1] + S)
 LX = (17.0, 17.0 + BAR_T)                     # links' x layer (outside the aluminium horn)
 CX = (LX[1] + 0.3, LX[1] + 4.3)               # coupler x layer
+INSERT_R = (4.0 + 1.0) / 2                    # M3 heat-set insert wants a 4.0 hole; this printer prints holes ~1 mm small
+PIN_D = 4.0                                   # pivot holes in the links (5/32" bit): M3 shoulder screws have a 4 mm shoulder
+FL_T = 5.0                                    # tower flange: deep enough for an M3 x 4 insert
 
 
 def link_bar(p0, p1):
@@ -54,7 +57,7 @@ def link_bar(p0, p1):
         wp().center((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2).transformed(rotate=(0, 0, ang)).rect(math.dist(p0, p1), BAR_W).extrude(BAR_T))
     b = cq.Workplane("XY").add(b.val())
     for p in (p0, p1):
-        b = b.cut(cyl_dir((LX[0] - 1, p[0], p[1]), (1, 0, 0), 3.3 / 2, BAR_T + 2))      # 3.3 mm drilled (M3 shoulder screw)
+        b = b.cut(cyl_dir((LX[0] - 1, p[0], p[1]), (1, 0, 0), PIN_D / 2, BAR_T + 2))     # drilled: the shoulder screw's 4 mm shoulder
     return b
 
 
@@ -69,14 +72,17 @@ def build():
     plate = box(-60, 60, -72, 38, 0, IN / 8)
     for x, y in ((-50, -62), (50, -62), (-50, 28), (50, 28)):
         plate = plate.cut(cyl(x, y, 2.2, -1, 5))                                            # rubber-foot holes
+    for cx in (-38, 38):
+        plate = plate.cut(cyl(cx, -48, 3.25, -1, 5))                                        # M6 bolt for the washer ballast
     a2 = base_parts["base"]["shape"]
     tower = a2.cut(box(-61, 61, -73, 39, -1, IN / 8))
     for cx in (-38, 38):
         tower = tower.cut(cyl(cx, -48, 13.2, 0, 18))
-    tower = tower.union(cyl(0, 0, 34, IN / 8, IN / 8 + 3).cut(cyl(0, 0, 25, 0, 10)))      # flange: 4 M3 screws through the sheet
+    tower = tower.union(cyl(0, 0, 34, IN / 8, IN / 8 + FL_T).cut(cyl(0, 0, 25, 0, 20)))   # flange: 4 M3 screws up through the sheet
+    tower = tower.cut(box(-6, 6, -36, -20, IN / 8 - 1, 16))                                 # cable slot, re-cut through the flange
     for a in (45, 135, 225, 315):
         x, y = 30 * math.cos(math.radians(a)), 30 * math.sin(math.radians(a))
-        tower = tower.cut(cyl(x, y, 2.0, 0, 8))
+        tower = tower.cut(cyl(x, y, INSERT_R, 0, IN / 8 + FL_T - 0.8))                      # M3 heat-set insert, blind
         plate = plate.cut(cyl(x, y, 1.7, -1, 5))
     add("base_plate", "fixed", plate, "metal", 0.0027 * 120 * 110 * IN / 8, "1/8\" aluminium sheet 120 x 110, drilled from the printed jig")
     add("tower", "fixed", tower, "printed")
@@ -89,14 +95,14 @@ def build():
 
     # ---------------- turret: A2's turret + an ear on the cradle for the idle link's pivot
     ear = box(4.0, 16.5, -6, 6, PB[1] - 7, PB[1] + 7).union(box(0.1, 4.1, -15, 15, 97, PB[1] + 7))
-    ear = ear.cut(cyl_dir((3.9, PB[0], PB[1]), (1, 0, 0), 2.1, 14))                        # M3 heat-set insert
+    ear = ear.cut(cyl_dir((3.9, PB[0], PB[1]), (1, 0, 0), INSERT_R, 14))                   # M3 heat-set insert
     turret = base_parts["turret"]["shape"].union(ear)
     add("turret", "turret", turret, "printed")
     for n in ("turntable_horn", "shoulder_servo_MG996R"):
         b = base_parts[n]
         add(n, "turret", b["shape"], "bought", b["mass"])
     add("pivot_B_screw", "turret", cyl_dir((10.0, PB[0], PB[1]), (1, 0, 0), 1.5, LX[1] - 10 + 2.5).union(
-        cyl_dir((LX[1] + 0.1, PB[0], PB[1]), (1, 0, 0), 2.75, 2.4)), "metal", 1.0, "M3 x 10 shoulder screw into a heat-set insert")
+        cyl_dir((LX[1] + 0.1, PB[0], PB[1]), (1, 0, 0), 2.75, 2.4)), "metal", 1.0, "M3 shoulder screw (4 mm shoulder x 4 mm long) into a heat-set insert")
 
     # ---------------- parallelogram: 2 aluminium links (+ the metal horn on the driven one)
     horn = cyl_dir((R.SH_TIP_X, PA[0], PA[1]), (1, 0, 0), 12.0, 3.0)
@@ -122,11 +128,11 @@ def build():
         brkt = brkt.cut(cyl_dir((0, by1 - 5, hz), (0, 1, 0), TOL["servo_pilot"] / 2, 7))
     cpl = cpl.union(cross).union(brkt)
     for c in (CA, CB):
-        cpl = cpl.cut(cyl_dir((CX[0] - 1, c[0], c[1]), (1, 0, 0), 2.1, 6))                 # M3 heat-set inserts
+        cpl = cpl.cut(cyl_dir((CX[0] - 1, c[0], c[1]), (1, 0, 0), INSERT_R, 6))            # M3 heat-set inserts
     add("coupler", "lift", cpl, "printed")
     for nm, c in (("pivot_A2_screw", CA), ("pivot_B2_screw", CB)):
         add(nm, "lift", cyl_dir((LX[0] - 2.4, c[0], c[1]), (1, 0, 0), 2.75, 2.4).union(cyl_dir((LX[0], c[0], c[1]), (1, 0, 0), 1.5, BAR_T + 4)),
-            "metal", 1.0, "M3 x 8 shoulder screw into a heat-set insert")
+            "metal", 1.0, "M3 shoulder screw (4 mm shoulder x 4 mm long) into a heat-set insert")
     add("wrist_servo", "lift", moved(micro_servo_local(), trsf_axes((0, WY, GZ), (0, 0, -1), (0, 1, 0))), "bought", 13.0)
 
     # ---------------- claw + can (as now)
@@ -137,11 +143,11 @@ def build():
 
 
 def jig():
-    """Printed drill jig: the bar drops into the slot, drill both 3.3 mm holes through the bushings -> identical links."""
+    """Printed drill jig: the bar drops into the slot, drill both 4.0 mm holes through the bushings -> identical links."""
     j = box(-14, L + 10, -BAR_W / 2 - 4, BAR_W / 2 + 4, 0, 8)
     j = j.cut(box(-BAR_W / 2 - 0.3, L + 11, -BAR_W / 2 - 0.2, BAR_W / 2 + 0.2, 4, 9))    # slot; the bar's end butts on the stop
     for x in (0, L):
-        j = j.cut(cyl(x, 0, 3.3 / 2 + 0.5, -1, 9))                                          # +0.5: this printer prints holes ~1 mm small
+        j = j.cut(cyl(x, 0, (PIN_D + 1.0) / 2, -1, 9))                                      # drill guide; +1: this printer prints holes ~1 mm small
     return j
 
 
@@ -285,7 +291,7 @@ def main():
     steps = [
         step(1, "Cut the metal: plate + 2 links (printed jig)", ["base_plate", "link_A", "link_B"], [],
              f"Base: 1/8\" aluminium sheet, 120 x 110 mm, holes drilled through a printed template. Links: two pieces of 1/8\" x 1/2\" "
-             f"flat bar. Drop each one in the <b>printed drill jig</b> and drill both 3.3 mm holes through it: the holes come out exactly "
+             f"flat bar. Drop each one in the <b>printed drill jig</b> and drill both 4.0 mm (5/32\") holes through it: the holes come out exactly "
              f"{L:.0f} mm apart on both links. A parallelogram only stays level if the two links are identical, so the jig is the key part."),
         step(2, "Tower + turntable servo + bearing on the plate", ["tower", "turntable_servo_MG90S", "bearing_6807", "ballast_L", "ballast_R"],
              ["base_plate"], "The printed tower screws onto the plate with 4 M3 screws. The MG90S goes inside (2 tab screws) and the 6807 presses "

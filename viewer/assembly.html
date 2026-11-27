@@ -121,18 +121,19 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 const $ = id => document.getElementById(id);
 let D;
 const DATA = new URLSearchParams(location.search).get("data");
-const PLANB = DATA === "planb", FIXES = DATA === "fixes", REDES = DATA === "redesign", HYB = DATA === "hybrid";
-try { D = await (await fetch(PLANB ? "data/planb.json" : FIXES ? "data/fixes.json" : REDES ? "data/redesign.json" : HYB ? "data/hybrid.json" : "data/assembly.json")).json(); }
+const PLANB = DATA === "planb", FIXES = DATA === "fixes", REDES = DATA === "redesign", HYB = DATA === "hybrid", HYBB = DATA === "hybrid_build";
+try { D = await (await fetch(PLANB ? "data/planb.json" : FIXES ? "data/fixes.json" : REDES ? "data/redesign.json" : HYB ? "data/hybrid.json" : HYBB ? "data/hybrid_build.json" : "data/assembly.json")).json(); }
 catch (e) { $("loading").textContent = "Couldn't load data/assembly.json. Open this page from the project website (or a local web server), not as a file."; return; }
 $("loading").remove();
 if (D.title) { document.title = D.title; document.querySelector("#steps h1").textContent = D.title; }
 const other = document.querySelector("#steps .sub");
 document.querySelector("#steps h1").insertAdjacentHTML("afterend", `<div class="tabs">
-  <a class="tab ${!PLANB && !FIXES && !REDES && !HYB ? "on" : ""}" href="assembly.html">Assembly</a>
+  <a class="tab ${!PLANB && !FIXES && !REDES && !HYB && !HYBB ? "on" : ""}" href="assembly.html">Assembly</a>
   <a class="tab ${FIXES ? "on" : ""}" href="assembly.html?data=fixes">Proposed fixes</a>
   <a class="tab ${PLANB ? "on" : ""}" href="assembly.html?data=planb">Plan B</a>
   <a class="tab ${REDES ? "on" : ""}" href="assembly.html?data=redesign">Redesign</a>
-  <a class="tab ${HYB ? "on" : ""}" href="assembly.html?data=hybrid">Hybrid</a></div>`);
+  <a class="tab ${HYB ? "on" : ""}" href="assembly.html?data=hybrid">Hybrid</a>
+  <a class="tab ${HYBB ? "on" : ""}" href="assembly.html?data=hybrid_build">Hybrid build</a></div>`);
 if (FIXES) $("legend").insertAdjacentHTML("beforeend", '<span><i class="sw" style="background:#e0352b;opacity:.45"></i> OLD part (what you printed before)</span>');
 
 // ---------------- scene
@@ -187,7 +188,7 @@ const printedSet = new Set(D.printed);
 // ---------------- step list
 const LV = D.levels;
 const steps = [{ n: 0, title: D.fixes ? "What changed, and why" : D.redesign || D.hybrid ? "The idea, and what it saves" : "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can" && !n.startsWith("old_")).concat(["test_can"]), screws: [], glue: [] },
-  ...(D.planb || D.fixes || D.redesign || D.hybrid ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
+  ...(D.planb || D.fixes || D.redesign || D.hybrid || D.hybrid_build ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
   ...(D.motion ? [{ n: "▶", title: "Watch it run: the whole movement", run: true, level: null, new: [],
     show: Object.keys(owners).filter(n => !n.startsWith("old_")), screws: [], glue: [] }] : [])];
 const list = $("list");
@@ -412,6 +413,23 @@ function renderInfo(s) {
           <small>Gripper frame and fingers are the same in both, so they're left out.</small></div>
         <div class="box"><h3>Checks</h3><ul style="padding-left:18px;margin:4px 0">${R}</ul></div>
         <div class="box"><h3>Trade-offs</h3><ul style="padding-left:18px;margin:4px 0"><li>The can tilts ${MO.params.lift_deg.toFixed(1)}° while it's up. It's level again when it's put down, because the arm returns to the same angle.</li><li>The MG996R sits on its side in a printed cradle. The cradle has to be stiff, so it gets gussets.</li><li>Same firmware and wiring: only the lift angles get re-taught (LIFT_DOWN / LIFT_UP).</li></ul></div>`;
+      return;
+    }
+    if (D.hybrid_build) {
+      I.innerHTML = `<div class="head"><span class="big">★</span><h2>Build the hybrid (Concept A3)</h2></div>
+        <p>${D.steps.length} steps, each one animated: the new parts fly into place, and every screw drives in along its dashed path with its hole size and drill bit. The order is checked in CAD: every screw seats in its part, and a screwdriver can reach it when its step comes. The design behind it is in the <a href="assembly.html?data=hybrid">Hybrid</a> tab.</p>
+        <div class="box fit"><h3>The order</h3><ol style="margin:4px 0;padding-left:20px">
+          <li>Metal first: drill both links with the jig, cut and drill the plate (1–2)</li>
+          <li>Brass inserts into the printed parts (3)</li>
+          <li>Base: tower, turntable servo, bearing (4–6)</li>
+          <li>Turret and shoulder servo (7–9)</li>
+          <li>Parallelogram: link A, link B, coupler, wrist servo (10–13)</li>
+          <li>Claw, the same as the main guide (14–19)</li>
+          <li>Wire it and re-teach the lift (20)</li></ol></div>
+        ${Object.entries(LV).map(([k, v]) => `<div class="lvl ${k}"><b>${v.label}</b>${v.text}<br><small>Steps: ${D.steps.filter(x => x.level === k).map(x => x.n).join(", ")}</small></div>`).join("")}
+        <div class="box"><h3>Tools and printing</h3><ul>${D.while_waiting.map(t => `<li>${t}</li>`).join("")}</ul></div>
+        <div class="box"><h3>Colours</h3><span class="chip pr">blue = printed</span><span class="chip bo">orange outline = bought (metal parts in grey)</span><span class="chip sc">grey = screw</span><span class="chip gl">yellow = glue</span></div>
+        <div class="box"><small>Concept: checked in CAD, not built yet.</small></div>`;
       return;
     }
     if (D.hybrid) {

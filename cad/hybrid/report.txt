@@ -5,4 +5,4 @@ SHOULDER (MG996R): load 71 g; a parallelogram's driven link only sees the load x
 PIVOT LOAD: the overhang moment goes into the links as push/pull: 0.9 N per pin (91 g) vs ~600 N an M3 shoulder screw in aluminium takes -> PASS
 TURNTABLE (MG90S): 0.020 kg*cm to accelerate vs 1.8 stall: 1.1 % -> PASS
 TIP-OVER (with the 2 x 60 g washer stacks): CG -2 mm toward the front edge at 38, 15 mm toward the side edge at 60 -> PASS
-PRINT TIME, same profile: A (as built) 21 h 53, A2 (redesign) 9 h 03, A3 (hybrid) tower 3h 19m 15s, turret 3h 26m 22s, coupler 44m 4s, link_jig 35m 44s = 8 h 04 (63 % less than A; claw the same in all three)
+PRINT TIME, same profile: A (as built) 21 h 53, A2 (redesign) 9 h 03, A3 (hybrid) tower 3h 24m 17s, turret 3h 26m 48s, coupler 43m 59s, link_jig 36m 5s = 8 h 09 (63 % less than A; claw the same in all three)
