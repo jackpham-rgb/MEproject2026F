@@ -476,7 +476,7 @@ function renderInfo(s) {
     if (D.original) {
       I.innerHTML = `<div class="head"><span class="big">★</span><h2>Original parts: make them work</h2></div>
         <p>This is the guide exactly as it was when you printed the parts on 23 Nov (${D.steps.length} steps). Use it for parts you've already printed. Those parts have the problems below; each one has a fix you can do by hand, without reprinting. The fixed design and its guide are in tab <a href="assembly.html">2 · Fixed</a>.</p>
-        <div class="box fit"><h3>Known problems → what to do</h3><ol style="margin:4px 0;padding-left:20px">${D.known_issues.map(([a, b]) => `<li><b>${a}.</b> ${b}</li>`).join("")}</ol></div>
+        <div class="box fit"><h3>Known problems → what to do</h3><ol style="margin:4px 0;padding-left:20px">${D.known_issues.map(([a, b]) => `<li><b>${a}.</b> ${b}</li>`).join("")}</ol>${D.fix_check ? `<small>${D.fix_check}</small>` : ""}</div>
         ${Object.entries(LV).map(([k, v]) => `<div class="lvl ${k}"><b>${v.label}</b>${v.text}<br><small>Steps: ${D.steps.filter(x => x.level === k).map(x => x.n).join(", ")}</small></div>`).join("")}
         <div class="box"><h3>Next: measure first</h3>Step <b>M</b>: measure what you printed against the CAD before you start.</div>`;
       return;

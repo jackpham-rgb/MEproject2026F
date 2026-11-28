@@ -21,6 +21,31 @@ import redesign as R  # noqa: E402
 from model import cyl  # noqa: E402
 
 DROP = 5.0
+HORN_R = 10.4                                   # trim the round horn to 21 mm: the old base's servo blocks start 10.7 mm out
+
+
+def old_base_check(horn, spacer, tips):
+    """Clearances against the base AS PRINTED (model at git da6e43b, built in a temp folder)."""
+    import shutil
+    import tempfile
+    tmp = tempfile.mkdtemp()
+    subprocess.run(f"git archive da6e43b backend/cad | tar -x -C {tmp}", shell=True, cwd=ROOT, check=True)
+    code = (f"import sys, json; sys.path.insert(0, {os.path.join(tmp, 'backend', 'cad')!r}); import model as M\n"
+            "from model import cyl\n"
+            "b = next(p['shape'] for p in M.build_parts() if p['name'] == 'base')\n"
+            "import cadquery as cq\n"
+            "sh = {k: cq.importers.importStep(v) for k, v in json.loads(sys.argv[1]).items()}\n"
+            "out = {k: round(v.intersect(b).val().Volume(), 2) for k, v in sh.items()}\n"
+            "near = cyl(0, 0, 16, 20, 45).intersect(b).val().BoundingBox().zmax\n"
+            "rin = next(r / 10 for r in range(100, 160) if cyl(0, 0, r / 10, 20, 45).intersect(b).val().Volume() > 0.01)\n"
+            "print(json.dumps(dict(out=out, block_top=round(near, 1), block_r=round(rin, 1))))\n")
+    files = {}
+    for k, v in (("horn", horn), ("spacer", spacer), ("tips", tips)):
+        files[k] = os.path.join(tmp, k + ".step")
+        cq.exporters.export(cq.Workplane().add(v), files[k])
+    r = subprocess.run([sys.executable, "-c", code, json.dumps(files)], capture_output=True, text=True, cwd=tmp)
+    shutil.rmtree(tmp, ignore_errors=True)
+    return json.loads(r.stdout.strip().splitlines()[-1])
 OUT = os.path.join(ROOT, "viewer", "data", "original.json")
 FIX = os.path.join(ROOT, "cad", "print", "fix")
 
@@ -40,6 +65,10 @@ def main():
     for x, y in ((5.66, 5.66), (-5.66, 5.66), (-5.66, -5.66), (5.66, -5.66)):
         sp = sp.cut(cyl(x, y, 1.6, 40, 60))                                                # through: the plate screws pass
     tp = next(p["shape"] for p in M.build_parts() if p["name"] == "turret_plate")
+    horn_s = cyl(0, 0, HORN_R, 45.0, 48.0).union(cyl(0, 0, 5.0, 42.0, 45.0)).val()
+    tips_s = cyl(0, 0, 8.9, 43.0, 48.0).cut(cyl(0, 0, 7.1, 42, 49)).val()                  # where the screw tips sweep as it turns
+    chk = old_base_check(horn_s, sp.val(), tips_s)
+    print("vs the base as printed:", chk)
     clash = sp.intersect(tp).val().Volume()
     cq.exporters.export(sp, os.path.join(FIX, "horn_spacer_5mm.stl"), tolerance=0.02, angularTolerance=0.1)
     import print_prep as PP
@@ -50,8 +79,10 @@ def main():
     # ---- 3D: real-height MG996R (tabs where they are, spline 5 mm lower), horn 5 mm lower, the spacer, longer screws
     servo = next(m for m in cur["meshes"] if m["owner"] == "turntable_servo_MG996R")
     servo = dict(servo, v=[round(c - DROP if i % 3 == 2 else c, 2) for i, c in enumerate(servo["v"])])  # current model has it 5 mm higher (shorter blocks)
-    horn = [m for m in d["meshes"] if m["owner"] == "turntable_horn"]
-    horn = [dict(m, v=[round(c - DROP if i % 3 == 2 else c, 2) for i, c in enumerate(m["v"])]) for m in horn]
+    hm = cyl(0, 0, HORN_R, 45.0, 48.0).union(cyl(0, 0, 5.0, 42.0, 45.0)).cut(cyl(0, 0, 1.6, 40, 50))
+    for x, y in ((5.66, 5.66), (-5.66, 5.66), (-5.66, -5.66), (5.66, -5.66)):
+        hm = hm.cut(cyl(x, y, 0.8, 40, 50))
+    horn = [mesh("turntable_horn", hm.val(), "bought", "#f4f4f4")]
     long = []
     for s in d["screws"]:
         if s["owner"] == "turret_plate":
@@ -73,7 +104,12 @@ def main():
 
     for s in d["steps"]:
         if s["title"] == "Servo horn":
-            s["how"] = ("Turn the servo to 135° first (laptop panel). Press the round horn onto the spline with its 4 inner holes on "
+            s["how"] = ("<b>First, on the table: trim the round horn to Ø21 mm</b> (flush cutters round the rim, then sand smooth; "
+                        "the 4 holes 8 mm out keep ~1.6 mm of plastic round them). Lowered 5 mm, the horn passes just 1 mm over "
+                        "the tops of the base's 2 servo blocks, which start 10.7 mm from the centre; a full-size horn overlaps "
+                        "them and could scrape. At Ø21 it clears them sideways too. <b>Test before the turret goes on:</b> turn "
+                        "the horn by hand 180° each way. It must not touch anything. "
+                        "Turn the servo to 135° first (laptop panel). Press the round horn onto the spline with its 4 inner holes on "
                         "the diagonals, then the centre screw. <b>The horn now sits about 5 mm lower than the 3D model of 23 Nov "
                         "showed</b>, inside the bearing's bore: the real MG996R is 5 mm shorter. That's fine; the spacer in the next "
                         "step makes up the gap. Leave the base's servo blocks as they are.")
@@ -90,8 +126,8 @@ def main():
                         "level. The spacer is a 23-minute print and leaves the base untouched (checked in CAD: it fits inside the "
                         "plate's hub). File: cad/print/fix/horn_spacer_5mm.stl.")
     d["known_issues"] = [
-        ["MG996R spline stops 5 mm short of the turret horn", "<b>Don't sand the blocks inside the base.</b> Put the horn on the spline "
-         "where it is, drop a printed <b>5 mm horn spacer</b> on it (23 min print) and use 4 × #2 × 5/8″ screws through the plate. "
+        ["MG996R spline stops 5 mm short of the turret horn", "<b>Don't sand the blocks inside the base.</b> Trim the round horn to "
+         "Ø21 mm on the table (so it clears the servo blocks as it turns), put it on the spline where it is, drop a printed <b>5 mm horn spacer</b> on it (23 min print) and use 4 × #2 × 5/8″ screws through the plate. "
          "Shown in steps 4–5. <i>Easy · 15 min.</i>"],
         ["Wrist servo hits the base tower when the carriage is low", "No cutting: set <b>LIFT_DOWN</b> a few degrees higher in the laptop "
          "panel, so the carriage stops about 4 mm higher. The claw then grips the can 4 mm higher, which makes no difference. "
@@ -110,6 +146,10 @@ def main():
          "through the loose part before assembling. Never force a press fit. <i>Easy.</i>"],
     ]
     d["fix_files"] = [dict(name="horn_spacer_5mm.stl", time=t)]
+    d["fix_check"] = (f"Checked against the base as printed (git da6e43b): horn (trimmed Ø{2 * HORN_R:.0f}) overlap {chk['out']['horn']} mm3, "
+                      f"spacer {chk['out']['spacer']} mm3, screw tips {chk['out']['tips']} mm3. Servo blocks start {chk['block_r']} mm "
+                      f"out, tops at z {chk['block_top']}: the horn clears them by {chk['block_r'] - HORN_R:.1f} mm sideways and "
+                      f"{45.0 - chk['block_top']:.1f} mm above.")
     d["screw_names"]["#2"] = "#2 × 5/8″ pan-head sheet-metal screw"
     d["title"] = "1 · Original parts (as printed 23 Nov)"
     d["original"] = True
