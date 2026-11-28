@@ -1,4 +1,4 @@
-"""Step-by-step build guide for Concept A3 (hybrid), in the same format as the main guide.
+"""Step-by-step build guide for Plan D (hybrid), in the same format as the main guide.
 
     python3.13 backend/cad/hybrid_build.py  ->  viewer/data/hybrid_build.json  (viewer/assembly.html?data=hybrid_build)
 

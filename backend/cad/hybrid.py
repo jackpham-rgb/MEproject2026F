@@ -1,4 +1,4 @@
-"""Concept A3 "hybrid": Concept A2 (shoulder, MG90S turntable) + the EEZYbotARM's parallelogram arm, built from bought
+"""Plan D "hybrid": Concept A2 (shoulder, MG90S turntable) + the EEZYbotARM's parallelogram arm, built from bought
 metal stock where loads and precise fits are, printed only where a custom shape is needed.
 
     python3.13 backend/cad/hybrid.py  ->  viewer/data/hybrid.json (viewer/assembly.html?data=hybrid)
@@ -266,7 +266,7 @@ def main():
     prev = json.load(open(R.OUT))["times"]
     tot = lambda d: sum(R.minutes(v) for v in d.values())  # noqa: E731
     rep.append("PRINT TIME, same profile: A (as built) " + prev["old_total"] + ", A2 (redesign) " + prev["new_total"] +
-               ", A3 (hybrid) " + ", ".join(f"{k} {v}" for k, v in times.items()) + f" = {R.hm(tot(times))}"
+               ", D (hybrid) " + ", ".join(f"{k} {v}" for k, v in times.items()) + f" = {R.hm(tot(times))}"
                f" ({100 - 100 * tot(times) / tot(prev['old']):.0f} % less than A; claw the same in all three)")
     times = dict(new=times, new_total=R.hm(tot(times)), a=prev["old"], a_total=prev["old_total"], a2=prev["new"], a2_total=prev["new_total"])
     open(os.path.join(DIR, "report.txt"), "w").write("\n".join(rep) + "\n")

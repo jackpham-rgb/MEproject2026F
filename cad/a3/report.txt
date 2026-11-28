@@ -1,0 +1,5 @@
+CAN LANDING: centre (127.0, 0.0), upside down 180.0 deg -> PASS
+COLLISIONS through the firmware sequence (every 4th of 289 poses, new arm included): PASS (none)
+LIFT: lift servo turns the arm 6.8 deg (was 68 deg of crank) -> can +15.7 mm (>= 15.2); the can leans 6.8 deg and moves 10 mm outward while up, both undone when it is lowered -> PASS
+LIFT SERVO (MG90S, 1.8 kg*cm at 4.8 V / 2.2 at 6 V): load 73 g, CG 94 mm out -> holding 0.68 kg*cm + accelerating 0.04. Without help: 40 % of stall (inside the 50 % rule, thin margin if the supply sags). With the rubber-band assist carrying ~0.54 kg*cm: 10 % -> PASS
+PRINT: one new part, the arm: 55m 55s (same profile as the other plans). Everything else is already printed.
