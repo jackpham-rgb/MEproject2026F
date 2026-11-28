@@ -71,6 +71,7 @@ def main():
     print("vs the base as printed:", chk)
     clash = sp.intersect(tp).val().Volume()
     cq.exporters.export(sp, os.path.join(FIX, "horn_spacer_5mm.stl"), tolerance=0.02, angularTolerance=0.1)
+    cq.exporters.export(sp, os.path.join(ROOT, "cad", "print", "stl", "CA-104_horn_spacer.stl"), tolerance=0.02, angularTolerance=0.1)  # for the plates
     import print_prep as PP
     R.DIR = FIX
     t = R.slice_one(sp.val(), "horn_spacer_5mm", os.path.join(ROOT, "cad", "print", "reprint", "reprint_a.ini"), PP, keep=True)

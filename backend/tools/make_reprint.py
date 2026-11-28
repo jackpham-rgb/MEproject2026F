@@ -73,6 +73,13 @@ PLATES = [   # round 2 (2026-11-24). Round 1 plates 1, 4, 5, 6, 7, 9: archive/re
     ("f  Carriage arm + gripper frame + lift link (the base is reused: sand its 2 servo blocks)", "STANDARD",
      {**FAST, **EASY_SUP, "perimeters": "4", "fill_density": "15%", "fill_pattern": "cubic"},
      ["CA-301", "CA-401", "CA-302"], "everything that must be reprinted, nothing that can be reused"),
+    ("g  Carriage arm + lift link + horn spacer: the Fixed build from your original parts", "STANDARD",
+     {**FAST, **EASY_SUP, "perimeters": "4", "fill_density": "15%", "fill_pattern": "cubic"},
+     ["CA-301", "CA-302", "CA-104"], "only what can't be fixed by hand: the snapped carriage, the new lift link (14 mm crank horn), "
+     "the 5 mm horn spacer (old base: no sanding). Base, turret plate, spine, top cap, gripper frame, fingers: reused"),
+    ("h  g + gripper frame", "STANDARD",
+     {**FAST, **EASY_SUP, "perimeters": "4", "fill_density": "15%", "fill_pattern": "cubic"},
+     ["CA-301", "CA-401", "CA-302", "CA-104"], "g + a new gripper frame, if the old claw is already built (instead of opening its horn hole)"),
     ("2  Whole claw: gripper frame + both fingers", "DETAIL",
      {**FAST, **EASY_SUP, "perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
       "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
@@ -80,6 +87,7 @@ PLATES = [   # round 2 (2026-11-24). Round 1 plates 1, 4, 5, 6, 7, 9: archive/re
 ]
 PER_PART = {"CA-301_carriage_arm": {"perimeters": "5", "fill_density": "30%", "fill_pattern": "gyroid"},   # the arm snapped: more walls
             "CA-302_lift_link": {"perimeters": "3", "fill_density": "0%", **BRIM},       # tiny: walls fill it
+            "CA-104_horn_spacer": {"perimeters": "3", "fill_density": "40%", "fill_pattern": "gyroid"},   # small disc, takes 4 screws
             "CA-101_base": {**BASE_FAST, "external_perimeter_speed": "45", "perimeter_speed": "60", "infill_speed": "90"},
             "CA-402_finger_R": {"perimeters": "5", "top_solid_layers": "5", "bottom_solid_layers": "5", "fill_density": "30%",
                                 "fill_pattern": "gyroid", "external_perimeter_speed": "25", "perimeter_speed": "35"},
@@ -106,6 +114,8 @@ def stability():
     brims = {}
     for _, _, _, pns, _ in PLATES:
         for pn in pns:
+            if pn not in pn_of:                               # parts made outside the main model (CA-104 horn spacer)
+                continue
             nm = pn_of[pn]
             lines += [f"## {pn} {D.PN[nm][1]}", "", "| Side on the bed | Contact (mm²) | Height (mm) | Tip ratio | Overhang (mm²) | Press fits vertical | |",
                       "|---|---:|---:|---:|---:|---|---|"]
