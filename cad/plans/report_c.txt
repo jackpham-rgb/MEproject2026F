@@ -1,0 +1,7 @@
+CAN LANDING: centre (127.0, 0.0), upside down 180.0 deg, bottom z -0.0 -> PASS
+COLLISIONS through the firmware sequence (every 4th of 289 poses): PASS (none)
+LIFT: links swing -10.7 -> +10.7 deg, can +15.7 mm (>= 15.2), can tilt while lifted 0.00 deg (A2: 7.1), forward drift 0.74 mm mid-stroke, 0.00 at the top -> PASS
+SHOULDER (MG996R): load 83 g; a parallelogram's driven link only sees the load x the pin distance (41 mm), not the CG's (83 mm): 0.73 kg*cm with 2x dynamic vs 9.4 stall: 8 % -> PASS
+PIVOT LOAD: the overhang moment goes into the links as push/pull: 0.9 N per pin (92 g) vs ~600 N an M3 shoulder screw in aluminium takes -> PASS
+TURNTABLE (MG90S): 0.021 kg*cm to accelerate vs 1.8 stall: 1.1 % -> PASS
+TIP-OVER (plywood base 634 g in total, 2 x 70 g washers): CG -6 mm toward the front edge at 38, 11 toward the side at 60 -> PASS

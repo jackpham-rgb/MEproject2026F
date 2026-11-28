@@ -73,7 +73,7 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 .mrow input.opt::placeholder{font-style:italic;font-size:12px}
 #info h4{margin:14px 0 2px;font-size:15px}
 .tabs{display:flex;flex-wrap:wrap;gap:4px;padding:0 12px 8px}
-.tab{flex:1 0 30%;text-align:center;font:700 12.5px system-ui,sans-serif;padding:6px 4px;border:1px solid var(--line);border-radius:7px;color:var(--ink);text-decoration:none}
+.tab{flex:1 0 22%;text-align:center;font:700 12.5px system-ui,sans-serif;padding:6px 4px;border:1px solid var(--line);border-radius:7px;color:var(--ink);text-decoration:none}
 .tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
 #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted)}
 @media (max-width:900px){
@@ -121,19 +121,23 @@ ul{margin:4px 0;padding-left:18px} li{margin:2px 0}
 const $ = id => document.getElementById(id);
 let D;
 const DATA = new URLSearchParams(location.search).get("data");
+const FILES = ["planb", "fixes", "redesign", "hybrid", "hybrid_build", "original", "planc", "plane"];
 const PLANB = DATA === "planb", FIXES = DATA === "fixes", REDES = DATA === "redesign", HYB = DATA === "hybrid", HYBB = DATA === "hybrid_build";
-try { D = await (await fetch(PLANB ? "data/planb.json" : FIXES ? "data/fixes.json" : REDES ? "data/redesign.json" : HYB ? "data/hybrid.json" : HYBB ? "data/hybrid_build.json" : "data/assembly.json")).json(); }
+try { D = await (await fetch(`data/${FILES.includes(DATA) ? DATA : "assembly"}.json`)).json(); }
 catch (e) { $("loading").textContent = "Couldn't load data/assembly.json. Open this page from the project website (or a local web server), not as a file."; return; }
 $("loading").remove();
 if (D.title) { document.title = D.title; document.querySelector("#steps h1").textContent = D.title; }
 const other = document.querySelector("#steps .sub");
-document.querySelector("#steps h1").insertAdjacentHTML("afterend", `<div class="tabs">
-  <a class="tab ${!PLANB && !FIXES && !REDES && !HYB && !HYBB ? "on" : ""}" href="assembly.html">Assembly</a>
-  <a class="tab ${FIXES ? "on" : ""}" href="assembly.html?data=fixes">Proposed fixes</a>
-  <a class="tab ${PLANB ? "on" : ""}" href="assembly.html?data=planb">Plan B</a>
-  <a class="tab ${REDES ? "on" : ""}" href="assembly.html?data=redesign">Redesign</a>
-  <a class="tab ${HYB ? "on" : ""}" href="assembly.html?data=hybrid">Hybrid</a>
-  <a class="tab ${HYBB ? "on" : ""}" href="assembly.html?data=hybrid_build">Hybrid build</a></div>`);
+// tabs: 1 original parts, 2 fixed (default), 3-7 plans B-F
+const TABS = [["original", "1 · Original", ["original"]], ["", "2 · Fixed", ["", null, "fixes"]], ["planb", "3 · Plan B", ["planb"]],
+  ["planc", "4 · Plan C", ["planc"]], ["hybrid_build", "5 · Plan D", ["hybrid_build", "hybrid"]], ["plane", "6 · Plan E", ["plane"]],
+  ["redesign", "7 · Plan F", ["redesign"]]];
+const TIPS = { original: "The parts you already printed: the original guide + how to make them work", "": "After the fixes: what changed, how it works, how to build it",
+  planb: "No printer: home materials + the parts you already have", planc: "Before 3D printers: plywood, aluminium, a shop",
+  hybrid_build: "Printer + hardware-store metal (realistic hybrid)", plane: "Online designs + engineering advice, DUM-E style",
+  redesign: "Redesigned from scratch for the least print time" };
+document.querySelector("#steps h1").insertAdjacentHTML("afterend", `<div class="tabs">${TABS.map(([k, label, on]) =>
+  `<a class="tab ${on.includes(DATA) || (k === "" && !FILES.includes(DATA)) ? "on" : ""}" title="${TIPS[k]}" href="assembly.html${k ? "?data=" + k : ""}">${label}</a>`).join("")}</div>`);
 if (FIXES) $("legend").insertAdjacentHTML("beforeend", '<span><i class="sw" style="background:#e0352b;opacity:.45"></i> OLD part (what you printed before)</span>');
 
 // ---------------- scene
@@ -170,7 +174,7 @@ for (const m of D.meshes) {
     metalness: m.kind === "screw" ? 0.6 : 0.05, transparent: true, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
   const mesh = new THREE.Mesh(g, mat);
   let edges = null;
-  if (m.kind === "printed" || m.kind === "can") {
+  if (m.kind === "printed" || m.kind === "can" || m.kind === "made") {
     edges = new THREE.LineSegments(new THREE.EdgesGeometry(g, 28), new THREE.LineBasicMaterial({ color: 0x0b1a33, transparent: true }));
   } else if (m.kind === "bought") {
     edges = new THREE.LineSegments(new THREE.EdgesGeometry(g, 35), new THREE.LineBasicMaterial({ color: 0xff8a00, transparent: true }));
@@ -184,11 +188,13 @@ for (const [n, o] of Object.entries(owners)) { o.group.name = n; scene.add(o.gro
 const screwBy = Object.fromEntries(D.screws.map(s => [s.name, s]));
 const glueSet = new Set(D.glue.map(g => g.name));
 const printedSet = new Set(D.printed);
+let FIXSUM = null;
+if (!FILES.includes(DATA)) fetch("data/fixes_summary.json").then(r => r.json()).then(x => { FIXSUM = x; if (cur === 0) renderInfo(steps[0]); }).catch(() => {});
 
 // ---------------- step list
 const LV = D.levels;
-const steps = [{ n: 0, title: D.fixes ? "What changed, and why" : D.redesign || D.hybrid ? "The idea, and what it saves" : "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can" && !n.startsWith("old_")).concat(["test_can"]), screws: [], glue: [] },
-  ...(D.planb || D.fixes || D.redesign || D.hybrid || D.hybrid_build ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
+const steps = [{ n: 0, title: D.fixes ? "What changed, and why" : D.redesign || D.hybrid || D.planc || D.plane ? "The idea, and what it saves" : D.original ? "Before you start: known problems" : "Before you start", level: null, new: [], show: Object.keys(owners).filter(n => n !== "test_can" && !n.startsWith("old_")).concat(["test_can"]), screws: [], glue: [] },
+  ...(D.planb || D.fixes || D.redesign || D.hybrid || D.hybrid_build || D.planc || D.plane ? [] : [{ n: "M", title: "Measure first: CAD vs real (calipers)", measure: true, level: null, new: [], show: [], screws: [], glue: [] }]), ...D.steps,
   ...(D.motion ? [{ n: "▶", title: "Watch it run: the whole movement", run: true, level: null, new: [],
     show: Object.keys(owners).filter(n => !n.startsWith("old_")), screws: [], glue: [] }] : [])];
 const list = $("list");
@@ -217,6 +223,7 @@ function styleOwner(n, isNew) {
   for (const it of o.items) {
     let c = it.base.clone();
     if (it.kind === "old") { it.mesh.material.color.copy(c); it.mesh.material.opacity = 0.32; it.mesh.material.depthWrite = false; continue; }
+    if (it.kind === "made") { /* shop-made (wood, acrylic): keep its own colour */ } else
     if (it.kind === "printed") c = realEl.checked ? new THREE.Color(0x8fa3b8) : PRINTED_COL.clone();
     if (ghost) c.lerp(new THREE.Color(dark ? 0x2a3038 : 0xffffff), 0.55);
     it.mesh.material.color.copy(c);
@@ -416,8 +423,8 @@ function renderInfo(s) {
       return;
     }
     if (D.hybrid_build) {
-      I.innerHTML = `<div class="head"><span class="big">★</span><h2>Build the hybrid (Concept A3)</h2></div>
-        <p>${D.steps.length} steps, each one animated: the new parts fly into place, and every screw drives in along its dashed path with its hole size and drill bit. The order is checked in CAD: every screw seats in its part, and a screwdriver can reach it when its step comes. The design behind it is in the <a href="assembly.html?data=hybrid">Hybrid</a> tab.</p>
+      I.innerHTML = `<div class="head"><span class="big">★</span><h2>Plan D: printer + hardware-store metal</h2></div>
+        <p>${D.steps.length} steps, each one animated: the new parts fly into place, and every screw drives in along its dashed path with its hole size and drill bit. The order is checked in CAD: every screw seats in its part, and a screwdriver can reach it when its step comes. Why it's designed this way (borrowed ideas, parts list, print times, checks): <a href="assembly.html?data=hybrid">Plan D overview →</a></p>
         <div class="box fit"><h3>The order</h3><ol style="margin:4px 0;padding-left:20px">
           <li>Metal first: drill both links with the jig, cut and drill the plate (1–2)</li>
           <li>Brass inserts into the printed parts (3)</li>
@@ -454,14 +461,42 @@ function renderInfo(s) {
       return;
     }
     if (D.planb) {
-      I.innerHTML = `<div class="head"><span class="big">★</span><h2>Plan B: wooden base + carriage repair</h2></div>
-        <p>Use this if the base or the carriage print fails. The wooden base keeps every height of the printed one, so the bearing, the turntable servo and the whole column sit exactly where they would on the printed base (checked in CAD: nothing overlaps).</p>
+      I.innerHTML = `<div class="head"><span class="big">★</span><h2>Plan B: the printer doesn't work</h2></div>
+        <p>Use what you have at home plus the parts already printed. Use this if the base or the carriage print fails. The wooden base keeps every height of the printed one, so the bearing, the turntable servo and the whole column sit exactly where they would on the printed base (checked in CAD: nothing overlaps).</p>
         <div class="box fit"><h3>Print first</h3>The 1:1 cutting templates: <a href="../docs/planb_templates.pdf">docs/planb_templates.pdf</a> (3 pages, print at 100 %, check the 50 mm bar).</div>
         <div class="box"><h3>Shopping</h3><ul>${D.while_waiting.map(t => `<li>${t}</li>`).join("")}</ul></div>
         <div class="box"><h3>Column</h3>Build the column exactly as in the <a href="assembly.html">main guide</a>, steps 1–15; step 8 here drops it onto the wooden base.</div>`;
       return;
     }
-    I.innerHTML = `<div class="head"><span class="big">★</span><h2>Before you start</h2></div>
+    if (D.original) {
+      I.innerHTML = `<div class="head"><span class="big">★</span><h2>Original parts: make them work</h2></div>
+        <p>This is the guide exactly as it was when you printed the parts on 23 Nov (${D.steps.length} steps). Use it for parts you've already printed. Those parts have the problems below; each one has a fix you can do by hand, without reprinting. The fixed design and its guide are in tab <a href="assembly.html">2 · Fixed</a>.</p>
+        <div class="box fit"><h3>Known problems → what to do</h3><ol style="margin:4px 0;padding-left:20px">${D.known_issues.map(([a, b]) => `<li><b>${a}.</b> ${b}</li>`).join("")}</ol></div>
+        ${Object.entries(LV).map(([k, v]) => `<div class="lvl ${k}"><b>${v.label}</b>${v.text}<br><small>Steps: ${D.steps.filter(x => x.level === k).map(x => x.n).join(", ")}</small></div>`).join("")}
+        <div class="box"><h3>Next: measure first</h3>Step <b>M</b>: measure what you printed against the CAD before you start.</div>`;
+      return;
+    }
+    if (D.planc || D.plane) {
+      const R = D.report.map(r => `<li>${r.replace(/PASS/g, '<b style="color:#1f7a45">PASS</b>')}</li>`).join("");
+      const head = D.planc
+        ? `<h2>Plan C: how it was done before 3D printers</h2></div>
+          <p>Nothing printed. It's the same robot (the Plan D parallelogram, the same 4 servos and the same claw position), built the way a school or hobby shop built robots before printers: <b>plywood</b> for the base, <b>1/8″ aluminium plate and angle</b> cut with a hacksaw and file, a <b>PVC pipe</b> hub, <b>tapped threads</b> instead of brass inserts, a <b>hex standoff</b> as a pivot, the claw outline in <b>acrylic</b>, and <b>bought brass gears</b>. Wood is tan, acrylic light blue, metal grey.</p>`
+        : `<h2>Plan E: online designs + engineering advice</h2></div>
+          <p>Plan D, upgraded with what engineers and the best online arms do. The look borrows the <b>DUM-E</b> idea from the Iron Man films: one sturdy arm on a <b>heavy round base</b>, with a simple claw (inspiration only, not a copy). The upgrades:</p>
+          <ul style="padding-left:18px"><li><b>Counterbalanced arm.</b> ${D.cw} g of washers on a tail behind the shoulder, so the servo holds nothing and only accelerates the arm (industrial practice).</li>
+          <li><b>Round, heavy base:</b> it can't tip whichever way the turret points.</li>
+          <li><b>EEZYbotARM parallelogram</b> (from Plan D): the can stays level.</li>
+          <li><b>Electronics:</b> a PCA9685 board on its own fused 6 V supply, soft (ramped) moves, strain relief at every joint, and an IR can-present sensor.</li></ul>`;
+      I.innerHTML = `<div class="head"><span class="big">★</span>${head}
+        <div class="box"><h3>Parts to buy or cut</h3><ul style="padding-left:18px;margin:4px 0">${D.bom.map(b => `<li><b>${b.f}</b>: ${b.part}</li>`).join("")}</ul></div>
+        <div class="box"><h3>Checks (CAD)</h3><ul style="padding-left:18px;margin:4px 0">${R}</ul></div>
+        <div class="box"><small>Concept: checked in CAD, not built yet. Same firmware sequence; re-teach LIFT_DOWN / LIFT_UP.</small></div>`;
+      return;
+    }
+    I.innerHTML = `<div class="head"><span class="big">★</span><h2>Fixed design: before you start</h2></div>
+      ${FIXSUM ? `<div class="box fit"><h3>What was fixed, and why</h3><ol style="margin:4px 0;padding-left:20px">${FIXSUM.map(x => `<li><b>${x.title}.</b> <small>${x.how.replace(/<[^>]+>/g, "").slice(0, 220)}${x.how.length > 220 ? "…" : ""}</small></li>`).join("")}</ol>
+        <a href="assembly.html?data=fixes">See every change in 3D: new part vs a red ghost of the old one →</a></div>` : ""}
+      <div class="box"><h3>How it works</h3>The <b>MG996R</b> turns the column on the 6807 bearing. The <b>MG90S</b> lift servo swings a crank, and the link pushes the <b>carriage</b> up the 2 rods (on the LM6UU bearings) by 15.7 mm. The <b>wrist servo</b> flips the claw 180°, and the <b>SG90</b> closes the geared fingers. Watch the whole cycle in the <b>▶</b> step at the end.</div>
       <p>${D.steps.length} steps: the column is built on the table first (1–15), the base last (16–19). Every step shows the new parts flying into place and every screw driving in along its dashed path. Rotate and zoom freely.</p>
       ${Object.entries(LV).map(([k, v]) => `<div class="lvl ${k}"><b>${v.label}</b>${v.text}<br><small>Steps: ${D.steps.filter(x => x.level === k).map(x => x.n).join(", ")}</small></div>`).join("")}
       <div class="box"><h3>Do while the precise parts print</h3><ul>${D.while_waiting.map(t => `<li>${t}</li>`).join("")}</ul></div>

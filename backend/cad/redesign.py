@@ -307,7 +307,7 @@ def main():
     ]
     data = dict(meshes=meshes, screws=[], glue=[], steps=steps, printed=sorted(p["name"] for p in parts if p["kind"] == "printed"),
                 names={p["name"]: p["name"].replace("_", " ") for p in parts}, screw_names={}, redesign=True, report=rep, times=times,
-                title="Concept A2: redesign from scratch",
+                title="Plan F: redesign from scratch (least printing)",
                 levels=dict(precise=dict(label="FIT", color="#c40000", text=""), try_=dict(label="TRY", color="#c77700", text=""),
                             easy=dict(label="CONCEPT", color="#1f7a45", text="Concept model: checked in CAD, not built yet.")),
                 while_waiting=[],

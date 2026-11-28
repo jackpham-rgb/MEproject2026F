@@ -316,7 +316,7 @@ def main():
     bom = [b for i, b in enumerate(bom) if b["part"] not in [x["part"] for x in bom[:i]]]
     data = dict(meshes=meshes, screws=[], glue=[], steps=steps, printed=sorted(p["name"] for p in parts if p["kind"] == "printed"),
                 names={p["name"]: p["name"].replace("_", " ") for p in parts}, screw_names={}, hybrid=True, report=rep, times=times, bom=bom,
-                title="Concept A3: hybrid (printed + metal)",
+                title="Plan D: hybrid overview (printed + metal)",
                 levels=dict(precise=dict(label="FIT", color="#c40000", text=""), try_=dict(label="TRY", color="#c77700", text=""),
                             easy=dict(label="CONCEPT", color="#1f7a45", text="Concept model: checked in CAD, not built yet.")),
                 while_waiting=[],

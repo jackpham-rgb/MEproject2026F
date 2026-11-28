@@ -286,7 +286,7 @@ def main():
     data = dict(meshes=meshes, screws=screws, glue=glue, steps=steps,
                 printed=sorted(p["name"] for p in parts if p["kind"] == "printed") + ["gripper_frame", "finger_L", "finger_R"],
                 names={**{p["name"]: p["name"].replace("_", " ") for p in parts}, **MAIN["names"]}, screw_names=SCREW_NAMES,
-                levels=levels, while_waiting=tools, hybrid_build=True, title="Concept A3 hybrid: build guide",
+                levels=levels, while_waiting=tools, hybrid_build=True, title="Plan D: hybrid build guide",
                 motion=dict(kind="parallel", groups=groups, sequence=json.load(open(os.path.join(HERE, "build", "viewer_mesh.json")))["sequence"],
                             params=dict(lift_theta0=0, grip_z=P["grip_z"], pivot_x=P["pivot_x"], pivot_y=P["pivot_y"], lift_servo_tip=[0, 0, 0],
                                         link_len=L, a0=A0, pa=list(H.PA), pb=list(H.PB), can_y=P["can_y"], h_max=H.H_MAX, a2_tilt=H.R.LIFT_DEG)))
